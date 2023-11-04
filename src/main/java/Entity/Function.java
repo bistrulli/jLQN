@@ -1,24 +1,23 @@
-package entity;
+package Entity;
 
 import java.net.URI;
 import java.util.ArrayList;
 
-import org.antlr.v4.parse.ANTLRParser.throwsSpec_return;
-
 public class Function {
-	String name=null;
-	URI Url=null;
-	Integer Concurrency=null;
-	String CPU=null;
-	String MEM=null;
-	
-	ArrayList<Activity> activities=null;
-	ArrayList<DecisionNode> dnodes=null;
-	
+	String name = null;
+	URI Url = null;
+	Integer Concurrency = null;
+	String CPU = null;
+	String MEM = null;
+
+	ArrayList<Activity> activities = null;
+	ArrayList<DecisionNode> dnodes = null;
+	String mainAct = null;
+
 	public Function(String name) {
 		this.setName(name);
-		this.dnodes=new ArrayList<DecisionNode>();
-		this.activities=new ArrayList<Activity>();
+		this.dnodes = new ArrayList<DecisionNode>();
+		this.activities = new ArrayList<Activity>();
 	}
 
 	public String getName() {
@@ -76,17 +75,26 @@ public class Function {
 	public void setActivities(ArrayList<Activity> activities) {
 		this.activities = activities;
 	}
+
 	public Activity getActivityByName(String name) throws Exception {
-		Activity tgt=null;
+		Activity tgt = null;
 		for (Activity act : activities) {
-			if(act.getName().equals(name)) {
-				tgt=act;
+			if (act.getName().equals(name)) {
+				tgt = act;
 				break;
 			}
 		}
-		if(tgt==null) {
-			throw new Exception(String.format("Acticity %s not found for funtion %s", name,this.getName()));
+		if (tgt == null) {
+			throw new Exception(String.format("Acticity %s not found for funtion %s", name, this.getName()));
 		}
 		return tgt;
+	}
+
+	public String getMainAct() {
+		return mainAct;
+	}
+
+	public void setMainAct(String mainAct) {
+		this.mainAct = mainAct;
 	}
 }

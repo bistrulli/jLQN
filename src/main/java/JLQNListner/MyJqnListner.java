@@ -1,12 +1,20 @@
 package JLQNListner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import Entity.Activity;
+import Entity.App;
+import Entity.Call;
+import Entity.ForkNode;
+import Entity.Function;
+import Entity.OrNode;
+import Entity.ReplyNode;
 import JLQN.JLqnListener;
 import JLQN.JLqnParser.RuleActAsyncCallContext;
 import JLQN.JLqnParser.RuleActConnectionsContext;
@@ -69,17 +77,15 @@ import JLQN.JLqnParser.RuleTaskEntryNameContext;
 import JLQN.JLqnParser.RuleTaskIdContext;
 import JLQN.JLqnParser.RuleTaskKindContext;
 import JLQN.JLqnParser.RuleTransitionContext;
-import entity.Activity;
-import entity.App;
-import entity.Call;
-import entity.ForkNode;
-import entity.Function;
-import entity.OrNode;
-import entity.ReplyNode;
 
 public class MyJqnListner implements JLqnListener {
 
 	public App app = null;
+	private HashMap<String, String> fmainAct=null;
+	
+	public MyJqnListner() {
+		this.fmainAct=new HashMap<>();
+	}
 
 	@Override
 	public void visitTerminal(TerminalNode node) {
@@ -163,11 +169,13 @@ public class MyJqnListner implements JLqnListener {
 	@Override
 	public void enterRuleTask(RuleTaskContext ctx) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void exitRuleTask(RuleTaskContext ctx) {
+		String taskname=ctx.ruleTaskId().RULE_ID().getText();
+		String entry=ctx.ruleTaskEntryName().get(0).RULE_ID().getText();
+		this.fmainAct.put(taskname, entry);
 	}
 
 	@Override
@@ -513,7 +521,7 @@ public class MyJqnListner implements JLqnListener {
 				joinAct = null;
 			}
 		}
-		System.out.println(rule);
+		//System.out.println(rule);
 	}
 	
 	private void processRuleConnection(List<RuleTransitionContext> transitions, Function f) {
@@ -526,22 +534,22 @@ public class MyJqnListner implements JLqnListener {
 
 	@Override
 	public void exitRuleActivityInfo(RuleActivityInfoContext ctx) {
-		System.out.println("A " + ctx.RULE_ID().getText());
+		//System.out.println("A " + ctx.RULE_ID().getText());
 		Function f = new Function(ctx.RULE_ID().getText());
 		this.app.getFunctions().add(f);
 
 		// assegno tutte le activity della funzione
 		List<RuleActivityDemandContext> activities = ctx.ruleActivityDemand();
 		for (RuleActivityDemandContext act : activities) {
-			System.out.println(act.ruleActivity().getText() + " " + act.ruleNUMBER().getText());
+			//System.out.println(act.ruleActivity().getText() + " " + act.ruleNUMBER().getText());
 			f.getActivities()
 					.add(new Activity(act.ruleActivity().getText(), Double.valueOf(act.ruleNUMBER().getText())));
 		}
 		// riprendo tutte le chiamate sincrone
 		List<RuleActSyncCallContext> syncCalls = ctx.ruleActSyncCall();
 		for (RuleActSyncCallContext call : syncCalls) {
-			System.out.println(
-					"y " + call.RULE_ID().get(0) + " " + call.RULE_ID().get(1) + " " + call.ruleNUMBER().getText());
+			//System.out.println(
+					//"y " + call.RULE_ID().get(0) + " " + call.RULE_ID().get(1) + " " + call.ruleNUMBER().getText());
 			try {
 				Activity act = f.getActivityByName(call.RULE_ID().get(0).getText());
 				act.setCall(new Call(call.RULE_ID().get(0).getText(), call.RULE_ID().get(1).getText()));
@@ -553,11 +561,16 @@ public class MyJqnListner implements JLqnListener {
 		// qui creo i decision node al'interno della funzione
 		RuleActConnectionsContext connections = ctx.ruleActConnections();
 		if (connections != null) {
-			System.out.println(":");
+			//System.out.println(":");
 			this.processRuleConnection(connections.ruleTransition(),f);
 			this.processRuleTransition(connections.ruleJoinList(), connections.ruleForkList(), f);
 		}
-
+		
+		try {
+			f.setMainAct(this.fmainAct.get(f.getName()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

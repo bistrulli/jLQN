@@ -1,4 +1,4 @@
-package entity;
+package Entity;
 
 //si assume che un activity puo fare una chiamata ad una sola altra entry
 public class Activity{

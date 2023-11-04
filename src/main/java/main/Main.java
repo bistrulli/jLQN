@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -16,6 +15,7 @@ import JLQN.JLqnParser;
 //import com.khubla.antlr4example.Cobol85Parser.StartRuleContext;
 import JLQN.JLqnParser.RuleModelContext;
 import JLQNListner.MyJqnListner;
+import LqnToGCF.LqnToGcf;
 
 /**
  * @author Tom Everett
@@ -41,13 +41,17 @@ class Main {
 			 * make a Parser on the token stream
 			 */
 			JLqnParser parser = new JLqnParser(tokenStream);
-			parser.addParseListener(new MyJqnListner());
+			MyJqnListner myListner = new MyJqnListner();
+			parser.addParseListener(myListner);
 			/*
 			 * get the top node of the AST. This corresponds to the topmost rule of
 			 * equation.q4, "equation"
 			 */
 			@SuppressWarnings("unused")
 			RuleModelContext ruleModel = parser.ruleModel();
+			
+			LqnToGcf trasducer = new LqnToGcf(myListner.app);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
