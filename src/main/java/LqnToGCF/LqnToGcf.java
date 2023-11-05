@@ -1,11 +1,21 @@
 package LqnToGCF;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
 
 import Entity.App;
 import Entity.Function;
@@ -13,29 +23,78 @@ import Entity.Function;
 public class LqnToGcf {
 	private Path destPath = Paths.get("/Users/emilio-imt/eclipse-workspace");
 	private static Path tmpPath = Paths.get("src/main/resources/f_tmpl");
-	
-	
 
 	public LqnToGcf(App lqnApp) {
-		Path appDir=Paths.get(destPath.toString()+File.separator+lqnApp.getName().replace("\"", ""));
-		System.out.println(appDir.toString());
+		Path appDir = Paths.get(destPath.toString() + File.separator + lqnApp.getName().replace("\"", ""));
 		for (Function f : lqnApp.getFunctions()) {
-			this.copyTmpfun(this.tmpPath,appDir,f);
-		}	
+			this.copyTmpfun(this.tmpPath, appDir, f);
+			this.translate(appDir,f);
+		}
 	}
-	
-	private void copyTmpfun(Path source, Path dest,Function f) {
-		dest=Paths.get(dest.toString()+File.separator+f.getName());
+
+	public void translate(Path fDir,Function f) {
+		fDir = Paths.get(fDir.toString() + File.separator + f.getName());
+		Velocity.init();
+		VelocityContext context = new VelocityContext();
+		context.put("f",f);
+		Template template = null;
+
+		try {
+			template = Velocity.getTemplate(this.tmpPath.toString()+"/src/main/java/functions/Logic.java");
+		} catch (ResourceNotFoundException rnfe) {
+			rnfe.printStackTrace();
+		} catch (ParseErrorException pee) {
+			pee.printStackTrace();
+		} catch (MethodInvocationException mie) {
+			mie.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		StringWriter sw = new StringWriter();
+		template.merge(context, sw);
+		try {
+			FileWriter fw=new FileWriter(Paths.get(fDir.toString()+File.separator+"/src/main/java/functions/Logic.java").toFile());
+			fw.write(sw.toString());
+			fw.flush();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private void copyTmpfun(Path source, Path dest, Function f) {
+		dest = Paths.get(dest.toString() + File.separator + f.getName());
 		try {
 			FileUtils.createParentDirectories(dest.toFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		File sourceDirectory = new File(source.toString());
-	    File destinationDirectory = new File(dest.toString());
-	    try {
+		File destinationDirectory = new File(dest.toString());
+		try {
 			FileUtils.copyDirectory(sourceDirectory, destinationDirectory);
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		File pmFile=Paths.get(dest.toString()+File.separator+"pom.xml").toFile();
+		try {
+			Scanner sc = new Scanner(pmFile);
+			String pomContent="";
+			while(sc.hasNext())
+				pomContent+=sc.next()+"\n";
+			sc.close();
+			pomContent=pomContent.replace("$fname", f.getName());
+			try {
+				FileWriter fw=new FileWriter(pmFile);
+				fw.write(pomContent);
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
