@@ -1,5 +1,5 @@
 #! /bin/sh
-gcloud beta functions deploy f1 \
+gcloud beta functions deploy $fname \
 --gen2 \
 --runtime=java17 \
 --region=northamerica-northeast1 \
@@ -11,4 +11,4 @@ gcloud beta functions deploy f1 \
 --allow-unauthenticated \
 --project modellearning \
 --max-instances=50 \
---min-instances=50
+--min-instances=1

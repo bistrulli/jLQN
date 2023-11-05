@@ -28,19 +28,19 @@ public class LqnToGcf {
 		Path appDir = Paths.get(destPath.toString() + File.separator + lqnApp.getName().replace("\"", ""));
 		for (Function f : lqnApp.getFunctions()) {
 			this.copyTmpfun(this.tmpPath, appDir, f);
-			this.translate(appDir,f);
+			this.translate(appDir, f);
 		}
 	}
 
-	public void translate(Path fDir,Function f) {
+	public void translate(Path fDir, Function f) {
 		fDir = Paths.get(fDir.toString() + File.separator + f.getName());
 		Velocity.init();
 		VelocityContext context = new VelocityContext();
-		context.put("f",f);
+		context.put("f", f);
 		Template template = null;
 
 		try {
-			template = Velocity.getTemplate(this.tmpPath.toString()+"/src/main/java/functions/Logic.vm");
+			template = Velocity.getTemplate(this.tmpPath.toString() + "/src/main/java/functions/Logic.vm");
 		} catch (ResourceNotFoundException rnfe) {
 			rnfe.printStackTrace();
 		} catch (ParseErrorException pee) {
@@ -54,15 +54,17 @@ public class LqnToGcf {
 		StringWriter sw = new StringWriter();
 		template.merge(context, sw);
 		try {
-			FileWriter fw=new FileWriter(Paths.get(fDir.toString()+File.separator+"/src/main/java/functions/Logic.java").toFile());
+			FileWriter fw = new FileWriter(
+					Paths.get(fDir.toString() + File.separator + "/src/main/java/functions/Logic.java").toFile());
 			fw.write(sw.toString());
 			fw.flush();
 			fw.close();
-			FileUtils.delete(Paths.get(fDir.toString()+File.separator+"/src/main/java/functions/Logic.vm").toFile());
+			FileUtils
+					.delete(Paths.get(fDir.toString() + File.separator + "/src/main/java/functions/Logic.vm").toFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	private void copyTmpfun(Path source, Path dest, Function f) {
@@ -79,18 +81,23 @@ public class LqnToGcf {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		File pmFile=Paths.get(dest.toString()+File.separator+"pom.xml").toFile();
+		this.updateFname(Paths.get(dest.toString() + File.separator + "pom.xml"), f.getName());
+		this.updateFname(Paths.get(dest.toString() + File.separator + "deploy.sh"), f.getName());
+		this.updateFname(Paths.get(dest.toString() + File.separator + "update.sh"), f.getName());
+	}
+
+	public void updateFname(Path file, String fname) {
+		File f = file.toFile();
 		try {
-			Scanner sc = new Scanner(pmFile);
-			String pomContent="";
-			while(sc.hasNext())
-				pomContent+=sc.next()+"\n";
+			Scanner sc = new Scanner(f);
+			String content = "";
+			while (sc.hasNextLine())
+				content += sc.nextLine() + "\n";
 			sc.close();
-			pomContent=pomContent.replace("$fname", f.getName());
+			content = content.replace("$fname", fname);
 			try {
-				FileWriter fw=new FileWriter(pmFile);
-				fw.write(pomContent);
+				FileWriter fw = new FileWriter(f);
+				fw.write(content);
 				fw.close();
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -1,4 +1,9 @@
 #! /bin/sh
 
 #https://cloud.google.com/sdk/gcloud/reference/run/services/update#--max-instances
-gcloud run services update f1 --concurrency=3 --project=modellearning --region=northamerica-northeast1 --max-instances=20 --min-instances=0 
+gcloud run services update $fname \
+--concurrency=1 \
+--project=modellearning \
+--region=northamerica-northeast1 \
+--max-instances=50 \
+--min-instances=1 
