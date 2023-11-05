@@ -1,0 +1,59 @@
+'''
+Created on 11 ago 2023
+
+@author: emilio-imt
+'''
+
+from locust import HttpUser, task, between, events
+import queue, time, logging
+import locust.stats
+import numpy as np
+import subprocess
+
+locust.stats.CSV_STATS_INTERVAL_SEC = 1
+
+delay_samples = queue.Queue()
+tgt_samples = queue.Queue()
+
+
+@events.test_stop.add_listener
+def on_test_stop(**kw):
+    
+    rtsamples = list(tgt_samples.queue)
+    delaysamples = list(delay_samples.queue)
+    np.savetxt('rt_tgt.csv', rtsamples, delimiter=',', fmt='%f')
+    np.savetxt('rt_delay.csv', delaysamples, delimiter=',', fmt='%f')
+
+
+class SimpleWorkload(HttpUser):
+    waittime = 1
+    thinkTime = None
+    
+    # Define a stochastic spawn rate that spawns 10 users per second with a 50% chance
+    # spawn_rate_distribution = lambda t: np.exponential(scale=1.0)
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.nreq = 0
+        self.thinkTime = 0
+    
+    def wait_time(self): 
+        self.thinkTime=np.random.exponential(scale=SimpleWorkload.waittime)
+        return self.thinkTime
+    
+    @task
+    def visit_homepage(self):
+        global delay_samples, tgt_samples
+        
+        st = time.time()
+        self.client.get("/")
+        tgt_samples.put(time.time() - st)
+        
+        st = time.time()
+        time.sleep(np.random.exponential(scale=SimpleWorkload.waittime))
+        delay_samples.put(time.time() - st)
+        
+
+if __name__ == "__main__":
+    SimpleWorkload().run()
+    

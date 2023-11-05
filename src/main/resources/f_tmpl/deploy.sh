@@ -4,7 +4,7 @@ gcloud beta functions deploy $fname \
 --runtime=java17 \
 --region=northamerica-northeast1 \
 --source=. \
---entry-point=functions.LogicF1 \
+--entry-point=functions.Logic \
 --memory=512MB \
 --cpu=1 \
 --trigger-http \

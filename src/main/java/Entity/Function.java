@@ -13,6 +13,7 @@ public class Function {
 	ArrayList<Activity> activities = null;
 	ArrayList<DecisionNode> dnodes = null;
 	String mainAct = null;
+	String kind=null;
 
 	public Function(String name) {
 		this.setName(name);
@@ -96,5 +97,13 @@ public class Function {
 
 	public void setMainAct(String mainAct) {
 		this.mainAct = mainAct;
+	}
+
+	public String getKind() {
+		return kind;
+	}
+
+	public void setKind(String kind) {
+		this.kind = kind;
 	}
 }

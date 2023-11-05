@@ -23,13 +23,22 @@ import Entity.Function;
 public class LqnToGcf {
 	private Path destPath = Paths.get("/Users/emilio-imt/eclipse-workspace");
 	private static Path tmpPath = Paths.get("src/main/resources/f_tmpl");
+	private static Path tmpLocustPath = Paths.get("src/main/resources/driver_tmpl");
 
 	public LqnToGcf(App lqnApp) {
 		Path appDir = Paths.get(destPath.toString() + File.separator + lqnApp.getName().replace("\"", ""));
 		for (Function f : lqnApp.getFunctions()) {
-			this.copyTmpfun(this.tmpPath, appDir, f);
-			this.translate(appDir, f);
+			if(!f.getKind().equals("r")) {
+				this.copyTmpfun(this.tmpPath, appDir, f);
+				this.translate(appDir, f);
+			}else {
+				this.copyTmpfun(this.tmpLocustPath, appDir, f);
+				this.translateLocust(appDir, f);
+			}
 		}
+	}
+	
+	public void translateLocust(Path fDir, Function f) {
 	}
 
 	public void translate(Path fDir, Function f) {
@@ -81,9 +90,12 @@ public class LqnToGcf {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.updateFname(Paths.get(dest.toString() + File.separator + "pom.xml"), f.getName());
-		this.updateFname(Paths.get(dest.toString() + File.separator + "deploy.sh"), f.getName());
-		this.updateFname(Paths.get(dest.toString() + File.separator + "update.sh"), f.getName());
+		if(Paths.get(dest.toString() + File.separator + "pom.xml").toFile().exists())
+			this.updateFname(Paths.get(dest.toString() + File.separator + "pom.xml"), f.getName());
+		if(Paths.get(dest.toString() + File.separator + "deploy.sh").toFile().exists())
+			this.updateFname(Paths.get(dest.toString() + File.separator + "deploy.sh"), f.getName());
+		if(Paths.get(dest.toString() + File.separator + "update.sh").toFile().exists())
+			this.updateFname(Paths.get(dest.toString() + File.separator + "update.sh"), f.getName());
 	}
 
 	public void updateFname(Path file, String fname) {

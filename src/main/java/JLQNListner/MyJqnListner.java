@@ -83,10 +83,12 @@ public class MyJqnListner implements JLqnListener {
 	public App app = null;
 	private HashMap<String, String> f2entry=null;
 	private HashMap<String, String> entry2mainAct=null;
+	private HashMap<String, String> f2type=null;
 	
 	public MyJqnListner() {
 		this.f2entry=new HashMap<String, String>();
 		this.entry2mainAct=new HashMap<String, String>();
+		this.f2type=new HashMap<String, String>();
 	}
 
 	@Override
@@ -177,7 +179,9 @@ public class MyJqnListner implements JLqnListener {
 	public void exitRuleTask(RuleTaskContext ctx) {
 		String taskname=ctx.ruleTaskId().RULE_ID().getText();
 		String entry=ctx.ruleTaskEntryName().get(0).RULE_ID().getText();
+		String kind=ctx.ruleTaskKind().getText();
 		this.f2entry.put(taskname, entry);
+		this.f2type.put(taskname, kind);
 	}
 
 	@Override
@@ -571,6 +575,7 @@ public class MyJqnListner implements JLqnListener {
 		
 		try {
 			f.setMainAct(this.entry2mainAct.get(this.f2entry.get(f.getName())));
+			f.setKind(this.f2type.get(f.getName()));
 			f.setName(this.f2entry.get(f.getName()));
 		} catch (Exception e) {
 			e.printStackTrace();
