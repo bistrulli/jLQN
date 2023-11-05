@@ -48,7 +48,11 @@ public abstract class DecisionNode {
 	}
 
 	public String getName() {
-		String name = this.getClass().getSimpleName();
+		String name="";
+		if(this.getJoinList().size()==1)
+			name = this.getClass().getSimpleName();
+		else
+			name = "JoinNode";
 		for (String act : this.joinList) {
 			name += "_" + act;
 		}

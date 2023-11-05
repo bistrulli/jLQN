@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.lang.Thread;
 
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
@@ -27,6 +28,7 @@ public class Logic implements HttpFunction {
 	private static HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
 	private HttpResponse response = null;
 	private HashMap<String, Boolean> act_exec=new HashMap<String, Boolean>();
+	private HashMap<String, Thread> act_thread=new HashMap<String, Thread>();
 
 	/*
 	 * activities
@@ -56,7 +58,17 @@ public class Logic implements HttpFunction {
 	#foreach ( $node in $f.getDnodes() )
 	public void $node.getName()(){
 	#if($node.class.getSimpleName()=="OrNode")
-		//TBA OrNode Logic
+		#if($node.getJoinList().size()>1)
+		//JoinNode Logic
+		try {
+			#foreach ( $act in $node.getJoinList())
+			this.act_thread.get("$act").join();
+			#end
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		#end
+		//OrNode Logic
 		List<Pair<String, Double>> distributionData = new ArrayList<>();
 		#foreach ( $act in $node.getForkList())
 		distributionData.add(new Pair<>("$act", $node.getProb().get($foreach.index)));
@@ -71,6 +83,23 @@ public class Logic implements HttpFunction {
 	#end
 	#if($node.class.getSimpleName()=="ForkNode")
 		//TBA ForkNode Logic
+		final Logic mainLogic=this;
+		String joinEvt="";
+		#foreach ( $act in $node.getForkList())
+		#if($foreach.index==0)
+		joinEvt="${act}";
+		#else
+		joinEvt+="&${act}";
+		#end
+		Thread ${act}Thread = new Thread(() -> {
+        	//TBA all the activated Dnodes by ${act} to allow a more complex parallel execution
+        	//in this way only asynch call are supported
+        	mainLogic.$act();
+        });
+        this.act_thread.put("${act}", ${act}Thread);
+        this.act_thread.get("${act}").start();
+		#end
+		this.act_exec.put(joinEvt, true);
 	#end
 	#if($node.class.getSimpleName()=="ReplyNode")
 		//ReplyNode Logic
