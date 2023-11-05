@@ -9,9 +9,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.logging.Logger;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.commons.math3.distribution.ExponentialDistribution;
+import org.apache.commons.math3.distribution.EnumeratedDistribution;
+import org.apache.commons.math3.util.Pair;
 
 import com.google.cloud.functions.HttpFunction;
 import com.google.cloud.functions.HttpRequest;
@@ -52,10 +56,21 @@ public class Logic implements HttpFunction {
 	#foreach ( $node in $f.getDnodes() )
 	public void $node.getName()(){
 	#if($node.class.getSimpleName()=="OrNode")
-	//TBA OrNode Logic
+		//TBA OrNode Logic
+		List<Pair<String, Double>> distributionData = new ArrayList<>();
+		#foreach ( $act in $node.getForkList())
+		distributionData.add(new Pair<>("$act", $node.getProb().get($foreach.index)));
+		#end
+		EnumeratedDistribution<String> distribution = new EnumeratedDistribution<>(distributionData);
+		String randomChoice = distribution.sample();
+		#foreach ( $act in $node.getForkList())
+		if(randomChoice=="$act"){
+			$act();
+		}
+		#end
 	#end
 	#if($node.class.getSimpleName()=="ForkNode")
-	//TBA ForkNode Logic
+		//TBA ForkNode Logic
 	#end
 	#if($node.class.getSimpleName()=="ReplyNode")
 		//ReplyNode Logic
