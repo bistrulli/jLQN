@@ -9,6 +9,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.logging.Logger;
+import java.util.HashMap;
 
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 
@@ -21,41 +22,68 @@ public class Logic implements HttpFunction {
 	private static ThreadMXBean mgm = ManagementFactory.getThreadMXBean();
 	private static HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
 	private HttpResponse response = null;
+	private HashMap<String, Boolean> act_exec=new HashMap<String, Boolean>();
 
 	/*
 	 * activities
 	 */
 	#foreach ( $act in $f.getActivities() )
-	private void $act.getName()(){
+	public void $act.getName()(){
+		this.act_exec.put("$act.getName()", true);
 		this.doWork($act.getDemand());
+		#if ($act.getCall() != $null)
+		String url = "https://northamerica-northeast1-modellearning.cloudfunctions.net/$act.getCall().getDest()";
+		var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+
+		try {
+			var getResponse = Logic.client.send(getRequest, BodyHandlers.ofString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		#end
 	}
 	#end
 
 	/*
 	 * Dnodes
 	 */
+	#foreach ( $node in $f.getDnodes() )
+	public void $node.getName()(){
+	#if($node.class.getSimpleName()=="OrNode")
+	//TBA OrNode Logic
+	#end
+	#if($node.class.getSimpleName()=="ForkNode")
+	//TBA ForkNode Logic
+	#end
+	#if($node.class.getSimpleName()=="ReplyNode")
+		//ReplyNode Logic
+		BufferedWriter writer;
+		try {
+			writer = this.response.getWriter();
+			writer.write("${node.getJoinList().get(0)}[${f.getName()}]");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	#end
+	}
+	#end
 
 	@Override
 	public void service(HttpRequest request, HttpResponse response) throws IOException {
-		// BufferedWriter writer = response.getWriter();
 		this.response = response;
 		mgm.setThreadCpuTimeEnabled(true);
-
-//		this.doWork();
-//		String url = "https://northamerica-northeast1-modellearning.cloudfunctions.net/f2";
-//		var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
-//
-//		try {
-//			var getResponse = LogicF1.client.send(getRequest, BodyHandlers.ofString());
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//		writer.write("ok");
+		
+		//execute the entry activity
+		${f.getMainAct()}();
+		//execetute the decision node of already executed evt
+		#foreach ( $node in $f.getDnodes())
+		if(this.act_exec.get("${node.getOriginEvt()}")!=null && this.act_exec.get("${node.getOriginEvt()}")) {
+		  ${node.getName()}();
+		}
+		#end
 	}
 
 	private void doWork(Double stime) {

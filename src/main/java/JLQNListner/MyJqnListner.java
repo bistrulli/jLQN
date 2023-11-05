@@ -81,10 +81,12 @@ import JLQN.JLqnParser.RuleTransitionContext;
 public class MyJqnListner implements JLqnListener {
 
 	public App app = null;
-	private HashMap<String, String> fmainAct=null;
+	private HashMap<String, String> f2entry=null;
+	private HashMap<String, String> entry2mainAct=null;
 	
 	public MyJqnListner() {
-		this.fmainAct=new HashMap<>();
+		this.f2entry=new HashMap<String, String>();
+		this.entry2mainAct=new HashMap<String, String>();
 	}
 
 	@Override
@@ -175,7 +177,7 @@ public class MyJqnListner implements JLqnListener {
 	public void exitRuleTask(RuleTaskContext ctx) {
 		String taskname=ctx.ruleTaskId().RULE_ID().getText();
 		String entry=ctx.ruleTaskEntryName().get(0).RULE_ID().getText();
-		this.fmainAct.put(taskname, entry);
+		this.f2entry.put(taskname, entry);
 	}
 
 	@Override
@@ -234,6 +236,7 @@ public class MyJqnListner implements JLqnListener {
 
 	@Override
 	public void exitRuleActivityDiagram(RuleActivityDiagramContext ctx) {
+		this.entry2mainAct.put(ctx.ruleEntry().RULE_ID().getText(), ctx.RULE_ID().getText());
 	}
 
 	@Override
@@ -567,7 +570,8 @@ public class MyJqnListner implements JLqnListener {
 		}
 		
 		try {
-			f.setMainAct(this.fmainAct.get(f.getName()));
+			f.setMainAct(this.entry2mainAct.get(this.f2entry.get(f.getName())));
+			f.setName(this.f2entry.get(f.getName()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

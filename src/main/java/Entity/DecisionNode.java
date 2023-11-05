@@ -7,12 +7,12 @@ public abstract class DecisionNode {
 	ArrayList<String> forkList = null;
 	ArrayList<String> orList = null;
 	ArrayList<Double> prob = null;
-	
+
 	public DecisionNode() {
-		this.joinList=new ArrayList<String>();
-		this.forkList=new ArrayList<String>();
-		this.orList=new ArrayList<String>();
-		this.prob=new ArrayList<Double>();
+		this.joinList = new ArrayList<String>();
+		this.forkList = new ArrayList<String>();
+		this.orList = new ArrayList<String>();
+		this.prob = new ArrayList<Double>();
 	}
 
 	public ArrayList<String> getJoinList() {
@@ -45,5 +45,24 @@ public abstract class DecisionNode {
 
 	public void setProb(ArrayList<Double> prob) {
 		this.prob = prob;
+	}
+
+	public String getName() {
+		String name = this.getClass().getSimpleName();
+		for (String act : this.joinList) {
+			name += "_" + act;
+		}
+		return name;
+	}
+
+	public String getOriginEvt() {
+		String evt = "";
+		for (String act : this.getJoinList()) {
+			if (act == this.getJoinList().get(0))
+				evt += act;
+			else
+				evt += "&" + act;
+		}
+		return evt;
 	}
 }

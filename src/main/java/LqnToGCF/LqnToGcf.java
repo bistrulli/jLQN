@@ -40,7 +40,7 @@ public class LqnToGcf {
 		Template template = null;
 
 		try {
-			template = Velocity.getTemplate(this.tmpPath.toString()+"/src/main/java/functions/Logic.java");
+			template = Velocity.getTemplate(this.tmpPath.toString()+"/src/main/java/functions/Logic.vm");
 		} catch (ResourceNotFoundException rnfe) {
 			rnfe.printStackTrace();
 		} catch (ParseErrorException pee) {
@@ -58,6 +58,7 @@ public class LqnToGcf {
 			fw.write(sw.toString());
 			fw.flush();
 			fw.close();
+			FileUtils.delete(Paths.get(fDir.toString()+File.separator+"/src/main/java/functions/Logic.vm").toFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
