@@ -1,9 +1,3 @@
-'''
-Created on 11 ago 2023
-
-@author: emilio-imt
-'''
-
 from locust import HttpUser, task, between, events
 import queue, time, logging
 import locust.stats
@@ -12,46 +6,93 @@ import subprocess
 
 locust.stats.CSV_STATS_INTERVAL_SEC = 1
 
-delay_samples = queue.Queue()
-tgt_samples = queue.Queue()
-
 
 @events.test_stop.add_listener
 def on_test_stop(**kw):
-    
-    rtsamples = list(tgt_samples.queue)
-    delaysamples = list(delay_samples.queue)
-    np.savetxt('rt_tgt.csv', rtsamples, delimiter=',', fmt='%f')
-    np.savetxt('rt_delay.csv', delaysamples, delimiter=',', fmt='%f')
+    pass
 
 
 class SimpleWorkload(HttpUser):
-    waittime = 1
-    thinkTime = None
-    
-    # Define a stochastic spawn rate that spawns 10 users per second with a 50% chance
-    # spawn_rate_distribution = lambda t: np.exponential(scale=1.0)
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.nreq = 0
-        self.thinkTime = 0
+        self.act_exec = {}
+        self.act_thread = {}
     
-    def wait_time(self): 
-        self.thinkTime=np.random.exponential(scale=SimpleWorkload.waittime)
-        return self.thinkTime
+    def doWait(self,ttime):
+    	delay=np.random.exponential(scale=ttime)
+    	time.sleep(delay)
+    
+    
+	#[[#]]#Activities
+	#foreach ( $act in $f.getActivities() )
+	def $act.getName()(self):
+		self.act_exec["$act.getName()"]=True;
+		self.doWait($act.getDemand());
+
+		#if ($act.getCall() != $null)
+		tgt_url = "$act.getCall().getDest()";
+		self.client.get(tgt_url)
+		#end
+	#end
+	
+	#[[#]]#Dnodes
+	#foreach ( $node in $f.getDnodes() )
+	def ${node.getName()}(self):
+	#if($node.class.getSimpleName()=="OrNode")
+		#if($node.getJoinList().size()>1)
+		#[[#]]#JoinNode Logic
+		#foreach ( $act in $node.getJoinList())
+		self.act_thread["$act"].join();
+		#end
+		#end
+		#[[#]]#OrNode Logic
+		label = []
+		p = []
+		#foreach ( $act in $node.getForkList())
+		label.append("$act")
+		p.append($node.getProb().get($foreach.index))
+		#end
+		
+		randomChoice = np.random.choice(a=label,p=p)
+		#foreach ( $act in $node.getForkList())
+		if(randomChoice=="$act"):
+			$act()
+		#end
+	#end
+	#if($node.class.getSimpleName()=="ForkNode")
+		#[[#]]#ForkNode Logic
+		final Logic mainLogic=this;
+		String joinEvt="";
+		#foreach ( $act in $node.getForkList())
+		#if($foreach.index==0)
+		joinEvt="${act}";
+		#else
+		joinEvt+="&${act}";
+		#end
+		Thread ${act}Thread = new Thread(() -> {
+        	//TBA all the activated Dnodes by ${act} to allow a more complex parallel execution
+        	//in this way only asynch call are supported
+        	mainLogic.$act();
+        });
+        this.act_thread.put("${act}", ${act}Thread);
+        this.act_thread.get("${act}").start();
+		#end
+		this.act_exec.put(joinEvt, true);
+	#end
+	#end
     
     @task
     def visit_homepage(self):
-        global delay_samples, tgt_samples
+ 		#[[#]]# execetute the entry activity
+ 		self.${f.getMainAct()}()
+		#foreach ( $node in $f.getDnodes())
+		#[[#]]# execetute the decision node of already executed evt
+		if(self.act_exec["${node.getOriginEvt()}"]!=None and self.act_exec["${node.getOriginEvt()}"]):
+		  self.act_exec["${node.getOriginEvt()}"]=False
+		  self.${node.getName()}()
+		#end
         
-        st = time.time()
-        self.client.get("/")
-        tgt_samples.put(time.time() - st)
-        
-        st = time.time()
-        time.sleep(np.random.exponential(scale=SimpleWorkload.waittime))
-        delay_samples.put(time.time() - st)
         
 
 if __name__ == "__main__":

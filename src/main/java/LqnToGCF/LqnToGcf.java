@@ -28,17 +28,48 @@ public class LqnToGcf {
 	public LqnToGcf(App lqnApp) {
 		Path appDir = Paths.get(destPath.toString() + File.separator + lqnApp.getName().replace("\"", ""));
 		for (Function f : lqnApp.getFunctions()) {
-			if(!f.getKind().equals("r")) {
-				this.copyTmpfun(this.tmpPath, appDir, f);
+			if (!f.getKind().equals("r")) {
+				this.copyTmpfun(tmpPath, appDir, f);
 				this.translate(appDir, f);
-			}else {
-				this.copyTmpfun(this.tmpLocustPath, appDir, f);
+			} else {
+				this.copyTmpfun(tmpLocustPath, appDir, f);
 				this.translateLocust(appDir, f);
 			}
 		}
 	}
-	
+
 	public void translateLocust(Path fDir, Function f) {
+		fDir = Paths.get(fDir.toString() + File.separator + f.getName());
+		Velocity.init();
+		VelocityContext context = new VelocityContext();
+		context.put("f", f);
+		Template template = null;
+
+		try {
+			template = Velocity.getTemplate(tmpLocustPath.toString() + File.separator + "SimpleWorkload.vm");
+		} catch (ResourceNotFoundException rnfe) {
+			rnfe.printStackTrace();
+		} catch (ParseErrorException pee) {
+			pee.printStackTrace();
+		} catch (MethodInvocationException mie) {
+			mie.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		StringWriter sw = new StringWriter();
+		template.merge(context, sw);
+		//System.out.println(sw.toString());
+		try {
+			FileWriter fw = new FileWriter(
+					Paths.get(fDir.toString() + File.separator + "SimpleWorkload.py").toFile());
+			fw.write(sw.toString());
+			fw.flush();
+			fw.close();
+			FileUtils.delete(Paths.get(fDir.toString() + File.separator + "SimpleWorkload.vm").toFile());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void translate(Path fDir, Function f) {
@@ -49,7 +80,7 @@ public class LqnToGcf {
 		Template template = null;
 
 		try {
-			template = Velocity.getTemplate(this.tmpPath.toString() + "/src/main/java/functions/Logic.vm");
+			template = Velocity.getTemplate(tmpPath.toString() + "/src/main/java/functions/Logic.vm");
 		} catch (ResourceNotFoundException rnfe) {
 			rnfe.printStackTrace();
 		} catch (ParseErrorException pee) {
@@ -90,11 +121,11 @@ public class LqnToGcf {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if(Paths.get(dest.toString() + File.separator + "pom.xml").toFile().exists())
+		if (Paths.get(dest.toString() + File.separator + "pom.xml").toFile().exists())
 			this.updateFname(Paths.get(dest.toString() + File.separator + "pom.xml"), f.getName());
-		if(Paths.get(dest.toString() + File.separator + "deploy.sh").toFile().exists())
+		if (Paths.get(dest.toString() + File.separator + "deploy.sh").toFile().exists())
 			this.updateFname(Paths.get(dest.toString() + File.separator + "deploy.sh"), f.getName());
-		if(Paths.get(dest.toString() + File.separator + "update.sh").toFile().exists())
+		if (Paths.get(dest.toString() + File.separator + "update.sh").toFile().exists())
 			this.updateFname(Paths.get(dest.toString() + File.separator + "update.sh"), f.getName());
 	}
 

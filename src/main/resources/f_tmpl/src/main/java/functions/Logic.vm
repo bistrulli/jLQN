@@ -125,6 +125,7 @@ public class Logic implements HttpFunction {
 		//execetute the decision node of already executed evt
 		#foreach ( $node in $f.getDnodes())
 		if(this.act_exec.get("${node.getOriginEvt()}")!=null && this.act_exec.get("${node.getOriginEvt()}")) {
+		  this.act_exec.put("${node.getOriginEvt()}",false);
 		  ${node.getName()}();
 		}
 		#end
