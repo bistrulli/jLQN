@@ -15,6 +15,7 @@ import JLQN.JLqnParser;
 //import com.khubla.antlr4example.Cobol85Parser.StartRuleContext;
 import JLQN.JLqnParser.RuleModelContext;
 import JLQNListner.MyJqnListner;
+import LQN2MPP.LqnToMPP;
 import LqnToGCF.LqnToGcf;
 
 /**
@@ -27,7 +28,7 @@ class Main {
 			/*
 			 * get the input file as an InputStream
 			 */
-			File f=new File("/Users/emilio-imt/dockerShared/dedalus/model3.lqn");
+			File f=new File("src/main/resources/case_studies/illustrative.lqn");
 			InputStream inputStream = new FileInputStream(f);
 			/*
 			 * make Lexer
@@ -50,7 +51,8 @@ class Main {
 			@SuppressWarnings("unused")
 			RuleModelContext ruleModel = parser.ruleModel();
 			
-			LqnToGcf trasducer = new LqnToGcf(myListner.app);
+			LqnToGcf gcftrasducer = new LqnToGcf(myListner.app);
+			LqnToMPP mpptrasducer = new LqnToMPP(myListner.app);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
