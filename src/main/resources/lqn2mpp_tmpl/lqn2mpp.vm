@@ -3,46 +3,51 @@ sys.path.append('/Users/emilio-imt/git/MPP4Lqn')
 
 from entity import *
 from Lqn2MPP import Lqn2MPP
-        
+		
 if __name__ == '__main__':
-    
-    lqn2mpp=Lqn2MPP()
-    nusers=1
-    
-    #foreach ( $f in $app.getFunctions() )
-    #if($f.getKind()=="r")
-    T_${f.getName()}=Task(name="T_${f.getName()}",proc=Processor(name="T_${f.getName()}",mult=nusers,sched="f"),tsize=nusers,ref=True)
-    #else
-    T_${f.getName()}=Task(name="T_${f.getName()}",proc=Processor(name="T_${f.getName()}",mult=nusers,sched="f"),tsize=nusers)
-    #end
-    #end
-    
-    #foreach ( $f in $app.getFunctions() )
-    ${f.getName()} = Entry("${f.getName()}")
-    T_${f.getName()}.addEntry(${f.getName()})
-    #end
-    
-    #foreach ( $f in $app.getFunctions() )
-    
-    
-    #[[######]]# ${f.getName()} logic
-    
-    #[[######]]# ${f.getName()} activities and calls
-    #foreach ( $act in $f.getActivities() )
-    #if($act.getCall()!=$null)
+	
+	lqn2mpp=Lqn2MPP()
+	nusers=1
+	
+	#foreach ( $f in $app.getFunctions() )
+	#if($f.getKind()=="r")
+	T_${f.getName()}=Task(name="T_${f.getName()}",proc=Processor(name="T_${f.getName()}",mult=nusers,sched="f"),tsize=nusers,ref=True)
+	#else
+	T_${f.getName()}=Task(name="T_${f.getName()}",proc=Processor(name="T_${f.getName()}",mult=nusers,sched="f"),tsize=nusers)
+	#end
+	#end
+	
+	#foreach ( $f in $app.getFunctions() )
+	${f.getName()} = Entry("${f.getName()}")
+	T_${f.getName()}.addEntry(${f.getName()})
+	#end
+	
+	#foreach ( $f in $app.getFunctions() )
+	
+	
+	#[[######]]# ${f.getName()} logic
+	
+	#[[######]]# ${f.getName()} activities and calls
+	#foreach ( $act in $f.getActivities() )
+	#if($act.getCall()!=$null)
 	#set($c=$act.getCall())
 	${f.getName()}${act.getName()}=SynchCall(dest=${c.getDest()}, parent=${f.getName()}, name="${act.getName()}To${c.getDest()}")
 	#else
 	${f.getName()}${act.getName()}=Activity(stime=${act.getDemand()}, parent=${f.getName()}, name="${act.getName()}")
 	#end
 	${f.getName()}.getActivities().append(${f.getName()}${act.getName()})
-    #end
+	#end
 
 	#[[######]]# ${f.getName()} Activity Diagram
-	#foreach ( $node in $f.getDnodes())
 	#if($f.getKind()!="r")
-	#[[#]]# TBA connection to first node, assumo che ci sia sempre un activity come inizio della logica 
+	#[[#]]# connect the entry to the main activity of function 
+	${f.getName()}DI=probChoice(parent=${f.getName()}, name="${f.getName()}DI", 
+									probs=["P_${f.getName()}${f.getMainAct()}"], 
+									branches=[${f.getName()}${f.getMainAct()}], 
+									origin=${f.getName()})
+	${f.getName()}.getDnodes().append(${f.getName()}DI)
 	#end
+	#foreach ( $node in $f.getDnodes())
 	#if($node.class.getSimpleName()=="OrNode")
 	${f.getName()}D${foreach.index}=probChoice(parent=${f.getName()}, name="${f.getName()}D${foreach.index}", 
 									probs=[#foreach($act in $node.getForkList())#if($foreach.first)"P_${f.getName()}${act}"#else,"P_${f.getName()}${act}"#end#end], 
@@ -51,23 +56,24 @@ if __name__ == '__main__':
 	${f.getName()}.getDnodes().append(${f.getName()}D${foreach.index})
 	#end
 	#if($node.class.getSimpleName()=="ReplyNode")
-	#[[#]]# TBA reply node
+	${f.getName()}D${foreach.index}=awsActivity(parent=${f.getName()}, name="${f.getName()}D${foreach.index}",activity=${f.getName()}${node.getJoinList().get(0)})
+	${f.getName()}.getDnodes().append(${f.getName()}D${foreach.index})
 	#end
 	#end
 	#if($f.getKind()=="r")
 	${f.getName()}Df=probChoice(parent=${f.getName()}, name="${f.getName()}Df", 
 									probs=["P_${f.getActivities().get(0).getName()}"], 
-									branches=[${f.getActivities().get(0).getName()}], 
+									branches=[${f.getName()}${f.getActivities().get(0).getName()}], 
 									origin=${f.getName()}${f.getActivities().get($f.getActivities().size()-$1).getName()})
 	${f.getName()}.getDnodes().append(${f.getName()}Df)
 	#end
-    #end
-    
-    LQN={"tasks":[#foreach($f in $app.getFunctions())#if($foreach.first)T_${f.getName()} #else,T_${f.getName()}#end#end], "name":$app.getName()}
-    lqn2mpp.getMPP(lqn=LQN)
-    #lqn2mpp.removeInfSynch()
-    #lqn2mpp.removeInfAsynch()
-    #lqn2mpp.removeInfAcquire()
-    lqn2mpp.toMatlab(outDir="./")
-    #lqn2mpp.toLqns(outDir="model",LQN=LQN)
-    
+	#end
+	
+	LQN={"tasks":[#foreach($f in $app.getFunctions())#if($foreach.first)T_${f.getName()} #else,T_${f.getName()}#end#end], "name":$app.getName()}
+	lqn2mpp.getMPP(lqn=LQN)
+	#lqn2mpp.removeInfSynch()
+	#lqn2mpp.removeInfAsynch()
+	#lqn2mpp.removeInfAcquire()
+	lqn2mpp.toMatlab(outDir="./")
+	#lqn2mpp.toLqns(outDir="model",LQN=LQN)
+	

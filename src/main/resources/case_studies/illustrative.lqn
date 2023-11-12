@@ -14,49 +14,49 @@ p procT3 f m 1000
 -1
 
 T 0
-t Client r think_e -1 procCli m 1
-t fun1 n f1_e -1 procT1 m 1000
-t fun2 n f2_e -1 procT2 m 1000
-t fun3 n f3_e -1 procT3 m 1000
+t Client r think -1 procCli m 1
+t fun1 n f1 -1 procT1 m 1000
+t fun2 n f2 -1 procT2 m 1000
+t fun3 n f3 -1 procT3 m 1000
 -1
 
 E 0
-A think_e think_a 
-A f1_e serve1_a
-A f2_e serve2_a
-A f3_e serve3_a
+A think thinka 
+A f1 serve1
+A f2 serve2
+A f3 serve3
 -1
 
 A Client
-s think_a 0.000001
-s think_a1 1.0
-y think_a f1_e 1.0
+s thinka 0.000001
+s thinka1 1.0
+y thinka f1 1.0
 :
-think_a->think_a1
+thinka->thinka1
 -1
 
 A fun1
-s serve1_a 0.000001
-s serve1_a2 1.0
-y serve1_a f2_e 1.0
+s serve1 0.000001
+s serve12 1.0
+y serve1 f2 1.0
 :
-	serve1_a -> serve1_a2;
-	serve1_a2[f1_e]
+	serve1 -> serve12;
+	serve12[f1]
 -1
 
 A fun2
-s serve2_a 0.000001
-s serve2_a2 1.0
-y serve2_a f3_e 1.0
+s serve2 0.000001
+s serve22 1.0
+y serve2 f3 1.0
 :
-	serve2_a -> serve2_a2;
-	serve2_a2[f2_e]
+	serve2 -> serve22;
+	serve22[f2]
 -1
 
 A fun3
-s serve3_a 1.0
+s serve3 1.0
 :
-	serve3_a[f3_e]
+	serve3[f3]
 -1
 
 # 1. Solver settings
