@@ -29,6 +29,9 @@ public class Logic implements HttpFunction {
 	private HttpResponse response = null;
 	private HashMap<String, Boolean> act_exec=new HashMap<String, Boolean>();
 	private HashMap<String, Thread> act_thread=new HashMap<String, Thread>();
+	private Long  startCpuTime=null;
+	private Long  startExecTime=null;
+	
 
 	/*
 	 * activities
@@ -38,7 +41,7 @@ public class Logic implements HttpFunction {
 		this.act_exec.put("$act.getName()", true);
 		this.doWork($act.getDemand());
 		#if ($act.getCall() != $null)
-		String url = "https://northamerica-northeast1-modellearning.cloudfunctions.net/$act.getCall().getDest()";
+		String url = "https://northamerica-northeast1-modellearning.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
 		var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
 		try {
@@ -119,6 +122,8 @@ public class Logic implements HttpFunction {
 	public void service(HttpRequest request, HttpResponse response) throws IOException {
 		this.response = response;
 		mgm.setThreadCpuTimeEnabled(true);
+		this.startCpuTime=mgm.getCurrentThreadCpuTime();
+		this.startExecTime=System.nanoTime();
 		
 		//execute the entry activity
 		${f.getMainAct()}();
@@ -129,6 +134,9 @@ public class Logic implements HttpFunction {
 		  ${node.getName()}();
 		}
 		#end
+		String logstring=String.format("cpu:=%d  rt:=%d",mgm.getCurrentThreadCpuTime()-this.startCpuTime,
+									   System.nanoTime()-this.startExecTime);
+		Logic.logger.info(logstring);
 	}
 
 	private void doWork(Double stime) {

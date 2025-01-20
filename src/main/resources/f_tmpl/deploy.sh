@@ -5,10 +5,10 @@ gcloud beta functions deploy $fname \
 --region=northamerica-northeast1 \
 --source=. \
 --entry-point=functions.Logic \
---memory=512MB \
+--memory=1024MB \
 --cpu=1 \
 --trigger-http \
 --allow-unauthenticated \
 --project modellearning \
---max-instances=50 \
+--max-instances=100 \
 --min-instances=1

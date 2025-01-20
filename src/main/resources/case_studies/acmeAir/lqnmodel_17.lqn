@@ -1,0 +1,161 @@
+G
+"lqnmodel_17.lqn"
+0.0001
+10000
+1
+0.5
+-1
+
+# Processors declaration, with multiplicity 
+P 0
+p ProcClient f m 1000
+p ProcMSauth f m 4
+p ProcMSvalidateid f m 15
+p ProcMSviewprofile f m 15
+p ProcMSupdateprofile f m 15
+p ProcMSupdateMiles f m 15
+p ProcMSbookflights f m 15
+p ProcMScancelbooking f m 15
+p ProcMSqueryflights f m 15
+p ProcMSgetrewardmiles f m 15
+-1
+
+# Tasks declaration
+T 0
+t client r clientEntry -1 ProcClient m 40
+t MSauth n MSauthEntry -1 ProcMSauth m 180
+t MSvalidateid n MSvalidateidEntry -1 ProcMSvalidateid m 180
+t MSviewprofile n MSviewprofileEntry -1 ProcMSviewprofile m 180
+t MSupdateprofile n MSupdateprofileEntry -1 ProcMSupdateprofile m 180
+t MSupdateMiles n MSupdateMilesEntry -1 ProcMSupdateMiles m 180
+t MSbookflights n MSbookflightsEntry -1 ProcMSbookflights m 180
+t MScancelbooking n MScancelbookingEntry -1 ProcMScancelbooking m 180
+t MSqueryflights n MSqueryflightsEntry -1 ProcMSqueryflights m 180
+t MSgetrewardmiles n MSgetrewardmilesEntry -1 ProcMSgetrewardmiles m 180
+-1
+
+# Entries declaration
+E 0
+A clientEntry clientEntry_A1
+A MSauthEntry MSauthEntry_A1
+A MSvalidateidEntry MSvalidateidEntry_A1
+A MSviewprofileEntry MSviewprofileEntry_A1
+A MSupdateprofileEntry MSupdateprofileEntry_A1
+A MSupdateMilesEntry MSupdateMilesEntry_A1
+A MSbookflightsEntry MSbookflightsEntry_A1
+A MScancelbookingEntry MScancelbookingEntry_A1
+A MSqueryflightsEntry MSqueryflightsEntry_A1
+A MSgetrewardmilesEntry MSgetrewardmilesEntry_A1
+-1
+
+A client
+s clientEntry_A1 0.00001
+y clientEntry_A1 MSviewprofileEntry 1.0
+s clientEntry_A2 0.00001
+y clientEntry_A2 MSupdateprofileEntry 1.0
+s clientEntry_A3 0.00001
+y clientEntry_A3 MSbookflightsEntry 1.0
+s clientEntry_A4 0.00001
+y clientEntry_A4 MScancelbookingEntry 1.0
+s clientEntry_A5 0.00001
+y clientEntry_A5 MSqueryflightsEntry 1.0
+s clientEntry_A6 0.00001
+y clientEntry_A6 MSauthEntry 1.0
+s clientEntry_A7 0.02723
+:
+	clientEntry_A1 -> clientEntry_A2;
+	clientEntry_A2 -> clientEntry_A3;
+	clientEntry_A3 -> clientEntry_A4;
+	clientEntry_A4 -> clientEntry_A5;
+	clientEntry_A5 -> clientEntry_A6;
+	clientEntry_A6 -> clientEntry_A7
+-1
+
+A MSauth
+s MSauthEntry_A1 0.00001
+y MSauthEntry_A1 MSvalidateidEntry 1.0
+s MSauthEntry_A2 0.05219
+:
+	MSauthEntry_A1 -> MSauthEntry_A2;
+	MSauthEntry_A2[MSauthEntry]
+-1
+
+A MSvalidateid
+s MSvalidateidEntry_A1 0.0848
+:
+	MSvalidateidEntry_A1[MSvalidateidEntry]
+-1
+
+A MSviewprofile
+s MSviewprofileEntry_A1 0.09985
+:
+	MSviewprofileEntry_A1[MSviewprofileEntry]
+-1
+
+A MSupdateprofile
+s MSupdateprofileEntry_A1 0.02312
+:
+	MSupdateprofileEntry_A1[MSupdateprofileEntry]
+-1
+
+A MSupdateMiles
+s MSupdateMilesEntry_A1 0.07251
+:
+	MSupdateMilesEntry_A1[MSupdateMilesEntry]
+-1
+
+A MSbookflights
+s MSbookflightsEntry_A1 0.00001
+y MSbookflightsEntry_A1 MSupdateMilesEntry 1.0
+s MSbookflightsEntry_A2 0.00001
+y MSbookflightsEntry_A2 MSgetrewardmilesEntry 1.0
+s MSbookflightsEntry_A3 0.00001
+y MSbookflightsEntry_A3 MSupdateMilesEntry 1.0
+s MSbookflightsEntry_A4 0.00001
+y MSbookflightsEntry_A4 MSgetrewardmilesEntry 1.0
+s MSbookflightsEntry_A5 0.03507
+:
+	MSbookflightsEntry_A1 -> MSbookflightsEntry_A2;
+	MSbookflightsEntry_A2 -> MSbookflightsEntry_A3;
+	MSbookflightsEntry_A3 -> MSbookflightsEntry_A4;
+	MSbookflightsEntry_A4 -> MSbookflightsEntry_A5;
+	MSbookflightsEntry_A5[MSbookflightsEntry]
+-1
+
+A MScancelbooking
+s MScancelbookingEntry_A1 0.000001
+y MScancelbookingEntry_A1 MSupdateMilesEntry 1.0
+s MScancelbookingEntry_A2 0.000001
+y MScancelbookingEntry_A2 MSgetrewardmilesEntry 1.0
+s MScancelbookingEntry_A3 0.04722
+:
+	MScancelbookingEntry_A1 -> MScancelbookingEntry_A2;
+	MScancelbookingEntry_A2 -> MScancelbookingEntry_A3;
+	MScancelbookingEntry_A3[MScancelbookingEntry]
+-1
+
+A MSqueryflights
+s MSqueryflightsEntry_A1 0.02098
+:
+	MSqueryflightsEntry_A1[MSqueryflightsEntry]
+-1
+
+A MSgetrewardmiles
+s MSgetrewardmilesEntry_A1 0.027230
+:
+	MSgetrewardmilesEntry_A1[MSgetrewardmilesEntry]
+-1
+
+# 1. Solver settings
+#! v 1.0e5           # fast rate to approximate instantaneous events
+#! solver ode        # ODE analysis - solver sim will run simulation
+#! confidence_percent_error 0.1 
+# #! stoptime 1000     # integration time horizon
+
+# 2. Output settings
+#! throughput: clientEntry_A1
+#! utilization: clientEntry_A1
+#! responsetime: clientEntry_A1 -1
+
+# 3. Export settings
+#! export csv

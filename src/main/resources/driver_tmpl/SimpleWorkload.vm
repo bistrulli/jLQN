@@ -1,15 +1,21 @@
 from locust import HttpUser, task, between, events
-import queue, time, logging
+import time, logging
 import locust.stats
 import numpy as np
 import subprocess
+from queue import Queue
+import threading
 
 locust.stats.CSV_STATS_INTERVAL_SEC = 1
 
+rtQue=Queue()
 
 @events.test_stop.add_listener
 def on_test_stop(**kw):
-	pass
+	rt=[]
+	while not rtQue.empty():
+		rt+=[rtQue.get()]
+	np.savetxt('clientrt.txt',rt)
 
 
 class SimpleWorkload(HttpUser):
@@ -31,7 +37,7 @@ class SimpleWorkload(HttpUser):
 		self.doWait($act.getDemand());
 
 		#if ($act.getCall() != $null)
-		tgt_url = "$act.getCall().getDest()";
+		tgt_url = "${act.getCall().getDest().toLowerCase()}";
 		self.client.get(tgt_url)
 		#end
 	#end
@@ -85,6 +91,7 @@ class SimpleWorkload(HttpUser):
 	@task
 	def visit_homepage(self):
 		#[[#]]# execetute the entry activity
+		strat_time=time.time()
 		self.${f.getMainAct()}()
 		#foreach ( $node in $f.getDnodes())
 		#[[#]]# execetute the decision node of already executed evt
@@ -92,9 +99,8 @@ class SimpleWorkload(HttpUser):
 		  self.act_exec["${node.getOriginEvt()}"]=False
 		  self.${node.getName()}()
 		#end
+		rtQue.put(time.time()-strat_time)
 		
-		
-
 if __name__ == "__main__":
 	SimpleWorkload().run()
 	

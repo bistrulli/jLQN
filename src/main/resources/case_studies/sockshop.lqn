@@ -1,5 +1,5 @@
 G
-"ATOM-3"
+"sockshop"
 0.01
 10000
 1
@@ -10,83 +10,206 @@ G
 P 0
 p ProcClient f m 1000
 p ProcRouter f m 1000
-p ProcFrontend f m 1000
-p ProcCatalogSvc f m 1000
-p ProcCartSvc f m 1000
-p ProcCatalogDB f m 1000
-p ProcCartDB f m 1000
+
+p ProcSSHome f m 1000
+p ProcSSCtlg f m 1000
+p ProcSSCart f m 1000
+
+p ProcSSList f m 1000
+p ProcSSItem f m 1000
+
+p ProcSSAdd f m 1000
+p ProcSSGet f m 1000
+p ProcSSDel f m 1000
+
+p ProcSSCtlgDB f m 1000
+p ProcSSCartDB f m 1000
 -1
 
 # Tasks declaration
 T 0
-t Client r Browse -1 ProcClient m 1
-t TaskRouter n Address -1 ProcRouter m 1000
-t TaskFrontend n Home Catalog Cart -1 ProcFrontend m 1000
-t TaskCatalogSvc n List Item -1 ProcCatalogSvc m 1000
-t TaskCartSvc n Get Add Del -1 ProcCartSvc m 1000#
-#t TaskCatalogDB n CatQuery -1 ProcCatalogDB m 1000
-#t TaskCartDB n CartQuery -1 ProcCartDB m 1000
+t Client r SockClient -1 ProcClient m 1
+
+t TaskRouter n SSAddress -1 ProcRouter m 1000
+
+t TaskSSHome n SSHome -1 ProcSSHome m 1000
+t TaskSSCtlg n SSCtlg -1 ProcSSCtlg m 1000
+t TaskSSCart n SSCart -1 ProcSSCart m 1000
+
+t TaskSSList n SSList -1 ProcSSList m 1000
+t TaskSSItem n SSItem -1 ProcSSItem m 1000
+
+t TaskSSGet n SSGet -1 ProcSSGet m 1000
+t TaskSSAdd n SSAdd -1 ProcSSAdd m 1000
+t TaskSSDel n SSDel -1 ProcSSDel m 1000
+
+t TaskSSCtlgDB n SSCatQuery -1 ProcSSCtlgDB m 1000
+t TaskSSCartDB n SSCartQuery -1 ProcSSCartDB m 1000
 -1
 
 # Entries declaration
 E 0
-s Browse 0.1 -1
-s Get 0.1 -1
-s Add 0.1 -1
-s Del 0.1 -1
-s Home 0.1 -1
-s Cart 0.1 -1
-s List 0.1 -1
-s Item 0.1 -1
-#s CatQuery 0.1 -1
-#s CartQuery 0.1 -1
-A Address ActivityAddress
-A Catalog ActivityCatalog
-y Browse Address 1.0 -1
-#y List CatQuery 1.0 -1
-#y Item CatQuery 1.0 -1
-y Cart Get 1.0 -1
-y Cart Add 1.0 -1
-y Cart Del 1.0 -1
-#y Get CartQuery 1.0 -1
-#y Add CartQuery 1.0 -1
-#y Del CartQuery 1.0 -1
+A SockClient SockClient_a1
+
+A SSAddress SSAddress_a1
+
+A SSHome SSHome_a1
+A SSCtlg SSCtlg_a1
+A SSCart SSCart_a1
+
+A SSList SSList_a1
+A SSItem SSItem_a1
+
+A SSGet SSGet_a1
+A SSAdd SSAdd_a1
+A SSDel SSDel_a1
+
+A SSCatQuery SSCatQuery_a1
+A SSCartQuery SSCartQuery_a1
 -1
 
-# Activities definition
+A Client
+s SockClient_a1 0.0001
+y SockClient_a1 SSAddress 1.0
+s SockClient_a2 0.0299
+:
+SockClient_a1 -> SockClient_a2
+-1
+
 A TaskRouter
- s ActivityAddress 0.1
- s ActivityHome 0.00000000001
- s ActivityCatalog 0.00000000001
- s ActivityCart 0.00000000001
- y ActivityHome Home 1.0
- y ActivityCatalog Catalog 1.0
- y ActivityCart Cart 1.0
+s SSAddress_a1 0.0001
+s SSAddress_SSHome 0.0001
+y SSAddress_SSHome SSHome 1.0
+s SSAddress_SSCtlg 0.0001
+y SSAddress_SSCtlg SSCtlg 1.0
+s SSAddress_SSCarts 0.0001
+y SSAddress_SSCarts SSCart 1.0
+s SSAddress_work 0.1050
 :
- ActivityAddress -> (0.333) ActivityHome + (0.333) ActivityCatalog + (0.334) ActivityCart;
- ActivityHome[Address];
- ActivityCatalog[Address];
- ActivityCart[Address]
+SSAddress_a1 -> (0.3333) SSAddress_SSHome+ (0.3333) SSAddress_SSCtlg + (0.3333) SSAddress_SSCarts;
+SSAddress_SSHome -> SSAddress_work;
+SSAddress_SSCtlg -> SSAddress_work;
+SSAddress_SSCarts -> SSAddress_work;
+SSAddress_work[SSAddress]
 -1
 
-A TaskFrontend
- s ActivityCatalog 0.1
- s ActivityList 0.00000000001
- s ActivityItem 0.00000000001
- y ActivityList List 1.0
- y ActivityItem Item 1.0
+A TaskSSHome
+s SSHome_a1 0.0001
+s SSHome_work 0.0542
 :
- ActivityCatalog -> (0.5) ActivityList + (0.5) ActivityItem;
- ActivityList[Catalog];
- ActivityItem[Catalog]
+SSHome_a1 -> SSHome_work;
+SSHome_work[SSHome]
 -1
+
+A TaskSSCtlg
+s SSCtlg_a1 0.0001
+s SSCtlg_work 0.0434
+s SSCtlg_SSList 0.0001
+y SSCtlg_SSList SSList 1.0
+s SSCtlg_SSItem 0.0001
+y SSCtlg_SSItem SSItem 1.0
+:
+SSCtlg_a1 -> (0.50) SSCtlg_SSList + (0.50) SSCtlg_SSItem;
+SSCtlg_SSList -> SSCtlg_work;
+SSCtlg_SSItem -> SSCtlg_work;
+SSCtlg_work[SSCtlg]
+-1
+
+A TaskSSCart
+s SSCart_a1 0.0001
+s SSCart_work 0.0204
+s SSCart_SSGet 0.0001
+y SSCart_SSGet SSGet 1.0
+s SSCart_SSAdd 0.0001
+y SSCart_SSAdd SSAdd 1.0
+s SSCart_SSDel 0.0001
+y SSCart_SSDel SSDel 1.0
+:
+SSCart_a1 -> (0.3333) SSCart_SSGet + (0.3333) SSCart_SSAdd + (0.3333) SSCart_SSDel;
+SSCart_SSGet -> SSCart_work;
+SSCart_SSAdd -> SSCart_work;
+SSCart_SSDel -> SSCart_work;
+SSCart_work[SSCart]
+-1
+
+A TaskSSList
+s SSList_a1 0.0001
+s SSList_work 0.1279
+s SSList_Query 0.0001
+y SSList_Query SSCatQuery 1.0
+:
+SSList_a1 -> SSList_Query;
+SSList_Query -> SSList_work;
+SSList_work[SSList]
+-1
+
+A TaskSSItem
+s SSItem_a1 0.0001
+s SSItem_work 0.0234
+s SSItem_Query 0.0001
+y SSItem_Query SSCatQuery 1.0
+:
+SSItem_a1 -> SSItem_Query;
+SSItem_Query -> SSItem_work;
+SSItem_work[SSItem]
+-1
+
+A TaskSSGet
+s SSGet_a1 0.0001
+s SSGet_work 0.0310
+s SSGet_Query 0.0001
+y SSGet_Query SSCartQuery 1.0
+:
+SSGet_a1 -> SSGet_Query;
+SSGet_Query -> SSGet_work;
+SSGet_work[SSGet]
+-1
+
+A TaskSSAdd
+s SSAdd_a1 0.0001
+s SSAdd_work 0.0532
+s SSAdd_Query 0.0001
+y SSAdd_Query SSCartQuery 1.0
+:
+SSAdd_a1 -> SSAdd_Query;
+SSAdd_Query -> SSAdd_work;
+SSAdd_work[SSAdd]
+-1
+
+A TaskSSDel
+s SSDel_a1 0.0001
+s SSDel_work 0.1048
+s SSDel_Query 0.0001
+y SSDel_Query SSCartQuery 1.0
+:
+SSDel_a1 -> SSDel_Query;
+SSDel_Query -> SSDel_work;
+SSDel_work[SSDel]
+-1
+
+A TaskSSCtlgDB
+s SSCatQuery_a1 0.0001
+s SSCatQuery_work 0.0467
+:
+SSCatQuery_a1->SSCatQuery_work;
+SSCatQuery_work[SSCatQuery]
+-1
+
+A TaskSSCartDB
+s SSCartQuery_a1 0.0001
+s SSCartQuery_work 0.4
+:
+SSCartQuery_a1->SSCartQuery_work;
+SSCartQuery_work[SSCartQuery]
+-1
+
 
 # DiffLQN settings, starting with #!
 # These will be ignored by LQNS
 
 # 1. Solver settings
 #! v 1.0e5             # fast rate to approximate instantaneous events
-#! solver sim          # ODE analysis - solver sim will run simulation
+#! solver ode          # ODE analysis - solver sim will run simulation
 #! stoptime 1000.0     # integration time horizon
 #! confidence_level 0.95
 #! confidence_percent_error 0.2

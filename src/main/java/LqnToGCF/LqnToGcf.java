@@ -21,9 +21,10 @@ import Entity.App;
 import Entity.Function;
 
 public class LqnToGcf {
-	private Path destPath = Paths.get("/Users/emilio-imt/eclipse-workspace");
+	private Path destPath = Paths.get("/Users/emilio-imt/git/AcmeAirServerless/");
 	private static Path tmpPath = Paths.get("src/main/resources/f_tmpl");
 	private static Path tmpLocustPath = Paths.get("src/main/resources/driver_tmpl");
+	private static Path tmpSysScriptsPath = Paths.get("src/main/resources/scripts_sys_tmpl");
 
 	public LqnToGcf(App lqnApp) {
 		Path appDir = Paths.get(destPath.toString() + File.separator + lqnApp.getName().replace("\"", ""));
@@ -35,6 +36,23 @@ public class LqnToGcf {
 				this.copyTmpfun(tmpLocustPath, appDir, f);
 				this.translateLocust(appDir, f);
 			}
+		}
+		//copy file at the lqnsystem level
+		this.copySysScritps(tmpSysScriptsPath, appDir);
+	}
+	
+	public void copySysScritps(Path source, Path dest) {
+		try {
+			FileUtils.createParentDirectories(dest.toFile());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		File sourceDirectory = new File(source.toString());
+		File destinationDirectory = new File(dest.toString());
+		try {
+			FileUtils.copyDirectory(sourceDirectory, destinationDirectory);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -137,7 +155,7 @@ public class LqnToGcf {
 			while (sc.hasNextLine())
 				content += sc.nextLine() + "\n";
 			sc.close();
-			content = content.replace("$fname", fname);
+			content = content.replace("$fname", fname.toLowerCase());
 			try {
 				FileWriter fw = new FileWriter(f);
 				fw.write(content);

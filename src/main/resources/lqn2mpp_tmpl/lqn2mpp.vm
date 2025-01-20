@@ -48,9 +48,10 @@ if __name__ == '__main__':
 	${f.getName()}.getDnodes().append(${f.getName()}DI)
 	#end
 	#foreach ( $node in $f.getDnodes())
+	#set($outerIndex = $foreach.index)
 	#if($node.class.getSimpleName()=="OrNode")
 	${f.getName()}D${foreach.index}=probChoice(parent=${f.getName()}, name="${f.getName()}D${foreach.index}", 
-									probs=[#foreach($act in $node.getForkList())#if($foreach.first)"P_${f.getName()}${act}"#else,"P_${f.getName()}${act}"#end#end], 
+									probs=[#foreach($act in $node.getForkList())#if($foreach.first)"P_${f.getName()}${act}${f.getName()}D${outerIndex}"#else,"P_${f.getName()}${act}${f.getName()}D${outerIndex}"#end#end], 
 									branches=[#foreach($act in $node.getForkList())#if($foreach.first)${f.getName()}${act}#else,${f.getName()}${act}#end#end], 
 									origin=${f.getName()}${node.getJoinList().get(0)})
 	${f.getName()}.getDnodes().append(${f.getName()}D${foreach.index})
