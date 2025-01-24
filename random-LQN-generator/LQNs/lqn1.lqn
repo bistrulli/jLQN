@@ -1,0 +1,36 @@
+G
+lqn1.lqn
+0.01
+10000
+1
+0.5
+-1
+
+# Processors declaration, with multiplicity
+P 0
+p Proc0 f m 1000
+p Proc1 f m 1000
+p Proc2 f m 1000
+p Proc3 f m 1000
+p Proc4 f m 1000
+p Proc5 f m 1000
+p Proc6 f m 1000
+p Proc7 f m 1000
+p Proc8 f m 1000
+p Proc9 f m 1000
+-1
+
+# Tasks declaration
+T 0
+t Task0 r Entry0_0 Entry0_1 Entry0_2 Entry0_3 -1 Proc0 m 1000
+t Task1 n Entry1_0 Entry1_1 Entry1_2 -1 Proc1 m 1000
+t Task2 n Entry2_0 Entry2_1 Entry2_2 Entry2_3 Entry2_4 -1 Proc2 m 1000
+t Task3 n Entry3_0 Entry3_1 Entry3_2 Entry3_3 Entry3_4 -1 Proc3 m 1000
+t Task4 n Entry4_0 Entry4_1 Entry4_2 Entry4_3 -1 Proc4 m 1000
+t Task5 n Entry5_0 Entry5_1 Entry5_2 Entry5_3 Entry5_4 -1 Proc5 m 1000
+t Task6 n Entry6_0 Entry6_1 -1 Proc6 m 1000
+t Task7 n Entry7_0 Entry7_1 Entry7_2 Entry7_3 Entry7_4 -1 Proc7 m 1000
+t Task8 n Entry8_0 Entry8_1 Entry8_2 -1 Proc8 m 1000
+t Task9 n Entry9_0 Entry9_1 Entry9_2 Entry9_3 -1 Proc9 m 1000
+-1
+
