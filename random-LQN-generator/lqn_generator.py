@@ -26,11 +26,16 @@ def processors_declaration(num_processors):
     return processors_string
 
 
-def tasks_declaration(num_tasks, max_entries_per_task):
+def tasks_and_entries_declaration(num_tasks, max_entries_per_task):
   #TODO change moltiplicity
   tasks_string = ""
   tasks_string += "# Tasks declaration\n"
   tasks_string += "T 0\n"
+
+  entries_string = ""
+  entries_string += "# Entries declaration\n"
+  entries_string += "E 0\n"
+
   for i in range(num_tasks):
       task_name = f"Task{i}"
       a = "r" if i == 0 else "n"
@@ -38,19 +43,13 @@ def tasks_declaration(num_tasks, max_entries_per_task):
       entry_names = [f"Entry{i}_{j}" for j in range(num_entries)]
       tasks_string += f"t {task_name} {a} "
       tasks_string += " ".join(entry_names) + f" -1 Proc{i} m 1000\n"
-  tasks_string += "-1\n\n"
-  return tasks_string
+      for entry_name in entry_names:
+        entries_string += f"s {entry_name} {round(random.uniform(0.001, 0.01), 4)} -1\n"
 
-#def entries_declaration()
-    # # Entries
-    # lqn_model += "# Entries declaration\n"
-    # lqn_model += "E 0\n"
-    # for i in range(num_tasks):
-    #     for j in range(num_entries_per_task):
-    #         entry_name = f"Entry{i}_{j}"
-    #         arrival_rate = round(random.uniform(0.001, 0.01), 4) 
-    #         lqn_model += f"s {entry_name} {arrival_rate} -1\n"
-    # lqn_model += "-1\n\n"
+  tasks_string += "-1\n\n"
+  entries_string += "-1\n\n"
+
+  return tasks_string + entries_string
 
 
 def save_file(filename, text_string):
@@ -62,7 +61,7 @@ def save_file(filename, text_string):
 def generate_random_lqn(filename, num_tasks=5, max_entries_per_task=3):
     lqn_text = header_declaration(filename)
     lqn_text += processors_declaration(num_tasks)
-    lqn_text += tasks_declaration(num_tasks, max_entries_per_task)
+    lqn_text += tasks_and_entries_declaration(num_tasks, max_entries_per_task)
     print(lqn_text)
     save_file(filename, lqn_text)
 
