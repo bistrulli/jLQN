@@ -1,5 +1,5 @@
 G
-lqn1.lqn
+"lqn1.lqn"
 0.01
 10000
 1
@@ -11,50 +11,43 @@ P 0
 p Proc0 f m 1000
 p Proc1 f m 1000
 p Proc2 f m 1000
-p Proc3 f m 1000
-p Proc4 f m 1000
-p Proc5 f m 1000
-p Proc6 f m 1000
 -1
 
 # Tasks declaration
 T 0
-t Task0 r Entry0_0 Entry0_1 Entry0_2 Entry0_3 Entry0_4 -1 Proc0 m 1000
-t Task1 n Entry1_0 Entry1_1 Entry1_2 Entry1_3 Entry1_4 -1 Proc1 m 1000
-t Task2 n Entry2_0 Entry2_1 Entry2_2 Entry2_3 Entry2_4 -1 Proc2 m 1000
-t Task3 n Entry3_0 -1 Proc3 m 1000
-t Task4 n Entry4_0 -1 Proc4 m 1000
-t Task5 n Entry5_0 Entry5_1 Entry5_2 Entry5_3 -1 Proc5 m 1000
-t Task6 n Entry6_0 Entry6_1 Entry6_2 Entry6_3 Entry6_4 -1 Proc6 m 1000
+t Task0 r Entr0 -1 Proc0 m 1
+t Task1 n Entr1 -1 Proc1 m 1000
+t Task2 n Entr2 -1 Proc2 m 1000
 -1
 
 # Entries declaration
 E 0
-s Entry0_0 0.0041 -1
-s Entry0_1 0.0085 -1
-s Entry0_2 0.008 -1
-s Entry0_3 0.0077 -1
-s Entry0_4 0.0088 -1
-s Entry1_0 0.0023 -1
-s Entry1_1 0.0054 -1
-s Entry1_2 0.006 -1
-s Entry1_3 0.0014 -1
-s Entry1_4 0.0043 -1
-s Entry2_0 0.0041 -1
-s Entry2_1 0.0054 -1
-s Entry2_2 0.007 -1
-s Entry2_3 0.0078 -1
-s Entry2_4 0.0042 -1
-s Entry3_0 0.0069 -1
-s Entry4_0 0.0016 -1
-s Entry5_0 0.0074 -1
-s Entry5_1 0.0066 -1
-s Entry5_2 0.0041 -1
-s Entry5_3 0.0017 -1
-s Entry6_0 0.0086 -1
-s Entry6_1 0.0047 -1
-s Entry6_2 0.0043 -1
-s Entry6_3 0.0097 -1
-s Entry6_4 0.0061 -1
+A Entr0 acti0
+A Entr1 acti1
+A Entr2 acti2
+-1
+
+# Activities declaration
+A Task0
+s acti0_0 0.0014
+s acti0_1 0.0042
+y acti0_0 Entr1 1.0
+:
+  acti0_0 -> acti0_1
+-1
+
+A Task1
+s acti1_0 0.0055
+s acti1_1 0.0037
+y acti1_0 Entr2 1.0
+:
+  acti1_0 -> acti1_1
+  acti1_1[Entr1]
+-1
+
+A Task2
+s acti2_0 0.0094
+:
+  acti2_0[Entr2]
 -1
 
