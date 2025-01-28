@@ -1,5 +1,5 @@
 G
-"lqn1.lqn"
+"lqn3.lqn"
 0.01
 10000
 1
@@ -51,138 +51,120 @@ A Entr9 acti9
 # Activities declaration
 A Task0
 s acti0 0.0001
-s acti01 0.72
-s acti02 0.63
-s acti03 0.66
-s acti08 0.62
-s acti09 3.53
+s acti01 0.12
+s acti02 3.96
+s acti06 1.54
 y acti01 Entr1 1.0
 y acti02 Entr2 1.0
-y acti03 Entr3 1.0
-y acti08 Entr8 1.0
-y acti09 Entr9 1.0
+y acti06 Entr6 1.0
 :
-  acti0 -> (0.2)acti01 + (0.2)acti02 + (0.2)acti03 + (0.2)acti08 + (0.2)acti09;
+  acti0 -> (0.34)acti01 + (0.33)acti02 + (0.33)acti06;
   acti01[Entr0];
   acti02[Entr0];
-  acti03[Entr0];
-  acti08[Entr0];
-  acti09[Entr0]
+  acti06[Entr0]
 -1
 
 A Task1
 s acti1 0.0001
-s acti14 0.26
-s acti15 2.72
-s acti17 1.54
-s acti18 2.97
-s acti19 2.04
+s acti13 2.47
+s acti14 3.7
+s acti16 3.3
+s acti18 1.08
+s acti19 3.17
+y acti13 Entr3 1.0
 y acti14 Entr4 1.0
-y acti15 Entr5 1.0
-y acti17 Entr7 1.0
+y acti16 Entr6 1.0
 y acti18 Entr8 1.0
 y acti19 Entr9 1.0
 :
-  acti1 -> (0.2)acti14 + (0.2)acti15 + (0.2)acti17 + (0.2)acti18 + (0.2)acti19;
+  acti1 -> (0.2)acti13 + (0.2)acti14 + (0.2)acti16 + (0.2)acti18 + (0.2)acti19;
+  acti13[Entr1];
   acti14[Entr1];
-  acti15[Entr1];
-  acti17[Entr1];
+  acti16[Entr1];
   acti18[Entr1];
   acti19[Entr1]
 -1
 
 A Task2
 s acti2 0.0001
-s acti27 2.27
-y acti27 Entr7 1.0
+s acti23 3.6
+s acti24 3.43
+s acti26 1.21
+y acti23 Entr3 1.0
+y acti24 Entr4 1.0
+y acti26 Entr6 1.0
 :
-  acti2 -> acti27;
-  acti27[Entr2]
+  acti2 -> (0.34)acti23 + (0.33)acti24 + (0.33)acti26;
+  acti23[Entr2];
+  acti24[Entr2];
+  acti26[Entr2]
 -1
 
 A Task3
 s acti3 0.0001
-s acti35 3.0
-s acti36 0.15
-s acti38 0.91
-s acti39 1.19
+s acti35 1.6
+s acti37 0.58
 y acti35 Entr5 1.0
-y acti36 Entr6 1.0
-y acti38 Entr8 1.0
-y acti39 Entr9 1.0
+y acti37 Entr7 1.0
 :
-  acti3 -> (0.25)acti35 + (0.25)acti36 + (0.25)acti38 + (0.25)acti39;
+  acti3 -> (0.5)acti35 + (0.5)acti37;
   acti35[Entr3];
-  acti36[Entr3];
-  acti38[Entr3];
-  acti39[Entr3]
+  acti37[Entr3]
 -1
 
 A Task4
 s acti4 0.0001
-s acti45 2.18
-s acti46 0.2
-s acti47 3.81
-s acti48 1.35
-s acti49 2.04
+s acti45 1.14
+s acti48 2.4
 y acti45 Entr5 1.0
-y acti46 Entr6 1.0
-y acti47 Entr7 1.0
 y acti48 Entr8 1.0
-y acti49 Entr9 1.0
 :
-  acti4 -> (0.2)acti45 + (0.2)acti46 + (0.2)acti47 + (0.2)acti48 + (0.2)acti49;
+  acti4 -> (0.5)acti45 + (0.5)acti48;
   acti45[Entr4];
-  acti46[Entr4];
-  acti47[Entr4];
-  acti48[Entr4];
-  acti49[Entr4]
+  acti48[Entr4]
 -1
 
 A Task5
 s acti5 0.0001
-s acti56 0.84
-s acti57 2.67
-s acti58 3.46
-y acti56 Entr6 1.0
+s acti57 1.13
+s acti59 1.28
 y acti57 Entr7 1.0
-y acti58 Entr8 1.0
+y acti59 Entr9 1.0
 :
-  acti5 -> (0.34)acti56 + (0.33)acti57 + (0.33)acti58;
-  acti56[Entr5];
+  acti5 -> (0.5)acti57 + (0.5)acti59;
   acti57[Entr5];
-  acti58[Entr5]
+  acti59[Entr5]
 -1
 
 A Task6
 s acti6 0.0001
-s acti68 0.2
+s acti68 1.81
+s acti69 2.13
 y acti68 Entr8 1.0
+y acti69 Entr9 1.0
 :
-  acti6 -> acti68;
-  acti68[Entr6]
+  acti6 -> (0.5)acti68 + (0.5)acti69;
+  acti68[Entr6];
+  acti69[Entr6]
 -1
 
 A Task7
 s acti7 0.0001
-s acti78 0.3
-s acti79 0.82
-y acti78 Entr8 1.0
+s acti79 1.62
 y acti79 Entr9 1.0
 :
-  acti7 -> (0.5)acti78 + (0.5)acti79;
-  acti78[Entr7];
+  acti7 -> acti79;
   acti79[Entr7]
 -1
 
 A Task8
-s acti8 2.01
+s acti8 3.14
 :
   acti8[Entr8]
 -1
 
 A Task9
-s acti9 3.78
+s acti9 1.54
 :
   acti9[Entr9]
 -1
