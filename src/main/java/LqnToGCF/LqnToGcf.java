@@ -13,20 +13,36 @@ import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
+import java.util.Properties;
 
 import Entity.App;
 import Entity.Function;
 
 public class LqnToGcf {
-	private Path destPath = Paths.get("/Users/emilio-imt/git/AcmeAirServerless/");
-	private static Path tmpPath = Paths.get("src/main/resources/f_tmpl");
-	private static Path tmpLocustPath = Paths.get("src/main/resources/driver_tmpl");
-	private static Path tmpSysScriptsPath = Paths.get("src/main/resources/scripts_sys_tmpl");
+	private Path destPath = Paths.get("/Users/emilio-imt/");
+	private VelocityEngine velocityEngine;
+	private static Path tmpPath = Paths.get("/Users/emilio-imt/git/jLQN/resources/f_tmpl");
+	private static Path tmpLocustPath = Paths.get("/Users/emilio-imt/git/jLQN/resources/driver_tmpl");
+	private static Path tmpSysScriptsPath = Paths.get("/Users/emilio-imt/git/jLQN/resources/scripts_sys_tmpl");
 
 	public LqnToGcf(App lqnApp) {
+		
+		//init velocity
+		Properties props = new Properties();
+        props.setProperty("resource.loader", "file");
+        props.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
+
+        // Abilita i percorsi assoluti
+        props.setProperty("file.resource.loader.path", ""); // Percorso vuoto per consentire path assolute
+        props.setProperty("file.resource.loader.cache", "false"); // Opzionale: evita cache durante sviluppo
+		
+        this.velocityEngine = new VelocityEngine();
+        this.velocityEngine.init(props);
+		
 		Path appDir = Paths.get(destPath.toString() + File.separator + lqnApp.getName().replace("\"", ""));
 		for (Function f : lqnApp.getFunctions()) {
 			if (!f.getKind().equals("r")) {
@@ -58,13 +74,13 @@ public class LqnToGcf {
 
 	public void translateLocust(Path fDir, Function f) {
 		fDir = Paths.get(fDir.toString() + File.separator + f.getName());
-		Velocity.init();
+		
 		VelocityContext context = new VelocityContext();
 		context.put("f", f);
 		Template template = null;
 
 		try {
-			template = Velocity.getTemplate(tmpLocustPath.toString() + File.separator + "SimpleWorkload.vm");
+			template = this.velocityEngine.getTemplate(tmpLocustPath.toString() + File.separator + "SimpleWorkload.vm");
 		} catch (ResourceNotFoundException rnfe) {
 			rnfe.printStackTrace();
 		} catch (ParseErrorException pee) {
@@ -92,13 +108,13 @@ public class LqnToGcf {
 
 	public void translate(Path fDir, Function f) {
 		fDir = Paths.get(fDir.toString() + File.separator + f.getName());
-		Velocity.init();
+		
 		VelocityContext context = new VelocityContext();
 		context.put("f", f);
 		Template template = null;
 
 		try {
-			template = Velocity.getTemplate(tmpPath.toString() + "/src/main/java/functions/Logic.vm");
+			template = this.velocityEngine.getTemplate(tmpPath.toString() + "/src/main/java/functions/Logic.vm");
 		} catch (ResourceNotFoundException rnfe) {
 			rnfe.printStackTrace();
 		} catch (ParseErrorException pee) {

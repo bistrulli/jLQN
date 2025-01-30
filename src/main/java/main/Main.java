@@ -26,9 +26,8 @@ import LqnToGCF.LqnToGcf;
  */
 class Main {
 	public static void main(String[] args) {
-		System.out.println("Antlr4 Example");
-		String directoryPath = "src/main/resources/case_studies/acmeair/";
-		String wildcardPattern = "lqnmodel_*.lqn";
+		String directoryPath = "/Users/emilio-imt/git/jLQN/resources/wasteless_journal";
+		String wildcardPattern = "*.lqn";
 		try {
 			Collection<File> matchingFiles = FileUtils.listFiles(new File(directoryPath),
 					new WildcardFileFilter(wildcardPattern), null);
@@ -66,7 +65,7 @@ class Main {
 					RuleModelContext ruleModel = parser.ruleModel();
 
 					LqnToGcf gcftrasducer = new LqnToGcf(myListner.app);
-					LqnToMPP mpptrasducer = new LqnToMPP(myListner.app);
+					//LqnToMPP mpptrasducer = new LqnToMPP(myListner.app);
 				}
 			}
 
