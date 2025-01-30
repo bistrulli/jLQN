@@ -101,7 +101,8 @@ def activities_declaration(tasks, dag):
                 p0 = round(1 - ((len(dag[i])-1) * p), 2)
                 text += f"  acti{i} -> ({p0})acti{i}{dag[i][0]}"
                 text += "".join([f" + ({p})acti{i}{dag[i][j]}" for j in range(1, len(dag[i]))])
-                text += "".join([f";\n  acti{i}{dag[i][j]}[Entr{i}]" for j in range(len(dag[i]))])
+                if i != 0: # Reference task does not issue replies
+                    text += "".join([f";\n  acti{i}{dag[i][j]}[Entr{i}]" for j in range(len(dag[i]))])
                 text += "\n"
         text += "-1\n\n"
     return text
