@@ -23,11 +23,15 @@ import Entity.App;
 import Entity.Function;
 
 public class LqnToGcf {
-	private Path destPath = Paths.get("/Users/emilio-imt/");
+	// Find the current path (run the jar file from the root of the project)
+	private static String projectRoot = System.getProperty("user.dir");
+	private static Path projectPath = Paths.get(projectRoot);
+
+	private Path destPath = projectPath.resolve("output");
 	private VelocityEngine velocityEngine;
-	private static Path tmpPath = Paths.get("/Users/emilio-imt/git/jLQN/resources/f_tmpl");
-	private static Path tmpLocustPath = Paths.get("/Users/emilio-imt/git/jLQN/resources/driver_tmpl");
-	private static Path tmpSysScriptsPath = Paths.get("/Users/emilio-imt/git/jLQN/resources/scripts_sys_tmpl");
+	private static Path tmpPath = projectPath.resolve("resources/f_tmpl");
+	private static Path tmpLocustPath = projectPath.resolve("resources/driver_tmpl");
+	private static Path tmpSysScriptsPath = projectPath.resolve("resources/scripts_sys_tmpl");
 
 	public LqnToGcf(App lqnApp) {
 		
