@@ -27,7 +27,6 @@ import LqnToGCF.LqnToGcf;
 class Main {
 	public static void main(String[] args) {
 		// Find the current path (run the jar file from the root of the project)
-		
 		String projectRoot = System.getProperty("user.dir");
 		String directoryPath = projectRoot + "/resources/wasteless_journal";
 		String wildcardPattern = "*.lqn";
