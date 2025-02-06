@@ -20,7 +20,7 @@ def get_cli():
     parser.add_argument("-a", "--call_avg", type=int, default=1,
                         help='The average number of calls for each task.', required=False)
     parser.add_argument("-v", "--call_var", type=float, default=0.001,
-                        help='The average number of calls for each task.', required=False)
+                        help='The variance of calls for each task.', required=False)
     return parser.parse_args()
 
 
