@@ -1,6 +1,8 @@
 import random
 import os
 import argparse
+import numpy as np
+# import math
 
 out_lqn_folder = os.path.join(os.getcwd(), "LQNs")
 
@@ -15,6 +17,10 @@ def get_cli():
                         help='The number of LQNs to generate (default is 10).', required=False)
     parser.add_argument("-f", "--functions", type=int,
                         help='The number of functions for each LQN.', required=True)
+    parser.add_argument("-a", "--call_avg", type=int, default=1,
+                        help='The average number of calls for each task.', required=False)
+    parser.add_argument("-v", "--call_var", type=float, default=0.001,
+                        help='The average number of calls for each task.', required=False)
     return parser.parse_args()
 
 
@@ -90,11 +96,13 @@ def entries_declaration(entries):
     text += "-1\n\n"
     return text
 
-def get_call_number():
-    return 1.0
+def get_call_number(average, variance):
+    std = np.sqrt(variance)
+    sample = round(np.random.normal(loc=average, scale=std))
+    return 1.0 if sample == 0 else sample
 
 
-def activities_declaration(tasks, dag):
+def activities_declaration(tasks, dag, call_avg, call_var):
     text = ""
     text += "# Activities declaration\n"
     for i, task in enumerate(tasks):
@@ -106,7 +114,7 @@ def activities_declaration(tasks, dag):
         else:
             text += f"s acti{i} 0.0001\n"
             text += "".join([f"s acti{i}{dag[i][j]} {random_service_time()}\n" for j in range(len(dag[i]))])
-            text += "".join([f"y acti{i}{dag[i][j]} Entr{dag[i][j]} {get_call_number()}\n" for j in range(len(dag[i]))])
+            text += "".join([f"y acti{i}{dag[i][j]} Entr{dag[i][j]} {get_call_number(call_avg, call_var)}\n" for j in range(len(dag[i]))])
             text += ":\n"
             if len(dag[i]) == 1: # Vertex has one connection
                 text += f"  acti{i} -> acti{i}{dag[i][0]};\n"
@@ -123,7 +131,7 @@ def activities_declaration(tasks, dag):
         text += "-1\n\n"
     return text
 
-def generate_random_lqn(lqn_id, num_tasks):
+def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var):
 
     filename = f"{num_tasks}fun-{lqn_id}"
 
@@ -140,7 +148,7 @@ def generate_random_lqn(lqn_id, num_tasks):
     lqn_text += entries_declaration(entries)
     
     dag = generate_random_dag_with_one_root(num_tasks, 0.5, 0.3)
-    lqn_text += activities_declaration(tasks, dag)
+    lqn_text += activities_declaration(tasks, dag, call_avg, call_var)
 
     save_file(filename, lqn_text)
     print(f"LQN \"{filename}\" generated.")
@@ -156,7 +164,7 @@ if __name__ == '__main__':
 
     for i in range(0, args.number):
         padded_id = str(i).zfill(max_len)
-        lqn_text = generate_random_lqn(f'lqn{padded_id}', args.functions)
+        lqn_text = generate_random_lqn(f'lqn{padded_id}', args.functions, args.call_avg, args.call_var)
         # print(lqn_text)
 
 
