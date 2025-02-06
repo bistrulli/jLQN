@@ -23,7 +23,7 @@ def random_service_time():
     return round(random.uniform(0.1, 4.0), 2)
 
 def save_file(filename, text_string):
-    with open(f"{out_lqn_folder}/{filename}", "w") as file:
+    with open(f"{out_lqn_folder}/{filename}.lqn", "w") as file:
         file.write(text_string)
 
 def generate_random_dag_with_one_root(num_vertices, prob_edge=0.5, prob_root=0.3):
@@ -52,7 +52,7 @@ def generate_random_dag_with_one_root(num_vertices, prob_edge=0.5, prob_root=0.3
 def header_declaration(filename):
     text = ""
     text += "G\n"
-    text += f"\"{filename}\"\n"
+    text += f"\"{filename}.lqn\"\n"
     text += "0.01\n"
     text += "10000\n"
     text += "1\n"
@@ -123,7 +123,10 @@ def activities_declaration(tasks, dag):
         text += "-1\n\n"
     return text
 
-def generate_random_lqn(filename, num_tasks, max_entries_per_task=1, max_activities_per_entry=3):
+def generate_random_lqn(lqn_id, num_tasks):
+
+    filename = f"{num_tasks}fun-{lqn_id}"
+
     lqn_text = header_declaration(filename)
 
     processors = [f"Proc{i}" for i in range(num_tasks)]
@@ -140,6 +143,7 @@ def generate_random_lqn(filename, num_tasks, max_entries_per_task=1, max_activit
     lqn_text += activities_declaration(tasks, dag)
 
     save_file(filename, lqn_text)
+    print(f"LQN \"{filename}\" generated.")
 
     return lqn_text
 
@@ -147,8 +151,12 @@ def generate_random_lqn(filename, num_tasks, max_entries_per_task=1, max_activit
 
 if __name__ == '__main__':
     args = get_cli()
-    for i in range(0, args.number-1):
-        lqn_text = generate_random_lqn(f'lqn{i}.lqn', args.functions)
+
+    max_len = len(str(args.number))
+
+    for i in range(0, args.number):
+        padded_id = str(i).zfill(max_len)
+        lqn_text = generate_random_lqn(f'lqn{padded_id}', args.functions)
         # print(lqn_text)
 
 
