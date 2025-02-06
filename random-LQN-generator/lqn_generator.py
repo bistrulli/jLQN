@@ -2,10 +2,8 @@ import random
 import os
 import argparse
 import numpy as np
-# import math
 
 out_lqn_folder = os.path.join(os.getcwd(), "LQNs")
-
 
 def get_cli():
     """
@@ -13,37 +11,72 @@ def get_cli():
     :return:    ArgumentParser object.
     """
     parser = argparse.ArgumentParser(description="Generate a set of random LQNs.")
+    
+    # Number of LQNs
     parser.add_argument("-n", "--number", type=int, default=10,
                         help='The number of LQNs to generate (default is 10).', required=False)
+    
+    # Density of the DAG
     parser.add_argument("-f", "--functions", type=int,
                         help='The number of functions for each LQN.', required=True)
+    parser.add_argument("-p", "--prob_edge", type=float,
+                        help='The probability of an edge to be formed.', required=True)
+    
+    # Gaussian distributed calls
     parser.add_argument("-a", "--call_avg", type=int, default=1,
                         help='The average number of calls for each task.', required=False)
     parser.add_argument("-v", "--call_var", type=float, default=0.001,
                         help='The variance of calls for each task.', required=False)
+    
     return parser.parse_args()
 
-
-
-def random_service_time():
-    return round(random.uniform(0.1, 4.0), 2)
-
 def save_file(filename, text_string):
+    """Save a randomly generated LQN in a .lqn file inside the out_lqn_folder.
+
+    :param filename:    The filename used for the lqn file (excluding extension).
+    :param text_string: The lqn text to save in the file.
+    """
     with open(f"{out_lqn_folder}/{filename}.lqn", "w") as file:
         file.write(text_string)
 
-def generate_random_dag_with_one_root(num_vertices, prob_edge=0.5, prob_root=0.3):
+def random_service_time(lb=0.1, ub=4.0):
+    """Randomly pick a uniformely distributed number for the service time.
+
+    :param lb:  The lower bound of the uniform distribution.
+    :param ub:  The upper bound of the uniform distribution.
+    :return:    The random service time (e.g. 2.32).
+    """
+    return round(random.uniform(lb, ub), 2)
+
+def get_call_number(average, variance):
+    """Randomly pick a non-negative integer number for a call in a Gaussian distribution.
+
+    :param average:     The average of the Gaussian distribution.
+    :param variance:    The variance of the Gaussian distribution.
+    :return:            A feasible number of calls.
+    """
+    std = np.sqrt(variance)
+    sample = round(np.random.normal(loc=average, scale=std))
+    return 1.0 if sample <= 0 else sample
+
+def generate_random_dag_with_one_root(num_vertices, prob_edge):
+    """Generate a random DAG with a single root.
+
+    :param num_vertices:    The number of vertices in the DAG.
+    :param prob_edge:       The probability of an edge to be formed.
+    :return:                An adjacency list describing the randomly formed DAG.     
+    """
     adj_list = [list() for _ in range(num_vertices)]
 
     # Create edges ensuring no cycles are formed
-    for i in range(1, num_vertices):
+    for i in range(0, num_vertices): # for i in range(1, num_vertices):
         for j in range(i + 1, num_vertices):
             if random.random() < prob_edge:
                 adj_list[i].append(j)
 
         # Connect the current vertex to the root with some probability
-        if random.random() < prob_root :
-            adj_list[0].append(i)
+        # if random.random() < prob_root :
+        #    adj_list[0].append(i)
 
     # Add vertices that have no parent to the root
     for i in range(1, num_vertices):
@@ -55,10 +88,15 @@ def generate_random_dag_with_one_root(num_vertices, prob_edge=0.5, prob_root=0.3
 
     return adj_list
 
-def header_declaration(filename):
+def header_declaration(lqn_id):
+    """Generate the header section in the standard lqn file format.
+
+    :param lqn_id:  The id of the lqn.
+    :return:        The string of the header section of the lqn.
+    """
     text = ""
     text += "G\n"
-    text += f"\"{filename}.lqn\"\n"
+    text += f"\"{lqn_id}.lqn\"\n"
     text += "0.01\n"
     text += "10000\n"
     text += "1\n"
@@ -67,6 +105,11 @@ def header_declaration(filename):
     return text
 
 def processors_declaration(processors):
+    """Generate the processors section in the standard lqn file format.
+
+    :param processors:  A list containing all processor names.
+    :return:            The string of the section of the lqn relative to processors.
+    """
     text = ""
     text += "# Processors declaration, with multiplicity\n"
     text += "P 0\n"
@@ -76,6 +119,11 @@ def processors_declaration(processors):
     return text
 
 def tasks_declaration(tasks):
+    """Generate the tasks section in the standard lqn file format.
+
+    :param tasks:   A list containing all task names.
+    :return:        The string of the section of the lqn relative to tasks.
+    """
     text = ""
     text += "# Tasks declaration\n"
     text += "T 0\n"
@@ -88,6 +136,11 @@ def tasks_declaration(tasks):
     return text
 
 def entries_declaration(entries):
+    """Generate the entries section in the standard lqn file format.
+
+    :param entries: A list containing all entry names.
+    :return:        The string of the section of the lqn relative to entries.
+    """
     text = ""
     text += "# Entries declaration\n"
     text += "E 0\n"
@@ -96,10 +149,6 @@ def entries_declaration(entries):
     text += "-1\n\n"
     return text
 
-def get_call_number(average, variance):
-    std = np.sqrt(variance)
-    sample = round(np.random.normal(loc=average, scale=std))
-    return 1.0 if sample == 0 else sample
 
 
 def activities_declaration(tasks, dag, call_avg, call_var):
@@ -131,7 +180,7 @@ def activities_declaration(tasks, dag, call_avg, call_var):
         text += "-1\n\n"
     return text
 
-def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var):
+def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var, prob_edge):
 
     filename = f"{num_tasks}fun-{lqn_id}"
 
@@ -147,7 +196,7 @@ def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var):
     entries = [f"Entr{i}" for i in range(num_tasks)]
     lqn_text += entries_declaration(entries)
     
-    dag = generate_random_dag_with_one_root(num_tasks, 0.5, 0.3)
+    dag = generate_random_dag_with_one_root(num_tasks, prob_edge)
     lqn_text += activities_declaration(tasks, dag, call_avg, call_var)
 
     save_file(filename, lqn_text)
@@ -164,7 +213,7 @@ if __name__ == '__main__':
 
     for i in range(0, args.number):
         padded_id = str(i).zfill(max_len)
-        lqn_text = generate_random_lqn(f'lqn{padded_id}', args.functions, args.call_avg, args.call_var)
+        lqn_text = generate_random_lqn(f'lqn{padded_id}', args.functions, args.call_avg, args.call_var, args.prob_edge)
         # print(lqn_text)
 
 
