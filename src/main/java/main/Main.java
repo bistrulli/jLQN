@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.TokenStream;
+import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
@@ -23,14 +24,18 @@ import JLQNListner.MyJqnListner;
 import LQN2MPP.LqnToMPP;
 import LqnToGCF.LqnToGcf;
 
+import main.Config;
+
 /**
  * Author: Tom Everett
  */
-public class Main {
+public class Main { 
 	
     static public Path projectPath;
+    static public Config config;
         
     public static void main(String[] args) {
+        config = processCommandLineArgs(args);
 		Path currentFilePath = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).toAbsolutePath();
         projectPath = currentFilePath.getParent().getParent(); 
         // Find the current path (run the jar file from the root of the project)
@@ -81,5 +86,38 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static Config processCommandLineArgs(String[] args) {
+        Options options = new Options();
+
+        Option projectName = new Option("p", "project", true, "Project name");
+        projectName.setRequired(true);
+        options.addOption(projectName);
+
+        Option regionName = new Option("r", "region", true, "Region name");
+        regionName.setRequired(true);
+        options.addOption(regionName);
+
+        Option zoneName = new Option("z", "zone", true, "Zone name");
+        zoneName.setRequired(true);
+        options.addOption(zoneName);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+
+        try {
+            CommandLine cmd = parser.parse(options, args);
+            String project = cmd.getOptionValue("project");
+            String region = cmd.getOptionValue("region");
+            String zone = cmd.getOptionValue("zone");
+
+            return new Config(project, region, zone);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("utility-name", options);
+            System.exit(1);
+        }
+        return null;
     }
 }

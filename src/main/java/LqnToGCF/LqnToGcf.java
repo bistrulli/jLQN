@@ -79,6 +79,7 @@ public class LqnToGcf {
         
         VelocityContext context = new VelocityContext();
         context.put("f", f);
+        context.put("config",Main.config);
         Template template = null;
 
         try {
@@ -113,6 +114,7 @@ public class LqnToGcf {
         
         VelocityContext context = new VelocityContext();
         context.put("f", f);
+        context.put("config",Main.config);
         Template template = null;
 
         try {

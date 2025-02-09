@@ -41,7 +41,8 @@ public class Logic implements HttpFunction {
 		this.act_exec.put("$act.getName()", true);
 		this.doWork($act.getDemand());
 		#if ($act.getCall() != $null)
-		String url = "https://northamerica-northeast1-modellearning.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
+		/*String url = "https://northamerica-northeast1-modellearning.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";*/
+		String url =  "https://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
 		var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
 		try {
