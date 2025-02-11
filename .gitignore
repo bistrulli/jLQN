@@ -1,6 +1,6 @@
 random-LQN-generator/LQNs/
 output/
-
+random-LQN-generator/venv/
 
 target/
 pom.xml.tag
