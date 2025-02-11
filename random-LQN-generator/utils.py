@@ -1,6 +1,9 @@
 import random
 import numpy as np
 import argparse
+import os
+
+out_lqn_folder = os.path.join(os.getcwd(), "LQNs")
 
 def get_cli():
     """
@@ -80,3 +83,17 @@ def generate_random_dag_with_one_root(num_vertices, prob_edge):
     adj_list[0].sort()
 
     return adj_list
+
+def get_probability(node_position, num_edges):
+    """Calculate the (almost) equal probability of the edge connecting the current node with node_id in the DAG.
+    The sum of the probabilities is 1.
+
+    :param node_position:   The position of the node in the list.
+    :param num_edges:       The number of edges from the current node.
+    :return:                The probability of the edge.
+    """
+    p = round(1 / num_edges, 2)
+    if node_position != 0:
+        return p
+    else:
+        return round(1 - ((num_edges-1) * p), 2)

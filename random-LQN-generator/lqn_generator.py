@@ -1,10 +1,4 @@
-import random
-import os
-from jinja2 import Environment, FileSystemLoader
-
 from utils import *
-
-out_lqn_folder = os.path.join(os.getcwd(), "LQNs")
 
 def header_declaration(lqn_id):
     """Generate the header section in the standard lqn file format.
@@ -12,7 +6,7 @@ def header_declaration(lqn_id):
     :param lqn_id:  The id of the lqn.
     :return:        The string of the header section of the lqn.
     """
-    text = ""
+    text = "# Generated with string concatenation\n"
     text += "G\n"
     text += f"\"{lqn_id}.lqn\"\n"
     text += "0.01\n"
@@ -93,11 +87,8 @@ def activities_declaration(tasks, dag, call_avg, call_var):
                 text += f"  acti{i} -> acti{i}{dag[i][0]};\n"
                 text += f"  acti{i}{dag[i][0]}[Entr{i}]\n"
             else: # Vertex has 2 or more connections
-                # Almost equal probability for choices
-                p = round(1 / len(dag[i]), 2)
-                p0 = round(1 - ((len(dag[i])-1) * p), 2)
-                text += f"  acti{i} -> ({p0})acti{i}{dag[i][0]}"
-                text += "".join([f" + ({p})acti{i}{dag[i][j]}" for j in range(1, len(dag[i]))])
+                text += f"  acti{i} -> ({get_probability(0, len(dag[i]))})acti{i}{dag[i][0]}"
+                text += "".join([f" + ({get_probability(j, len(dag[i]))})acti{i}{dag[i][j]}" for j in range(1, len(dag[i]))])
                 if i != 0: # Reference task does not issue replies
                     text += "".join([f";\n  acti{i}{dag[i][j]}[Entr{i}]" for j in range(len(dag[i]))])
                 text += "\n"
@@ -106,7 +97,7 @@ def activities_declaration(tasks, dag, call_avg, call_var):
 
 def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var, prob_edge):
 
-    filename = f"{num_tasks}fun-{lqn_id}"
+    filename = f"{num_tasks}fun-{lqn_id}-concatenation"
 
     lqn_text = header_declaration(filename)
 
