@@ -1,0 +1,26 @@
+# Header declaration
+G
+"{{ lqn_id }}.lqn"
+0.01
+10000
+1
+0.5
+-1
+
+# Processors declaration, with multiplicity
+P 0
+{% for processor in processors %}p {{ processor }} f m 1000
+{% endfor %}-1
+
+# Tasks declaration
+T 0
+t Task0 r Entr0 -1 Proc0 m 1
+{% for i in range(1, num_tasks) %}t Task{{ i }} n Entr{{ i }} -1 Proc{{ i }} m 1000
+{% endfor %}-1
+
+# Entries declaration
+E 0
+{% for i in range(num_tasks) %}A Entr{{ i }} acti{{ i }} 
+{% endfor %}-1
+
+
