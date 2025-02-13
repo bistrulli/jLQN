@@ -99,9 +99,9 @@ public class Main {
         regionName.setRequired(true);
         options.addOption(regionName);
 
-        Option zoneName = new Option("z", "zone", true, "Zone name");
-        zoneName.setRequired(true);
-        options.addOption(zoneName);
+        // Option zoneName = new Option("z", "zone", true, "Zone name");
+        // zoneName.setRequired(true);
+        // options.addOption(zoneName);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -110,9 +110,9 @@ public class Main {
             CommandLine cmd = parser.parse(options, args);
             String project = cmd.getOptionValue("project");
             String region = cmd.getOptionValue("region");
-            String zone = cmd.getOptionValue("zone");
+            // String zone = cmd.getOptionValue("zone");
 
-            return new Config(project, region, zone);
+            return new Config(project, region); // , zone);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("utility-name", options);
