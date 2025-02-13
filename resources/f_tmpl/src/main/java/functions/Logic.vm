@@ -140,11 +140,20 @@ public class Logic implements HttpFunction {
 		Logic.logger.info(logstring);
 	}
 
-	private void doWork(Double stime) {
-		ExponentialDistribution dist = new ExponentialDistribution(stime);
-		long delay = Long.valueOf(Math.round(dist.sample() * 1e9));
-		long start = mgm.getCurrentThreadCpuTime();
-		while ((mgm.getCurrentThreadCpuTime() - start) < delay) {
-		}
+	private void doWork(Double stime, boolean isSleep) {
+	    if (isSleep) { // Sleep
+	        try {
+	            long sleepTime = Math.round(stime * 1e3); // Convert stime to milliseconds
+	            Thread.sleep(sleepTime);
+	        } catch (InterruptedException e) {
+	            e.printStackTrace();
+	        }
+	    } else { // CPU Intensive task (busy waiting)
+	        ExponentialDistribution dist = new ExponentialDistribution(stime);
+	        long delay = Long.valueOf(Math.round(dist.sample() * 1e9));
+	        long start = mgm.getCurrentThreadCpuTime();
+	        while ((mgm.getCurrentThreadCpuTime() - start) < delay) {
+	        }
+	    }
 	}
 }
