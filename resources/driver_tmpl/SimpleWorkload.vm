@@ -96,8 +96,8 @@ class SimpleWorkload(HttpUser):
 		#foreach ( $node in $f.getDnodes())
 		#[[#]]# execetute the decision node of already executed evt
 		if(self.act_exec["${node.getOriginEvt()}"]!=None and self.act_exec["${node.getOriginEvt()}"]):
-		  self.act_exec["${node.getOriginEvt()}"]=False
-		  self.${node.getName()}()
+			self.act_exec["${node.getOriginEvt()}"]=False
+			self.${node.getName()}()
 		#end
 		rtQue.put(time.time()-strat_time)
 		
