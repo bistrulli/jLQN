@@ -12,7 +12,6 @@ import java.util.Scanner;
 import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -39,7 +38,7 @@ public class LqnToGcf {
         props.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
 
         // Enable absolute paths
-        props.setProperty("file.resource.loader.path", ""); // Empyt path to allow absolute paths
+        props.setProperty("file.resource.loader.path", ""); // Empty path to allow absolute paths
         props.setProperty("file.resource.loader.cache", "false"); // Optional: avoid caching during development
         
         this.velocityEngine = new VelocityEngine();
@@ -79,7 +78,7 @@ public class LqnToGcf {
         
         VelocityContext context = new VelocityContext();
         context.put("f", f);
-        context.put("config",Main.config);
+        context.put("config", Main.config);
         Template template = null;
 
         try {
@@ -114,7 +113,7 @@ public class LqnToGcf {
         
         VelocityContext context = new VelocityContext();
         context.put("f", f);
-        context.put("config",Main.config);
+        context.put("config", Main.config);
         Template template = null;
 
         try {
@@ -160,14 +159,32 @@ public class LqnToGcf {
             e.printStackTrace();
         }
         if (Paths.get(dest.toString() + File.separator + "pom.xml").toFile().exists())
-            this.updateFname(Paths.get(dest.toString() + File.separator + "pom.xml"), f.getName());
-        if (Paths.get(dest.toString() + File.separator + "deploy.sh").toFile().exists())
-            this.updateFname(Paths.get(dest.toString() + File.separator + "deploy.sh"), f.getName());
-        if (Paths.get(dest.toString() + File.separator + "update.sh").toFile().exists())
-            this.updateFname(Paths.get(dest.toString() + File.separator + "update.sh"), f.getName());
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "pom.xml"), "$fname", f.getName());
+        if (Paths.get(dest.toString() + File.separator + "deploy.sh").toFile().exists()) {
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "deploy.sh"), "$fname", f.getName());
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "deploy.sh"), "$region", Main.config.getRegionName());
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "deploy.sh"), "$project", Main.config.getProjectName());
+        }
+        if (Paths.get(dest.toString() + File.separator + "update.sh").toFile().exists()) {
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "update.sh"), "$fname", f.getName());
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "update.sh"), "$region", Main.config.getRegionName());
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "update.sh"), "$project", Main.config.getProjectName());
+        }
+        if (Paths.get(dest.toString() + File.separator + "src/getLog.sh").toFile().exists()) {
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "src/getLog.sh"), "$region", Main.config.getRegionName());
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "src/getLog.sh"), "$project", Main.config.getProjectName());
+        }
+        if (Paths.get(dest.toString() + File.separator + "vegeta.sh").toFile().exists())
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "vegeta.sh"), "$project", Main.config.getProjectName());
+        
+        // Locust
+        if (Paths.get(dest.toString() + File.separator + "profile.sh").toFile().exists()) {
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "profile.sh"), "$region", Main.config.getRegionName());
+            this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "profile.sh"), "$project", Main.config.getProjectName());
+        }
     }
 
-    public void updateFname(Path file, String fname) {
+    public void updatePlaceholder(Path file, String placeholder, String text) {
         File f = file.toFile();
         try {
             Scanner sc = new Scanner(f);
@@ -175,7 +192,7 @@ public class LqnToGcf {
             while (sc.hasNextLine())
                 content += sc.nextLine() + "\n";
             sc.close();
-            content = content.replace("$fname", fname.toLowerCase());
+            content = content.replace(placeholder, text.toLowerCase());
             try {
                 FileWriter fw = new FileWriter(f);
                 fw.write(content);

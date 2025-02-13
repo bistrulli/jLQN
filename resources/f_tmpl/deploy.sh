@@ -1,17 +1,15 @@
 #! /bin/sh
 
-source ../environment.sh
-
 gcloud beta functions deploy $fname \
 --gen2 \
 --runtime=java17 \
---region=$REGION_NAME \
+--region=$region \
 --source=. \
 --entry-point=functions.Logic \
 --memory=1024MB \
 --cpu=1 \
 --trigger-http \
 --allow-unauthenticated \
---project $PROJECT_NAME \
+--project $project \
 --max-instances=100 \
 --min-instances=1
