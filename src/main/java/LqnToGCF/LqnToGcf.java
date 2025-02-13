@@ -38,9 +38,9 @@ public class LqnToGcf {
         props.setProperty("resource.loader", "file");
         props.setProperty("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.FileResourceLoader");
 
-        // Abilita i percorsi assoluti
-        props.setProperty("file.resource.loader.path", ""); // Percorso vuoto per consentire path assolute
-        props.setProperty("file.resource.loader.cache", "false"); // Opzionale: evita cache durante sviluppo
+        // Enable absolute paths
+        props.setProperty("file.resource.loader.path", ""); // Empyt path to allow absolute paths
+        props.setProperty("file.resource.loader.cache", "false"); // Optional: avoid caching during development
         
         this.velocityEngine = new VelocityEngine();
         this.velocityEngine.init(props);
@@ -48,18 +48,18 @@ public class LqnToGcf {
         Path appDir = Paths.get(destPath.toString() + File.separator + lqnApp.getName().replace("\"", ""));
         for (Function f : lqnApp.getFunctions()) {
             if (!f.getKind().equals("r")) {
-                this.copyTmpfun(tmpPath, appDir, f);
+                this.copyTmpFun(tmpPath, appDir, f);
                 this.translate(appDir, f);
             } else {
-                this.copyTmpfun(tmpLocustPath, appDir, f);
+                this.copyTmpFun(tmpLocustPath, appDir, f);
                 this.translateLocust(appDir, f);
             }
         }
-        //copy file at the lqnsystem level
-        this.copySysScritps(tmpSysScriptsPath, appDir);
+        // copy file at the lqnsystem level
+        this.copySysScripts(tmpSysScriptsPath, appDir);
     }
     
-    public void copySysScritps(Path source, Path dest) {
+    public void copySysScripts(Path source, Path dest) {
         try {
             FileUtils.createParentDirectories(dest.toFile());
         } catch (IOException e) {
@@ -145,7 +145,7 @@ public class LqnToGcf {
 
     }
 
-    private void copyTmpfun(Path source, Path dest, Function f) {
+    private void copyTmpFun(Path source, Path dest, Function f) {
         dest = Paths.get(dest.toString() + File.separator + f.getName());
         try {
             FileUtils.createParentDirectories(dest.toFile());
