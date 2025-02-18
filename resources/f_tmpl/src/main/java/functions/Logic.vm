@@ -140,8 +140,8 @@ public class Logic implements HttpFunction {
 		Logic.logger.info(logstring);
 	}
 
-	private void doWork(Double stime, boolean isSleep) {
-	    if (isSleep) { // Sleep
+	private void doWork(Double stime) {
+	    if (true) { // Sleep
 	        try {
 	            long sleepTime = Math.round(stime * 1e3); // Convert stime to milliseconds
 	            Thread.sleep(sleepTime);
