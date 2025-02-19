@@ -9,6 +9,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.logging.Logger;
+import java.util.logging.FileHandler;
+import java.util.logging.SimpleFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,143 +25,151 @@ import com.google.cloud.functions.HttpRequest;
 import com.google.cloud.functions.HttpResponse;
 
 public class Logic implements HttpFunction {
-	private static final Logger logger = Logger.getLogger("$f.getName()");
-	private static ThreadMXBean mgm = ManagementFactory.getThreadMXBean();
-	private static HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
-	private HttpResponse response = null;
-	private HashMap<String, Boolean> act_exec=new HashMap<String, Boolean>();
-	private HashMap<String, Thread> act_thread=new HashMap<String, Thread>();
-	private Long  startCpuTime=null;
-	private Long  startExecTime=null;
-	
+    private static final Logger logger = Logger.getLogger("$f.getName()");
+    private static ThreadMXBean mgm = ManagementFactory.getThreadMXBean();
+    private static HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
+    private HttpResponse response = null;
+    private HashMap<String, Boolean> act_exec = new HashMap<String, Boolean>();
+    private HashMap<String, Thread> act_thread = new HashMap<String, Thread>();
+    private Long  startCpuTime = null;
+    private Long  startExecTime = null;
 
-	/*
-	 * activities
-	 */
-	#foreach ( $act in $f.getActivities() )
-	public void $act.getName()(){
-		this.act_exec.put("$act.getName()", true);
-		this.doWork($act.getDemand());
-		#if ($act.getCall() != $null)
-		/*String url = "https://northamerica-northeast1-modellearning.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";*/
-		#if(${config.getTestOption()})
-		String url =  "http://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
-		#else
-		String url =  "https://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
-		#end
-		var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+    static {
+        try {
+            // Configure the logger with handler and formatter
+            FileHandler fh = new FileHandler("$f.getName()" + ".log", true); // Append to the log file
+            logger.addHandler(fh);
+            SimpleFormatter formatter = new SimpleFormatter();
+            fh.setFormatter(formatter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-		try {
-			var getResponse = Logic.client.send(getRequest, BodyHandlers.ofString());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		#end
-	}
-	#end
+    /*
+     * activities
+     */
+    #foreach ( $act in $f.getActivities() )
+    public void $act.getName()(){
+        this.act_exec.put("$act.getName()", true);
+        this.doWork($act.getDemand());
+        #if ($act.getCall() != $null)
+        #if(${config.getTestOption()})
+        String url =  "http://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
+        #else
+        String url =  "https://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
+        #end
+        var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
-	/*
-	 * Dnodes
-	 */
-	#foreach ( $node in $f.getDnodes() )
-	public void $node.getName()(){
-	#if($node.class.getSimpleName()=="OrNode")
-		#if($node.getJoinList().size()>1)
-		//JoinNode Logic
-		try {
-			#foreach ( $act in $node.getJoinList())
-			this.act_thread.get("$act").join();
-			#end
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		#end
-		//OrNode Logic
-		List<Pair<String, Double>> distributionData = new ArrayList<>();
-		#foreach ( $act in $node.getForkList())
-		distributionData.add(new Pair<>("$act", $node.getProb().get($foreach.index)));
-		#end
-		EnumeratedDistribution<String> distribution = new EnumeratedDistribution<>(distributionData);
-		String randomChoice = distribution.sample();
-		#foreach ( $act in $node.getForkList())
-		if(randomChoice=="$act"){
-			$act();
-		}
-		#end
-	#end
-	#if($node.class.getSimpleName()=="ForkNode")
-		//TBA ForkNode Logic
-		final Logic mainLogic=this;
-		String joinEvt="";
-		#foreach ( $act in $node.getForkList())
-		#if($foreach.index==0)
-		joinEvt="${act}";
-		#else
-		joinEvt+="&${act}";
-		#end
-		Thread ${act}Thread = new Thread(() -> {
-        	//TBA all the activated Dnodes by ${act} to allow a more complex parallel execution
-        	//in this way only asynch call are supported
-        	mainLogic.$act();
+        try {
+            var getResponse = Logic.client.send(getRequest, BodyHandlers.ofString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        #end
+    }
+    #end
+
+    /*
+     * Dnodes
+     */
+    #foreach ( $node in $f.getDnodes() )
+    public void $node.getName()(){
+    #if($node.class.getSimpleName()=="OrNode")
+        #if($node.getJoinList().size()>1)
+        //JoinNode Logic
+        try {
+            #foreach ( $act in $node.getJoinList())
+            this.act_thread.get("$act").join();
+            #end
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        #end
+        //OrNode Logic
+        List<Pair<String, Double>> distributionData = new ArrayList<>();
+        #foreach ( $act in $node.getForkList())
+        distributionData.add(new Pair<>("$act", $node.getProb().get($foreach.index)));
+        #end
+        EnumeratedDistribution<String> distribution = new EnumeratedDistribution<>(distributionData);
+        String randomChoice = distribution.sample();
+        #foreach ( $act in $node.getForkList())
+        if(randomChoice=="$act"){
+            $act();
+        }
+        #end
+    #end
+    #if($node.class.getSimpleName()=="ForkNode")
+        //TBA ForkNode Logic
+        final Logic mainLogic=this;
+        String joinEvt="";
+        #foreach ( $act in $node.getForkList())
+        #if($foreach.index==0)
+        joinEvt="${act}";
+        #else
+        joinEvt+="&${act}";
+        #end
+        Thread ${act}Thread = new Thread(() -> {
+            //TBA all the activated Dnodes by ${act} to allow a more complex parallel execution
+            //in this way only asynch call are supported
+            mainLogic.$act();
         });
         this.act_thread.put("${act}", ${act}Thread);
         this.act_thread.get("${act}").start();
-		#end
-		this.act_exec.put(joinEvt, true);
-	#end
-	#if($node.class.getSimpleName()=="ReplyNode")
-		//ReplyNode Logic
-		BufferedWriter writer;
-		try {
-			writer = this.response.getWriter();
-			writer.write("${node.getJoinList().get(0)}[${f.getName()}]");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	#end
-	}
-	#end
+        #end
+        this.act_exec.put(joinEvt, true);
+    #end
+    #if($node.class.getSimpleName()=="ReplyNode")
+        //ReplyNode Logic
+        BufferedWriter writer;
+        try {
+            writer = this.response.getWriter();
+            writer.write("${node.getJoinList().get(0)}[${f.getName()}]");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    #end
+    }
+    #end
 
-	@Override
-	public void service(HttpRequest request, HttpResponse response) throws IOException {
-		this.response = response;
-		mgm.setThreadCpuTimeEnabled(true);
-		this.startCpuTime=mgm.getCurrentThreadCpuTime();
-		this.startExecTime=System.nanoTime();
-		
-		//execute the entry activity
-		${f.getMainAct()}();
-		//execetute the decision node of already executed evt
-		#foreach ( $node in $f.getDnodes())
-		if(this.act_exec.get("${node.getOriginEvt()}")!=null && this.act_exec.get("${node.getOriginEvt()}")) {
-		  this.act_exec.put("${node.getOriginEvt()}",false);
-		  ${node.getName()}();
-		}
-		#end
-		String logstring=String.format("cpu:=%d  rt:=%d",mgm.getCurrentThreadCpuTime()-this.startCpuTime,
-									   System.nanoTime()-this.startExecTime);
-		Logic.logger.info(logstring);
-	}
-
-
-	
-	private void doWork(Double stime) {
-		#if(${config.getTestOption()})
-	        try {
-	            long sleepTime = Math.round(stime * 1e3); // Convert stime to milliseconds
-	            Thread.sleep(sleepTime);
-	        } catch (InterruptedException e) {
-	            e.printStackTrace();
-	        }
-		#else
-	        ExponentialDistribution dist = new ExponentialDistribution(stime);
-	        long delay = Long.valueOf(Math.round(dist.sample() * 1e9));
-	        long start = mgm.getCurrentThreadCpuTime();
-	        while ((mgm.getCurrentThreadCpuTime() - start) < delay) {
-	        }
-	    #end
-	}
+    @Override
+    public void service(HttpRequest request, HttpResponse response) throws IOException {
+        this.response = response;
+        mgm.setThreadCpuTimeEnabled(true);
+        this.startCpuTime=mgm.getCurrentThreadCpuTime();
+        this.startExecTime=System.nanoTime();
+        
+        //execute the entry activity
+        ${f.getMainAct()}();
+        //execetute the decision node of already executed evt
+        #foreach ( $node in $f.getDnodes())
+        if(this.act_exec.get("${node.getOriginEvt()}")!=null && this.act_exec.get("${node.getOriginEvt()}")) {
+          this.act_exec.put("${node.getOriginEvt()}",false);
+          ${node.getName()}();
+        }
+        #end
+        String logstring=String.format("cpu:=%d  rt:=%d",mgm.getCurrentThreadCpuTime()-this.startCpuTime,
+                                       System.nanoTime()-this.startExecTime);
+        Logic.logger.info(logstring);
+    }
+    
+    private void doWork(Double stime) {
+        #if(${config.getTestOption()})
+            try {
+                long sleepTime = Math.round(stime * 1e3); // Convert stime to milliseconds
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        #else
+            ExponentialDistribution dist = new ExponentialDistribution(stime);
+            long delay = Long.valueOf(Math.round(dist.sample() * 1e9));
+            long start = mgm.getCurrentThreadCpuTime();
+            while ((mgm.getCurrentThreadCpuTime() - start) < delay) {
+            }
+        #end
+    }
 }
