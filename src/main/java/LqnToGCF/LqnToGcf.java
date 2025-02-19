@@ -5,9 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
@@ -16,11 +18,14 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
+
+import java.util.ArrayList;
 import java.util.Properties;
 
 import Entity.App;
 import Entity.Function;
 import main.Main;
+import java.util.List;
 
 public class LqnToGcf {
     
@@ -54,8 +59,19 @@ public class LqnToGcf {
                 this.translateLocust(appDir, f);
             }
         }
+
+
         // copy file at the lqnsystem level
         this.copySysScripts(tmpSysScriptsPath, appDir);
+
+        if(Main.config.getTestOption()) {
+            this.generateNginxConfig(lqnApp.getName().replace("\"", ""), lqnApp.getFunctions(), destPath);
+            try {
+                Files.deleteIfExists(appDir.resolve("nginx_conf.vm"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     public void copySysScripts(Path source, Path dest) {
@@ -201,6 +217,54 @@ public class LqnToGcf {
                 e.printStackTrace();
             }
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void generateNginxConfig(String appName, List<Function> functions, Path dest) {
+
+        // Remove Entr0
+        List<Function> filteredFunctions = functions.stream().filter(f -> !f.getKind().equals("r")).collect(Collectors.toList());
+
+
+        VelocityContext context = new VelocityContext();
+        context.put("config", Main.config);
+        context.put("entries", filteredFunctions);
+        
+        // Generate a list of ports starting from 8081
+        List<Integer> ports = new ArrayList<>();
+        int startingPort = 8081;
+        for (int i = 0; i < filteredFunctions.size(); i++) {
+            ports.add(startingPort + i);
+        }
+        context.put("ports", ports);
+        
+
+        Template template = null;
+        try {
+            template = this.velocityEngine.getTemplate(tmpSysScriptsPath.toString() + "/nginx_conf.vm");
+        } catch (ResourceNotFoundException rnfe) {
+            rnfe.printStackTrace();
+        } catch (ParseErrorException pee) {
+            pee.printStackTrace();
+        } catch (MethodInvocationException mie) {
+            mie.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        StringWriter sw = new StringWriter();
+        template.merge(context, sw);
+
+        //Path nginxPath = Paths.get("/etc/nginx/sites-available/" + appName);
+        Path nginxPath = Paths.get(dest.toString());
+
+        try {
+            FileWriter fw = new FileWriter(nginxPath.toFile() + File.separator + appName + File.separator + "nginx_conf.conf");
+            fw.write(sw.toString());
+            fw.flush();
+            fw.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

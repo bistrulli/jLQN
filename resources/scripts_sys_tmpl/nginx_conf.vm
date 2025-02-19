@@ -1,0 +1,16 @@
+server {
+    listen 80;
+
+    server_name ${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net;
+
+    #foreach($entry in $entries)
+    #set($index = $foreach.index)
+    location /${entry.getName().toLowerCase()} {
+        proxy_pass http://localhost:${ports.get($index)};
+        proxy_set_header host $host;
+        proxy_set_header x-real-ip $remote_addr;
+        proxy_set_header x-forwarded-for $proxy_add_x_forwarded_for;
+        proxy_set_header x-forwarded-proto $scheme;
+    }
+    #end
+}
