@@ -99,6 +99,11 @@ public class Main {
         regionName.setRequired(true);
         options.addOption(regionName);
 
+        Option testOption = new Option("t", "test", false, "Local test mode");
+        testOption.setRequired(false);
+        options.addOption(testOption);
+
+
         // Option zoneName = new Option("z", "zone", true, "Zone name");
         // zoneName.setRequired(true);
         // options.addOption(zoneName);
@@ -110,9 +115,10 @@ public class Main {
             CommandLine cmd = parser.parse(options, args);
             String project = cmd.getOptionValue("project");
             String region = cmd.getOptionValue("region");
+            boolean isTest = cmd.hasOption("test");
             // String zone = cmd.getOptionValue("zone");
 
-            return new Config(project, region); // , zone);
+            return new Config(project, region, isTest); // , zone);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("utility-name", options);
