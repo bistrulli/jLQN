@@ -66,6 +66,8 @@ public class LqnToGcf {
 
         if(Main.config.getTestOption()) {
             this.generateNginxConfig(lqnApp.getName().replace("\"", ""), lqnApp.getFunctions(), destPath);
+            this.updatePlaceholder(appDir.resolve("deploy_local_sys.sh"), "$project", Main.config.getProjectName());
+            this.updatePlaceholder(appDir.resolve("deploy_local_sys.sh"), "$region", Main.config.getRegionName());
             try {
                 Files.deleteIfExists(appDir.resolve("nginx_conf.vm"));
             } catch (IOException e) {

@@ -1,12 +1,18 @@
 #!/bin/bash
 
-# Define variables
+# Add the line to /etc/hosts if it doesn't already exist
+HOST_ENTRY="127.0.0.1 $region-$project.cloudfunctions.net"
+if ! grep -qF "$HOST_ENTRY" /etc/hosts; then
+    echo "$HOST_ENTRY" | sudo tee -a /etc/hosts > /dev/null
+    echo "Added $HOST_ENTRY to /etc/hosts"
+else
+    echo "$HOST_ENTRY already exists in /etc/hosts"
+fi
 
 CONFIG_FILE="nginx_conf.conf"
 
-
-sudo cp "./$CONFIG_FILE" "/etc/nginx/sites-available/$CONFIG_FILE"
-sudo ln -s "/etc/nginx/sites-available/$CONFIG_FILE" "/etc/nginx/sites-enabled/$CONFIG_FILE"
+sudo cp -f "./$CONFIG_FILE" "/etc/nginx/sites-available/$CONFIG_FILE"
+sudo ln -sf "/etc/nginx/sites-available/$CONFIG_FILE" "/etc/nginx/sites-enabled/$CONFIG_FILE"
 sudo nginx -t
 
 # Check if the configuration test was successful
@@ -21,7 +27,7 @@ fi
 
 dfiles=$(find . -type f -name "local_run.sh")
 port=8081
-for d in $dfiles 
+for d in $(echo "$dfiles" | sort)
 do
     echo "Executing $d with port $port"
     # Use dirname to get the base path
