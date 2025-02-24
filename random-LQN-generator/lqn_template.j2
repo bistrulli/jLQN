@@ -26,13 +26,13 @@ E 0
 
 # Activities declaration{% for i in range(num_tasks) %}{% if dag[i] | length == 0 %}
 A Task{{ i }}
-s acti{{ i }} {{ random_service_time() }}
+s acti{{ i }} {% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif %}
 :
     acti{{ i }}[Entr{{ i }}]
 -1{% elif dag[i] | length == 1 %}
 A Task{{ i }}
 s acti{{ i }} 0.0001
-s acti{{ i }}{{ dag[i][0] }} {{ random_service_time() }}
+s acti{{ i }}{{ dag[i][0] }} {% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif %}
 y acti{{ i }}{{ dag[i][0] }} Entr{{ dag[i][0] }} {{ get_call_number(call_avg, call_var) }}
 :
     acti{{ i }} -> acti{{ i }}{{ dag[i][0] }};
@@ -41,7 +41,7 @@ y acti{{ i }}{{ dag[i][0] }} Entr{{ dag[i][0] }} {{ get_call_number(call_avg, ca
 {% else %}
 A Task{{ i }}
 s acti{{ i }} 0.0001{% for j in dag[i] %}
-s acti{{ i }}{{ j }} {{ random_service_time() }}{% endfor %}{% for j in dag[i] %}
+s acti{{ i }}{{ j }} {% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif %}{% endfor %}{% for j in dag[i] %}
 y acti{{ i }}{{ j }} Entr{{ j }} {{ get_call_number(call_avg, call_var) }}{% endfor %}
 :
     acti{{ i }} -> ({{ get_probability(0, dag[i] | length) }})acti{{ i }}{{ dag[i][0] }}{% for j in dag[i][1:] %} + ({{ get_probability(1, dag[i] | length) }})acti{{ i }}{{ j }}{% endfor %}{% if i != 0%}{% for j in dag[i] %};
