@@ -1,0 +1,83 @@
+# Generated with Jinja2
+# Header declaration
+G
+"lqn20-5functions.lqn"
+0.01
+10000
+1
+0.5
+-1
+
+# Processors declaration, with multiplicity
+P 0
+p Proc0 f m 1000
+p Proc1 f m 1000
+p Proc2 f m 1000
+p Proc3 f m 1000
+p Proc4 f m 1000
+-1
+
+# Tasks declaration
+T 0
+t Task0 r Entr0 -1 Proc0 m 1
+t Task1 n Entr1 -1 Proc1 m 1000
+t Task2 n Entr2 -1 Proc2 m 1000
+t Task3 n Entr3 -1 Proc3 m 1000
+t Task4 n Entr4 -1 Proc4 m 1000
+-1
+
+# Entries declaration
+E 0
+A Entr0 acti0 
+A Entr1 acti1 
+A Entr2 acti2 
+A Entr3 acti3 
+A Entr4 acti4 
+-1
+
+# Activities declaration
+A Task0
+s acti0 0.0001
+s acti01 0.0001
+s acti03 0.0001
+s acti04 0.0001
+y acti01 Entr1 1
+y acti03 Entr3 1
+y acti04 Entr4 1
+:
+    acti0 -> (0.34)acti01 + (0.33)acti03 + (0.33)acti04
+-1
+
+A Task1
+s acti1 0.0001
+s acti12 0.71
+s acti14 0.68
+y acti12 Entr2 1
+y acti14 Entr4 2
+:
+    acti1 -> (0.5)acti12 + (0.5)acti14;
+    acti12[Entr1];
+    acti14[Entr1]
+-1
+
+A Task2
+s acti2 0.0001
+s acti23 1.72
+y acti23 Entr3 1
+:
+    acti2 -> acti23;
+    acti23[Entr2]
+-1
+
+
+A Task3
+s acti3 1.87
+:
+    acti3[Entr3]
+-1
+
+A Task4
+s acti4 3.68
+:
+    acti4[Entr4]
+-1

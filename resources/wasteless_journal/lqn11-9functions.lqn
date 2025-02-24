@@ -1,0 +1,160 @@
+# Generated with Jinja2
+# Header declaration
+G
+"lqn11-9functions.lqn"
+0.01
+10000
+1
+0.5
+-1
+
+# Processors declaration, with multiplicity
+P 0
+p Proc0 f m 1000
+p Proc1 f m 1000
+p Proc2 f m 1000
+p Proc3 f m 1000
+p Proc4 f m 1000
+p Proc5 f m 1000
+p Proc6 f m 1000
+p Proc7 f m 1000
+p Proc8 f m 1000
+-1
+
+# Tasks declaration
+T 0
+t Task0 r Entr0 -1 Proc0 m 1
+t Task1 n Entr1 -1 Proc1 m 1000
+t Task2 n Entr2 -1 Proc2 m 1000
+t Task3 n Entr3 -1 Proc3 m 1000
+t Task4 n Entr4 -1 Proc4 m 1000
+t Task5 n Entr5 -1 Proc5 m 1000
+t Task6 n Entr6 -1 Proc6 m 1000
+t Task7 n Entr7 -1 Proc7 m 1000
+t Task8 n Entr8 -1 Proc8 m 1000
+-1
+
+# Entries declaration
+E 0
+A Entr0 acti0 
+A Entr1 acti1 
+A Entr2 acti2 
+A Entr3 acti3 
+A Entr4 acti4 
+A Entr5 acti5 
+A Entr6 acti6 
+A Entr7 acti7 
+A Entr8 acti8 
+-1
+
+# Activities declaration
+A Task0
+s acti0 0.0001
+s acti01 0.0001
+s acti02 0.0001
+s acti03 0.0001
+s acti06 0.0001
+s acti08 0.0001
+y acti01 Entr1 1
+y acti02 Entr2 1.0
+y acti03 Entr3 1
+y acti06 Entr6 1
+y acti08 Entr8 1
+:
+    acti0 -> (0.2)acti01 + (0.2)acti02 + (0.2)acti03 + (0.2)acti06 + (0.2)acti08
+-1
+
+A Task1
+s acti1 0.0001
+s acti12 0.35
+s acti13 0.34
+s acti14 3.31
+s acti15 2.96
+s acti17 0.2
+s acti18 3.42
+y acti12 Entr2 2
+y acti13 Entr3 1
+y acti14 Entr4 1
+y acti15 Entr5 1
+y acti17 Entr7 1
+y acti18 Entr8 1
+:
+    acti1 -> (0.15)acti12 + (0.17)acti13 + (0.17)acti14 + (0.17)acti15 + (0.17)acti17 + (0.17)acti18;
+    acti12[Entr1];
+    acti13[Entr1];
+    acti14[Entr1];
+    acti15[Entr1];
+    acti17[Entr1];
+    acti18[Entr1]
+-1
+
+A Task2
+s acti2 0.0001
+s acti23 3.45
+s acti27 3.8
+s acti28 1.94
+y acti23 Entr3 1
+y acti27 Entr7 1
+y acti28 Entr8 1
+:
+    acti2 -> (0.34)acti23 + (0.33)acti27 + (0.33)acti28;
+    acti23[Entr2];
+    acti27[Entr2];
+    acti28[Entr2]
+-1
+
+A Task3
+s acti3 0.0001
+s acti35 2.16
+s acti37 1.66
+y acti35 Entr5 1
+y acti37 Entr7 1
+:
+    acti3 -> (0.5)acti35 + (0.5)acti37;
+    acti35[Entr3];
+    acti37[Entr3]
+-1
+
+A Task4
+s acti4 0.0001
+s acti45 1.58
+y acti45 Entr5 1
+:
+    acti4 -> acti45;
+    acti45[Entr4]
+-1
+
+
+A Task5
+s acti5 0.0001
+s acti56 3.24
+s acti58 0.48
+y acti56 Entr6 1
+y acti58 Entr8 2
+:
+    acti5 -> (0.5)acti56 + (0.5)acti58;
+    acti56[Entr5];
+    acti58[Entr5]
+-1
+
+A Task6
+s acti6 0.0001
+s acti67 2.01
+y acti67 Entr7 2
+:
+    acti6 -> acti67;
+    acti67[Entr6]
+-1
+
+
+A Task7
+s acti7 1.01
+:
+    acti7[Entr7]
+-1
+
+A Task8
+s acti8 1.11
+:
+    acti8[Entr8]
+-1
