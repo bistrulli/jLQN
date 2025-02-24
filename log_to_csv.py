@@ -5,8 +5,8 @@ from datetime import datetime
 
 def turn_log_into_csv(lqn_name, entr_name):
     # Input log file and output CSV file paths
-    log_file_path = f'/home/robb/git/jLQN/output/{lqn_name}/{entr_name}/{entr_name}.log'
-    csv_file_path = f'/home/robb/git/jLQN/output/{lqn_name}/{entr_name}/{entr_name}.csv'
+    log_file_path = f'./output/{lqn_name}/{entr_name}/{entr_name}.log'
+    csv_file_path = f'./output/{lqn_name}/{entr_name}/{entr_name}.csv'
 
     # Regex patterns to match the log entries
     time_pattern = re.compile(r'^(.*) functions\.Logic service')
@@ -35,5 +35,28 @@ def turn_log_into_csv(lqn_name, entr_name):
 
     print(f'Log file parsed and saved to {csv_file_path}')
 
+def calculate_average(csv_file_path, column_name):
+    values = []
+    # Open the CSV file and read the values of column column_name
+    with open(csv_file_path, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for row in csv_reader:
+            values.append(int(row[column_name]))
+    if values:
+        return sum(values) / len(values)
+    else:
+        return None
+
+lqn_name = '5fun-lqn0-template.lqn'
+
 for i in range(1, 5):
-    turn_log_into_csv('5fun-lqn0-template.lqn', f'Entr{i}')
+    entr_name = f'Entr{i}'
+    turn_log_into_csv(lqn_name, entr_name)
+
+    csv_file_path = f'./output/{lqn_name}/{entr_name}/{entr_name}.csv'
+
+    # Calculate the average rt value
+    average_rt = calculate_average(csv_file_path, 'rt')
+    average_cpu = calculate_average(csv_file_path, 'cpu')
+    print(f'The average rt value is: {average_rt}')
+    print(f'The average cpu value is: {average_cpu}')
