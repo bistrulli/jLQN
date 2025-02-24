@@ -197,6 +197,10 @@ public class LqnToGcf {
         
         // Locust
         if (Paths.get(dest.toString() + File.separator + "profile.sh").toFile().exists()) {
+            if (Main.config.getTestOption())
+                this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "profile.sh"), "$protocol", "http");
+            else
+                this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "profile.sh"), "$protocol", "https");
             this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "profile.sh"), "$region", Main.config.getRegionName());
             this.updatePlaceholder(Paths.get(dest.toString() + File.separator + "profile.sh"), "$project", Main.config.getProjectName());
         }
