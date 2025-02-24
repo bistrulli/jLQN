@@ -8,7 +8,7 @@ def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var, prob_edge):
     # Load the template
     template = env.get_template('lqn_template.j2')
 
-    filename = f"{num_tasks}fun-{lqn_id}-template"
+    filename = f"{lqn_id}-{num_tasks}functions"
 
     dag = generate_random_dag_with_one_root(num_tasks, prob_edge)
 
@@ -43,5 +43,6 @@ if __name__ == '__main__':
 
     for i in range(0, args.number):
         padded_id = str(i).zfill(max_len)
-        lqn_text = generate_random_lqn(f'lqn{padded_id}', args.functions, args.call_avg, args.call_var, args.prob_edge)
+        num_functions = random.randint(args.min_functions, args.max_functions)
+        lqn_text = generate_random_lqn(f'lqn{padded_id}', num_functions, args.call_avg, args.call_var, args.prob_edge)
         #print(lqn_text)

@@ -17,8 +17,10 @@ def get_cli():
                         help='The number of LQNs to generate (default is 1).', required=False)
     
     # Density of the DAG
-    parser.add_argument("-f", "--functions", type=int,
-                        help='The number of functions for each LQN.', required=True)
+    parser.add_argument("-max", "--max_functions", type=int,
+                        help='The maximum number of functions for each LQN.', required=True)
+    parser.add_argument("-min", "--min_functions", type=int,
+                        help='The minimum number of functions for each LQN.', required=True)
     parser.add_argument("-p", "--prob_edge", type=float,
                         help='The probability of an edge to be formed.', required=True)
     
