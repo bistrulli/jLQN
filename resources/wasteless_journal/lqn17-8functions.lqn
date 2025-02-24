@@ -1,7 +1,7 @@
 # Generated with Jinja2
 # Header declaration
 G
-"lqn02-8functions.lqn"
+"lqn17-8functions.lqn"
 0.01
 10000
 1
@@ -49,36 +49,45 @@ A Task0
 s acti0 0.0001
 s acti01 0.0001
 s acti02 0.0001
-s acti03 0.0001
-s acti07 0.0001
+s acti04 0.0001
 y acti01 Entr1 1
 y acti02 Entr2 1
-y acti03 Entr3 1
-y acti07 Entr7 1
+y acti04 Entr4 1
 :
-    acti0 -> (0.25)acti01 + (0.25)acti02 + (0.25)acti03 + (0.25)acti07
+    acti0 -> (0.34)acti01 + (0.33)acti02 + (0.33)acti04
 -1
 
 A Task1
 s acti1 0.0001
-s acti13 0.51
+s acti12 0.5
+s acti13 0.99
+s acti14 0.64
+s acti15 1.42
+y acti12 Entr2 1
 y acti13 Entr3 1
+y acti14 Entr4 1
+y acti15 Entr5 1
 :
-    acti1 -> acti13;
-    acti13[Entr1]
+    acti1 -> (0.25)acti12 + (0.25)acti13 + (0.25)acti14 + (0.25)acti15;
+    acti12[Entr1];
+    acti13[Entr1];
+    acti14[Entr1];
+    acti15[Entr1]
 -1
-
 
 A Task2
 s acti2 0.0001
-s acti24 0.28
-s acti26 2.16
-s acti27 1.62
+s acti23 0.55
+s acti24 1.33
+s acti26 2.18
+s acti27 0.23
+y acti23 Entr3 1
 y acti24 Entr4 1
 y acti26 Entr6 1
 y acti27 Entr7 1
 :
-    acti2 -> (0.34)acti24 + (0.33)acti26 + (0.33)acti27;
+    acti2 -> (0.25)acti23 + (0.25)acti24 + (0.25)acti26 + (0.25)acti27;
+    acti23[Entr2];
     acti24[Entr2];
     acti26[Entr2];
     acti27[Entr2]
@@ -86,50 +95,49 @@ y acti27 Entr7 1
 
 A Task3
 s acti3 0.0001
-s acti35 1.48
-s acti36 3.95
-y acti35 Entr5 1
-y acti36 Entr6 1.0
+s acti34 0.48
+s acti37 1.59
+y acti34 Entr4 1
+y acti37 Entr7 1
 :
-    acti3 -> (0.5)acti35 + (0.5)acti36;
-    acti35[Entr3];
-    acti36[Entr3]
+    acti3 -> (0.5)acti34 + (0.5)acti37;
+    acti34[Entr3];
+    acti37[Entr3]
 -1
 
 A Task4
 s acti4 0.0001
-s acti47 2.25
-y acti47 Entr7 1.0
+s acti45 2.9
+s acti46 1.79
+s acti47 3.53
+y acti45 Entr5 2
+y acti46 Entr6 1.0
+y acti47 Entr7 1
 :
-    acti4 -> acti47;
+    acti4 -> (0.34)acti45 + (0.33)acti46 + (0.33)acti47;
+    acti45[Entr4];
+    acti46[Entr4];
     acti47[Entr4]
 -1
 
-
 A Task5
 s acti5 0.0001
-s acti56 2.24
-s acti57 1.89
+s acti56 2.39
 y acti56 Entr6 1
-y acti57 Entr7 1
 :
-    acti5 -> (0.5)acti56 + (0.5)acti57;
-    acti56[Entr5];
-    acti57[Entr5]
+    acti5 -> acti56;
+    acti56[Entr5]
 -1
+
 
 A Task6
-s acti6 0.0001
-s acti67 1.96
-y acti67 Entr7 1.0
+s acti6 0.31
 :
-    acti6 -> acti67;
-    acti67[Entr6]
+    acti6[Entr6]
 -1
 
-
 A Task7
-s acti7 3.71
+s acti7 3.9
 :
     acti7[Entr7]
 -1

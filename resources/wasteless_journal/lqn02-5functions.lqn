@@ -1,7 +1,7 @@
 # Generated with Jinja2
 # Header declaration
 G
-"lqn00-5functions.lqn"
+"lqn02-5functions.lqn"
 0.01
 10000
 1
@@ -39,42 +39,47 @@ A Entr4 acti4
 A Task0
 s acti0 0.0001
 s acti01 0.0001
+s acti03 0.0001
+s acti04 0.0001
 y acti01 Entr1 1
+y acti03 Entr3 2
+y acti04 Entr4 1
 :
-    acti0 -> acti01;
-    acti01[Entr0]
+    acti0 -> (0.34)acti01 + (0.33)acti03 + (0.33)acti04
 -1
-
 
 A Task1
 s acti1 0.0001
-s acti12 0.36
-s acti13 0.55
-s acti14 1.36
+s acti12 3.11
 y acti12 Entr2 1
-y acti13 Entr3 1
-y acti14 Entr4 1
 :
-    acti1 -> (0.34)acti12 + (0.33)acti13 + (0.33)acti14;
-    acti12[Entr1];
-    acti13[Entr1];
-    acti14[Entr1]
+    acti1 -> acti12;
+    acti12[Entr1]
 -1
+
 
 A Task2
-s acti2 0.12
+s acti2 0.0001
+s acti24 2.87
+y acti24 Entr4 1
 :
-    acti2[Entr2]
+    acti2 -> acti24;
+    acti24[Entr2]
 -1
+
 
 A Task3
-s acti3 2.45
+s acti3 0.0001
+s acti34 0.81
+y acti34 Entr4 1
 :
-    acti3[Entr3]
+    acti3 -> acti34;
+    acti34[Entr3]
 -1
 
+
 A Task4
-s acti4 0.45
+s acti4 2.02
 :
     acti4[Entr4]
 -1

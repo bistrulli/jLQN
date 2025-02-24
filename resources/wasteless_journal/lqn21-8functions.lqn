@@ -1,7 +1,7 @@
 # Generated with Jinja2
 # Header declaration
 G
-"lqn05-8functions.lqn"
+"lqn21-8functions.lqn"
 0.01
 10000
 1
@@ -49,41 +49,50 @@ A Task0
 s acti0 0.0001
 s acti01 0.0001
 s acti02 0.0001
-s acti05 0.0001
-s acti06 0.0001
+s acti03 0.0001
+s acti07 0.0001
 y acti01 Entr1 1
 y acti02 Entr2 1
-y acti05 Entr5 1
-y acti06 Entr6 1
+y acti03 Entr3 1
+y acti07 Entr7 1
 :
-    acti0 -> (0.25)acti01 + (0.25)acti02 + (0.25)acti05 + (0.25)acti06
+    acti0 -> (0.25)acti01 + (0.25)acti02 + (0.25)acti03 + (0.25)acti07
 -1
 
 A Task1
 s acti1 0.0001
-s acti13 0.44
-s acti14 3.38
-s acti16 2.53
-y acti13 Entr3 2
-y acti14 Entr4 1.0
-y acti16 Entr6 1
+s acti13 1.79
+s acti14 0.27
+s acti15 3.52
+s acti16 1.4
+s acti17 0.11
+y acti13 Entr3 1
+y acti14 Entr4 1
+y acti15 Entr5 1
+y acti16 Entr6 1.0
+y acti17 Entr7 1
 :
-    acti1 -> (0.34)acti13 + (0.33)acti14 + (0.33)acti16;
+    acti1 -> (0.2)acti13 + (0.2)acti14 + (0.2)acti15 + (0.2)acti16 + (0.2)acti17;
     acti13[Entr1];
     acti14[Entr1];
-    acti16[Entr1]
+    acti15[Entr1];
+    acti16[Entr1];
+    acti17[Entr1]
 -1
 
 A Task2
 s acti2 0.0001
-s acti25 2.13
-s acti26 1.01
-s acti27 2.52
-y acti25 Entr5 1.0
+s acti23 1.4
+s acti25 3.55
+s acti26 3.18
+s acti27 0.19
+y acti23 Entr3 1
+y acti25 Entr5 1
 y acti26 Entr6 1
 y acti27 Entr7 1
 :
-    acti2 -> (0.34)acti25 + (0.33)acti26 + (0.33)acti27;
+    acti2 -> (0.25)acti23 + (0.25)acti25 + (0.25)acti26 + (0.25)acti27;
+    acti23[Entr2];
     acti25[Entr2];
     acti26[Entr2];
     acti27[Entr2]
@@ -91,38 +100,52 @@ y acti27 Entr7 1
 
 A Task3
 s acti3 0.0001
-s acti35 1.68
+s acti34 1.16
+s acti35 2.16
+s acti36 2.41
+s acti37 1.3
+y acti34 Entr4 1
 y acti35 Entr5 1
+y acti36 Entr6 1
+y acti37 Entr7 1
 :
-    acti3 -> acti35;
-    acti35[Entr3]
+    acti3 -> (0.25)acti34 + (0.25)acti35 + (0.25)acti36 + (0.25)acti37;
+    acti34[Entr3];
+    acti35[Entr3];
+    acti36[Entr3];
+    acti37[Entr3]
 -1
-
 
 A Task4
 s acti4 0.0001
-s acti46 0.81
-y acti46 Entr6 1
+s acti45 1.25
+s acti47 1.78
+y acti45 Entr5 1
+y acti47 Entr7 1
 :
-    acti4 -> acti46;
-    acti46[Entr4]
+    acti4 -> (0.5)acti45 + (0.5)acti47;
+    acti45[Entr4];
+    acti47[Entr4]
 -1
-
 
 A Task5
-s acti5 3.08
+s acti5 0.0001
+s acti56 1.92
+y acti56 Entr6 1
 :
-    acti5[Entr5]
+    acti5 -> acti56;
+    acti56[Entr5]
 -1
 
+
 A Task6
-s acti6 2.68
+s acti6 0.59
 :
     acti6[Entr6]
 -1
 
 A Task7
-s acti7 1.21
+s acti7 3.56
 :
     acti7[Entr7]
 -1

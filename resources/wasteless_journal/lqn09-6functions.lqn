@@ -1,7 +1,7 @@
 # Generated with Jinja2
 # Header declaration
 G
-"lqn28-5functions.lqn"
+"lqn09-6functions.lqn"
 0.01
 10000
 1
@@ -15,6 +15,7 @@ p Proc1 f m 1000
 p Proc2 f m 1000
 p Proc3 f m 1000
 p Proc4 f m 1000
+p Proc5 f m 1000
 -1
 
 # Tasks declaration
@@ -24,6 +25,7 @@ t Task1 n Entr1 -1 Proc1 m 1000
 t Task2 n Entr2 -1 Proc2 m 1000
 t Task3 n Entr3 -1 Proc3 m 1000
 t Task4 n Entr4 -1 Proc4 m 1000
+t Task5 n Entr5 -1 Proc5 m 1000
 -1
 
 # Entries declaration
@@ -33,6 +35,7 @@ A Entr1 acti1
 A Entr2 acti2 
 A Entr3 acti3 
 A Entr4 acti4 
+A Entr5 acti5 
 -1
 
 # Activities declaration
@@ -42,44 +45,60 @@ s acti01 0.0001
 s acti02 0.0001
 s acti03 0.0001
 s acti04 0.0001
+s acti05 0.0001
 y acti01 Entr1 1
 y acti02 Entr2 1
-y acti03 Entr3 2
+y acti03 Entr3 1
 y acti04 Entr4 1
+y acti05 Entr5 1
 :
-    acti0 -> (0.25)acti01 + (0.25)acti02 + (0.25)acti03 + (0.25)acti04
+    acti0 -> (0.2)acti01 + (0.2)acti02 + (0.2)acti03 + (0.2)acti04 + (0.2)acti05
 -1
 
 A Task1
 s acti1 0.0001
-s acti13 3.0
-y acti13 Entr3 2
+s acti13 1.07
+s acti14 1.21
+s acti15 2.98
+y acti13 Entr3 1
+y acti14 Entr4 1
+y acti15 Entr5 1
 :
-    acti1 -> acti13;
-    acti13[Entr1]
+    acti1 -> (0.34)acti13 + (0.33)acti14 + (0.33)acti15;
+    acti13[Entr1];
+    acti14[Entr1];
+    acti15[Entr1]
 -1
-
 
 A Task2
 s acti2 0.0001
-s acti23 0.11
-s acti24 0.13
+s acti23 1.26
+s acti24 0.59
+s acti25 0.84
 y acti23 Entr3 1
 y acti24 Entr4 1
+y acti25 Entr5 1
 :
-    acti2 -> (0.5)acti23 + (0.5)acti24;
+    acti2 -> (0.34)acti23 + (0.33)acti24 + (0.33)acti25;
     acti23[Entr2];
-    acti24[Entr2]
+    acti24[Entr2];
+    acti25[Entr2]
 -1
 
 A Task3
-s acti3 2.56
+s acti3 2.66
 :
     acti3[Entr3]
 -1
 
 A Task4
-s acti4 0.88
+s acti4 0.53
 :
     acti4[Entr4]
+-1
+
+A Task5
+s acti5 3.4
+:
+    acti5[Entr5]
 -1

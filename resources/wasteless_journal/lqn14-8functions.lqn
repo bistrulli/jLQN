@@ -1,7 +1,7 @@
 # Generated with Jinja2
 # Header declaration
 G
-"lqn05-8functions.lqn"
+"lqn14-8functions.lqn"
 0.01
 10000
 1
@@ -51,78 +51,89 @@ s acti01 0.0001
 s acti02 0.0001
 s acti05 0.0001
 s acti06 0.0001
+s acti07 0.0001
 y acti01 Entr1 1
 y acti02 Entr2 1
 y acti05 Entr5 1
 y acti06 Entr6 1
+y acti07 Entr7 1
 :
-    acti0 -> (0.25)acti01 + (0.25)acti02 + (0.25)acti05 + (0.25)acti06
+    acti0 -> (0.2)acti01 + (0.2)acti02 + (0.2)acti05 + (0.2)acti06 + (0.2)acti07
 -1
 
 A Task1
 s acti1 0.0001
-s acti13 0.44
-s acti14 3.38
-s acti16 2.53
-y acti13 Entr3 2
-y acti14 Entr4 1.0
-y acti16 Entr6 1
+s acti12 3.57
+s acti13 3.81
+s acti14 1.87
+s acti15 0.1
+y acti12 Entr2 1
+y acti13 Entr3 1.0
+y acti14 Entr4 1
+y acti15 Entr5 1
 :
-    acti1 -> (0.34)acti13 + (0.33)acti14 + (0.33)acti16;
+    acti1 -> (0.25)acti12 + (0.25)acti13 + (0.25)acti14 + (0.25)acti15;
+    acti12[Entr1];
     acti13[Entr1];
     acti14[Entr1];
-    acti16[Entr1]
+    acti15[Entr1]
 -1
 
 A Task2
 s acti2 0.0001
-s acti25 2.13
-s acti26 1.01
-s acti27 2.52
-y acti25 Entr5 1.0
-y acti26 Entr6 1
-y acti27 Entr7 1
+s acti24 2.78
+s acti25 1.49
+y acti24 Entr4 1
+y acti25 Entr5 1
 :
-    acti2 -> (0.34)acti25 + (0.33)acti26 + (0.33)acti27;
-    acti25[Entr2];
-    acti26[Entr2];
-    acti27[Entr2]
+    acti2 -> (0.5)acti24 + (0.5)acti25;
+    acti24[Entr2];
+    acti25[Entr2]
 -1
 
 A Task3
 s acti3 0.0001
 s acti35 1.68
+s acti36 2.8
+s acti37 1.75
 y acti35 Entr5 1
+y acti36 Entr6 1
+y acti37 Entr7 1
 :
-    acti3 -> acti35;
-    acti35[Entr3]
+    acti3 -> (0.34)acti35 + (0.33)acti36 + (0.33)acti37;
+    acti35[Entr3];
+    acti36[Entr3];
+    acti37[Entr3]
 -1
-
 
 A Task4
 s acti4 0.0001
-s acti46 0.81
-y acti46 Entr6 1
+s acti47 3.01
+y acti47 Entr7 1
 :
-    acti4 -> acti46;
-    acti46[Entr4]
+    acti4 -> acti47;
+    acti47[Entr4]
 -1
 
 
 A Task5
-s acti5 3.08
+s acti5 1.06
 :
     acti5[Entr5]
 -1
 
 A Task6
-s acti6 2.68
+s acti6 0.0001
+s acti67 1.89
+y acti67 Entr7 1
 :
-    acti6[Entr6]
+    acti6 -> acti67;
+    acti67[Entr6]
 -1
 
+
 A Task7
-s acti7 1.21
+s acti7 2.72
 :
     acti7[Entr7]
 -1
