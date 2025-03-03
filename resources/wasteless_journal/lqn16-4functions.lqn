@@ -37,23 +37,21 @@ A Task0
 s acti0 0.0001
 s acti01 0.0001
 s acti02 0.0001
-s acti03 0.0001
 y acti01 Entr1 1
 y acti02 Entr2 1
-y acti03 Entr3 1
 :
-    acti0 -> (0.34)acti01 + (0.33)acti02 + (0.33)acti03
+    acti0 -> (0.5)acti01 + (0.5)acti02
 -1
 
 A Task1
-s acti1 0.23
+s acti1 3.16
 :
     acti1[Entr1]
 -1
 
 A Task2
 s acti2 0.0001
-s acti23 1.97
+s acti23 0.59
 y acti23 Entr3 1
 :
     acti2 -> acti23;
@@ -62,7 +60,7 @@ y acti23 Entr3 1
 
 
 A Task3
-s acti3 1.78
+s acti3 1.09
 :
     acti3[Entr3]
 -1
