@@ -31,8 +31,6 @@ public class Logic implements HttpFunction {
     private HttpResponse response = null;
     private HashMap<String, Boolean> act_exec = new HashMap<String, Boolean>();
     private HashMap<String, Thread> act_thread = new HashMap<String, Thread>();
-    private Long  startCpuTime = null;
-    private Long  startExecTime = null;
 
     static {
         try {
@@ -139,20 +137,20 @@ public class Logic implements HttpFunction {
     public void service(HttpRequest request, HttpResponse response) throws IOException {
         this.response = response;
         mgm.setThreadCpuTimeEnabled(true);
-        this.startCpuTime=mgm.getCurrentThreadCpuTime();
-        this.startExecTime=System.nanoTime();
+        Long startCpuTime = mgm.getCurrentThreadCpuTime();
+        Long startExecTime = System.nanoTime();
         
-        //execute the entry activity
+        // Execute the entry activity
         ${f.getMainAct()}();
-        //execetute the decision node of already executed evt
+        // Execute the decision node of already executed evt
         #foreach ( $node in $f.getDnodes())
         if(this.act_exec.get("${node.getOriginEvt()}")!=null && this.act_exec.get("${node.getOriginEvt()}")) {
           this.act_exec.put("${node.getOriginEvt()}",false);
           ${node.getName()}();
         }
         #end
-        String logstring=String.format("cpu:=%d  rt:=%d",mgm.getCurrentThreadCpuTime()-this.startCpuTime,
-                                       System.nanoTime()-this.startExecTime);
+        String logstring=String.format("cpu:=%d  rt:=%d",mgm.getCurrentThreadCpuTime() - startCpuTime,
+                                       System.nanoTime() - startExecTime);
         Logic.logger.info(logstring);
     }
     
