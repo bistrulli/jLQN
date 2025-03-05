@@ -67,6 +67,24 @@ public class Logic implements HttpFunction {
             e.printStackTrace();
         }
         #end
+
+        #if ($act.getAsyncCall() != $null)
+        #if(${config.getTestOption()})
+        String url =  "http://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getAsyncCall().getDest().toLowerCase()}";
+        #else
+        String url =  "https://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getAsyncCall().getDest().toLowerCase()}";
+        #end
+        var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+
+        Thread ${act.getAsyncCall().getSource().toLowerCase()}${act.getAsyncCall().getDest().toLowerCase()}Thread = new Thread(() -> {
+            try {
+                var getResponse = Logic.client.send(getRequest, BodyHandlers.ofString());
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        ${act.getAsyncCall().getSource().toLowerCase()}${act.getAsyncCall().getDest().toLowerCase()}Thread.start();
+        #end
     }
     #end
 

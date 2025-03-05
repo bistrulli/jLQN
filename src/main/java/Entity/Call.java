@@ -1,8 +1,8 @@
 package Entity;
 
 public class Call {
-	String source=null;
-	String dest=null;
+	String source = null;
+	String dest = null;
 	
 	public Call(String source, String dest) {
 		this.setSource(source);

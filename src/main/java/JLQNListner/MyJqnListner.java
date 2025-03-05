@@ -581,7 +581,7 @@ public class MyJqnListner implements JLqnListener {
 		}
 
 		// riprendo la logica della funzione
-		// qui creo i decision node al'interno della funzione
+		// qui creo i decision node all'interno della funzione
 		RuleActConnectionsContext connections = ctx.ruleActConnections();
 		if (connections != null) {
 			//System.out.println(":");
