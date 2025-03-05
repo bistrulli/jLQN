@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import Entity.Activity;
 import Entity.App;
 import Entity.Call;
+import Entity.AsyncCall;
 import Entity.ForkNode;
 import Entity.Function;
 import Entity.OrNode;
@@ -552,6 +553,7 @@ public class MyJqnListner implements JLqnListener {
 			f.getActivities()
 					.add(new Activity(act.ruleActivity().getText(), Double.valueOf(act.ruleNUMBER().getText())));
 		}
+
 		// riprendo tutte le chiamate sincrone
 		List<RuleActSyncCallContext> syncCalls = ctx.ruleActSyncCall();
 		for (RuleActSyncCallContext call : syncCalls) {
@@ -564,6 +566,20 @@ public class MyJqnListner implements JLqnListener {
 				e.printStackTrace();
 			}
 		}
+
+		// riprendo tutte le chiamate asincrone
+		List<RuleActAsyncCallContext> asyncCalls = ctx.ruleActAsyncCall();
+		for (RuleActAsyncCallContext call : asyncCalls) {
+			//System.out.println(
+					//"y " + call.RULE_ID().get(0) + " " + call.RULE_ID().get(1) + " " + call.ruleNUMBER().getText());
+			try {
+				Activity act = f.getActivityByName(call.RULE_ID().get(0).getText());
+				act.setAsyncCall(new AsyncCall(call.RULE_ID().get(0).getText(), call.RULE_ID().get(1).getText()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		// riprendo la logica della funzione
 		// qui creo i decision node al'interno della funzione
 		RuleActConnectionsContext connections = ctx.ruleActConnections();
