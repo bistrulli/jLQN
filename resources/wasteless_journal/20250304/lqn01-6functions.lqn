@@ -73,11 +73,16 @@ y acti23 Entr3 1
 
 A Task3
 s acti3 0.0001
+s acti34 1.43
 s acti35 1.66
+y acti34 Entr4 1
 y acti35 Entr5 1
 :
-    acti3 -> acti35;
-    acti35[Entr3]
+    acti3 ->  acti34 & acti35;
+    acti34 -> ...
+    acti35 -> ...
+    acti34 & acti35 -> acti3;
+    acti3[Entr3]
 -1
 
 
