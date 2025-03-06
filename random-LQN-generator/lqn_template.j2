@@ -10,19 +10,25 @@ G
 
 # Processors declaration, with multiplicity
 P 0
-{% for processor in processors %}p {{ processor }} f m 1000
-{% endfor %}-1
+{% for processor in processors -%}
+p {{ processor }} f m 1000
+{% endfor -%}
+-1
 
 # Tasks declaration
 T 0
 t Task0 r Entr0 -1 Proc0 m 1
-{% for i in range(1, num_tasks) %}t Task{{ i }} n Entr{{ i }} -1 Proc{{ i }} m 1000
-{% endfor %}-1
+{% for i in range(1, num_tasks) -%}
+t Task{{ i }} n Entr{{ i }} -1 Proc{{ i }} m 1000
+{% endfor -%}
+-1
 
 # Entries declaration
 E 0
-{% for i in range(num_tasks) %}A Entr{{ i }} acti{{ i }} 
-{% endfor %}-1
+{% for i in range(num_tasks) -%}
+A Entr{{ i }} acti{{ i }} 
+{% endfor -%}
+-1
 
 # Activities declaration{% for i in range(num_tasks) %}{% if dag[i] | length == 0 %}
 A Task{{ i }}
@@ -33,7 +39,7 @@ s acti{{ i }} {% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif
 A Task{{ i }}
 s acti{{ i }} 0.0001
 s acti{{ i }}{{ dag[i][0] }} {% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif %}
-y acti{{ i }}{{ dag[i][0] }} Entr{{ dag[i][0] }} {{ get_call_number(call_avg, call_var) }}
+{{ get_call_type(p_async) }} acti{{ i }}{{ dag[i][0] }} Entr{{ dag[i][0] }} {{ get_call_number(call_avg, call_var) }}
 :
     acti{{ i }} -> acti{{ i }}{{ dag[i][0] }}{% if i != 0 %};
     acti{{ i }}{{ dag[i][0] }}[Entr{{ i }}]{% endif %}
@@ -42,9 +48,11 @@ y acti{{ i }}{{ dag[i][0] }} Entr{{ dag[i][0] }} {{ get_call_number(call_avg, ca
 A Task{{ i }}
 s acti{{ i }} 0.0001{% for j in dag[i] %}
 s acti{{ i }}{{ j }} {% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif %}{% endfor %}{% for j in dag[i] %}
-y acti{{ i }}{{ j }} Entr{{ j }} {{ get_call_number(call_avg, call_var) }}{% endfor %}
+{{ get_call_type(p_async) }} acti{{ i }}{{ j }} Entr{{ j }} {{ get_call_number(call_avg, call_var) }}{% endfor %}
 :
     acti{{ i }} -> ({{ get_probability(0, dag[i] | length) }})acti{{ i }}{{ dag[i][0] }}{% for j in dag[i][1:] %} + ({{ get_probability(1, dag[i] | length) }})acti{{ i }}{{ j }}{% endfor %}{% if i != 0%}{% for j in dag[i] %}{% if i != 0 %};
     acti{{ i }}{{ j }}[Entr{{ i }}]{% endif %}{% endfor %}{% endif %}
 -1{% endif %}
 {% endfor %}
+
+

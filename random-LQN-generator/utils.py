@@ -21,7 +21,7 @@ def get_cli():
                         help='The maximum number of functions for each LQN.', required=True)
     parser.add_argument("-min", "--min_functions", type=int,
                         help='The minimum number of functions for each LQN.', required=True)
-    parser.add_argument("-p", "--prob_edge", type=float,
+    parser.add_argument("-p", "--p_edge", type=float,
                         help='The probability of an edge to be formed.', required=True)
     
     # Gaussian distributed calls
@@ -29,6 +29,10 @@ def get_cli():
                         help='The average number of calls for each task.', required=False)
     parser.add_argument("-v", "--call_var", type=float, default=0.001,
                         help='The variance of calls for each task.', required=False)
+
+    # Asynchronous calls and parallelism
+    parser.add_argument("-async", "--p_async", type=float, default=0.1,
+                        help='The probability of an asynchronous call.', required=False)
     
     return parser.parse_args()
 
@@ -61,7 +65,7 @@ def get_call_number(average, variance):
     sample = round(np.random.normal(loc=average, scale=std))
     return 1.0 if sample <= 0 else sample
 
-def generate_random_dag_with_one_root(num_vertices, prob_edge):
+def generate_random_dag_with_one_root(num_vertices, p_edge):
     """Generate a random DAG with a single root.
 
     :param num_vertices:    The number of vertices in the DAG.
@@ -73,7 +77,7 @@ def generate_random_dag_with_one_root(num_vertices, prob_edge):
     # Create edges ensuring no cycles are formed
     for i in range(0, num_vertices): # for i in range(1, num_vertices):
         for j in range(i + 1, num_vertices):
-            if random.random() < prob_edge:
+            if random.random() < p_edge:
                 adj_list[i].append(j)
 
     # Add vertices that have no parent to the root
