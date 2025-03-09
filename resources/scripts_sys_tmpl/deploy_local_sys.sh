@@ -25,10 +25,35 @@ else
 fi
 
 
+# dfiles=$(find . -type f -name "local_run.sh")
+# port=8081
+# for d in $(echo "$dfiles" | sort)
+# do
+#     echo "Executing $d with port $port"
+#     # Use dirname to get the base path
+#     fun_path=$(dirname $(realpath "$d"))
+#     (
+#         cd $fun_path
+#         sh local_run.sh $port
+#     ) &
+#     port=$((port + 1))
+# done
+
+# # Wait for all background processes to complete
+# wait
+
+
 dfiles=$(find . -type f -name "local_run.sh")
-port=8081
 for d in $(echo "$dfiles" | sort)
 do
+    # Extract the number at the end of EntrXX
+    entry_dir=$(dirname "$d")
+    entry_name=$(basename "$entry_dir")
+    entry_number=$(echo "$entry_name" | grep -o -E '[0-9]+$')
+    
+    # Calculate the port number
+    port=$((8080 + entry_number))
+    
     echo "Executing $d with port $port"
     # Use dirname to get the base path
     fun_path=$(dirname $(realpath "$d"))
@@ -36,7 +61,6 @@ do
         cd $fun_path
         sh local_run.sh $port
     ) &
-    port=$((port + 1))
 done
 
 # Wait for all background processes to complete

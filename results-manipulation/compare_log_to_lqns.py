@@ -22,11 +22,11 @@ if __name__ == '__main__':
 
     lqns_out_path = f'/home/robb/git/jLQN/resources/wasteless_journal/{lqn_name}.out'
     lqns_service_times = estfl.extract_service_times_from_lqns(lqns_out_path)
-    print(f"Service times extracted from {lqn_name}.out:\n{lqns_service_times}")
+    #print(f"Service times extracted from {lqn_name}.out:\n{lqns_service_times}")
 
     lqn_path = f'../output/{lqn_name}.lqn'
     log_service_times = ltc.extract_service_times_from_log(lqn_path, f"{lqn_name}.lqn")
-    print(f"Service times of {lqn_name} extracted from log:\n{log_service_times}")
+    #print(f"Service times of {lqn_name} extracted from log:\n{log_service_times}")
 
     # Ensure both lists have the same length
     min_length = min(len(lqns_service_times), len(log_service_times))
@@ -38,6 +38,10 @@ if __name__ == '__main__':
     for lqns_time, log_time in zip(lqns_service_times, log_service_times):
         relative_error = abs(lqns_time - log_time) / log_time
         relative_errors.append(relative_error)
+
+    # Calculate average relative error
+    average_relative_error = sum(relative_errors) / len(relative_errors) if relative_errors else 0
+    print(f"Average Relative Error: {round(average_relative_error*100,2)}%")
 
     # Generate CSV file
     csv_file_path = f'/home/robb/git/jLQN/results-manipulation/comparison/{lqn_name}_comparison.csv'
