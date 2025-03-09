@@ -52,18 +52,23 @@ def calculate_average(csv_file_path, column_name):
     else:
         return None
 
-lqn_name = 'lqn00-9functions.lqn'
-lqn_path = f'../output/{lqn_name}'
 
-# Iterate over all directories in the lqn_name folder, excluding Entr0
-for entr_name in os.listdir(lqn_path):
-    entr_path = os.path.join(lqn_path, entr_name)
-    if os.path.isdir(entr_path) and entr_name != 'Entr0':
-        turn_log_into_csv(lqn_name, entr_name)
+def extract_service_times_from_log(lqn_folder_path, lqn_name):
+    service_times = []
 
-        csv_file_path = f'../output/{lqn_name}/{entr_name}/{entr_name}.csv'
+    # Iterate over all directories in the lqn_name folder, excluding Entr0
+    for entr_name in sorted(os.listdir(lqn_folder_path)):
+        entr_path = os.path.join(lqn_folder_path, entr_name)
+        if os.path.isdir(entr_path) and entr_name != 'Entr0':
+            turn_log_into_csv(lqn_name, entr_name)
 
-        # Calculate the average rt value
-        average_rt = calculate_average(csv_file_path, 'rt')
-        average_cpu = calculate_average(csv_file_path, 'cpu')
-        print(f'{entr_name}: {round(average_rt/1000000)}')
+            csv_file_path = f'../output/{lqn_name}/{entr_name}/{entr_name}.csv'
+
+            # Calculate the average rt value
+            average_rt = calculate_average(csv_file_path, 'rt')
+            #average_cpu = calculate_average(csv_file_path, 'cpu')
+            service_time = round(average_rt/1000000)
+            service_times.append(service_time) # Convert to milliseconds
+
+
+    return service_times
