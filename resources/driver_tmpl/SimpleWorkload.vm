@@ -40,6 +40,11 @@ class SimpleWorkload(HttpUser):
 		tgt_url = "${act.getCall().getDest().toLowerCase()}";
 		self.client.get(tgt_url)
 		#end
+
+		#if ($act.getAsyncCall() != $null)
+		tgt_url = "${act.getAsyncCall().getDest().toLowerCase()}";
+		self.client.get(tgt_url)
+		#end
 	#end
 	
 	#[[#]]#Dnodes

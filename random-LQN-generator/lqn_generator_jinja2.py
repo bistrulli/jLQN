@@ -2,8 +2,8 @@ from utils import *
 from jinja2 import Environment, FileSystemLoader
 import random
 
-def get_call_type(p_async):
-    return "z" if random.random() < p_async else "y"
+def get_call_type(task, async_tasks):
+    return "z" if task in async_tasks else "y"
 
 def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var, p_edge, p_async):
     # Set up Jinja2 environment
@@ -12,9 +12,13 @@ def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var, p_edge, p_async):
     # Load the template
     template = env.get_template('lqn_template.j2')
 
-    filename = f"{lqn_id}-{num_tasks}functions"
+    filename = f"{lqn_id}-{num_tasks}f"
 
     dag = generate_random_dag_with_one_root(num_tasks, p_edge)
+
+    # The list of tasks that receive calls that are only asynchronous
+    async_tasks = random.sample(range(num_tasks), int(p_async * num_tasks))
+    
 
     # Define the context
     context = {
@@ -25,7 +29,7 @@ def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var, p_edge, p_async):
         'dag': dag,
         'call_avg': call_avg,
         'call_var': call_var,
-        'p_async': p_async,
+        'async_tasks': async_tasks,
         'get_call_type': get_call_type,
         'random_service_time': random_service_time,
         'get_call_number': get_call_number,
