@@ -33,6 +33,8 @@ def get_cli():
     # Asynchronous calls and parallelism
     parser.add_argument("-async", "--p_async", type=float, default=0.1,
                         help='The probability of an asynchronous call.', required=False)
+    parser.add_argument("-parallel", "--p_parallelism", type=float, default=0.0,
+                        help='The probability of parallel calls.', required=False)
     
     return parser.parse_args()
 
