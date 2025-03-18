@@ -1,6 +1,8 @@
 from utils import *
 from jinja2 import Environment, FileSystemLoader
 import random
+import os
+import re
 
 def get_call_type(task, async_tasks):
     return "z" if task in async_tasks else "y"
@@ -57,18 +59,38 @@ def generate_random_lqn(folder_path, lqn_id, num_tasks, call_avg, call_var, p_ed
 
     return lqn_text
 
+def get_highest_lqn_value(folder_path):
+    """
+    Given a folder, looks for all the files whose name is in the format "lqnxx-yyf.lqn"
+    and gets the xx value of the highest one.
 
+    :param folder_path: The path to the folder to search in.
+    :return: The highest xx value found.
+    """
+    highest_value = '0'
+    pattern = re.compile(r'lqn(\d+)-\d+f\.lqn')
+
+    for filename in os.listdir(folder_path):
+        match = pattern.match(filename)
+        if match:
+            value = int(match.group(1))
+            if highest_value == '0' or value > highest_value:
+                highest_value = value
+
+    return highest_value
 
 if __name__ == '__main__':
     args = get_cli()
 
-    max_len = len(str(args.number))
+    max_len = 2 #len(str(args.num_lqns))
 
     today_folder_path = create_today_folder()
 
-    for i in range(0, args.number):
-        padded_id = str(i).zfill(max_len)
-        num_functions = random.randint(args.min_functions, args.max_functions)
-        lqn_text = generate_random_lqn(today_folder_path, f'lqn{padded_id}', num_functions, args.call_avg, args.call_var,
-                                       args.p_edge, args.p_async, args.p_parallelism)
+    starting_id = int(get_highest_lqn_value(today_folder_path)) + 1
+
+    for i in range(starting_id, starting_id + args.num_lqns):
+       padded_id = str(i).zfill(max_len)
+       num_functions = random.randint(args.min_functions, args.max_functions)
+       lqn_text = generate_random_lqn(today_folder_path, f'lqn{padded_id}', num_functions, args.call_avg, args.call_var,
+                                      args.prob_edge, args.prob_async, args.prob_parallel)
         #print(lqn_text)

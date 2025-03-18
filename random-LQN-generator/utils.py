@@ -14,27 +14,27 @@ def get_cli():
     parser = argparse.ArgumentParser(description="Generate a set of random LQNs.")
     
     # Number of LQNs
-    parser.add_argument("-n", "--number", type=int, default=1,
+    parser.add_argument("-n", "--num-lqns", type=int, default=1,
                         help='The number of LQNs to generate (default is 1).', required=False)
     
     # Density of the DAG
-    parser.add_argument("-max", "--max_functions", type=int,
+    parser.add_argument("-max", "--max-functions", type=int,
                         help='The maximum number of functions for each LQN.', required=True)
-    parser.add_argument("-min", "--min_functions", type=int,
+    parser.add_argument("-min", "--min-functions", type=int,
                         help='The minimum number of functions for each LQN.', required=True)
-    parser.add_argument("-p", "--p_edge", type=float,
+    parser.add_argument("-p", "--prob-edge", type=float,
                         help='The probability of an edge to be formed.', required=True)
     
     # Gaussian distributed calls
-    parser.add_argument("-a", "--call_avg", type=int, default=1,
-                        help='The average number of calls for each task.', required=False)
-    parser.add_argument("-v", "--call_var", type=float, default=0.001,
-                        help='The variance of calls for each task.', required=False)
+    parser.add_argument("-a", "--call-avg", type=int, default=1,
+                        help='The average number of calls for each task (default is 1).', required=False)
+    parser.add_argument("-v", "--call-var", type=float, default=0,
+                        help='The variance of calls for each task (default is 0).', required=False)
 
     # Asynchronous calls and parallelism
-    parser.add_argument("-async", "--p_async", type=float, default=0.1,
+    parser.add_argument("-async", "--prob-async", type=float, default=0.1,
                         help='The probability of an asynchronous call.', required=False)
-    parser.add_argument("-parallel", "--p_parallelism", type=float, default=0.0,
+    parser.add_argument("-parallel", "--prob-parallel", type=float, default=0.0,
                         help='The probability of parallel calls.', required=False)
     
     return parser.parse_args()
