@@ -8,7 +8,7 @@ def get_call_type(task, async_tasks):
 def is_parallel_type(task, parallel_tasks):
     return True if task in parallel_tasks else False
 
-def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var, p_edge, p_async, p_parallelism):
+def generate_random_lqn(folder_path, lqn_id, num_tasks, call_avg, call_var, p_edge, p_async, p_parallelism):
 
     # Set up Jinja2 environment
     env = Environment(loader=FileSystemLoader(searchpath='/home/robb/git/jLQN/random-LQN-generator'))
@@ -23,11 +23,11 @@ def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var, p_edge, p_async, 
     tasks = list(range(num_tasks))
 
     eligible_async_tasks = [task for task in tasks if task not in dag[0]]
-
     # The list of tasks that receive calls that are only asynchronous
     async_tasks = random.sample(eligible_async_tasks, int(p_async * len(eligible_async_tasks)))
 
-    parallel_tasks = random.sample(tasks, int(p_parallelism * len(tasks)))
+    eligible_parallel_tasks = list(range(1, num_tasks))
+    parallel_tasks = random.sample(eligible_parallel_tasks, int(p_parallelism * len(eligible_parallel_tasks)))
 
     
 
@@ -52,7 +52,7 @@ def generate_random_lqn(lqn_id, num_tasks, call_avg, call_var, p_edge, p_async, 
     # Render the template with the context
     lqn_text = template.render(context)
 
-    save_file(out_lqn_folder, filename, lqn_text)
+    save_file(folder_path, filename, lqn_text)
     print(f"LQN \"{filename}\" generated.")
 
     return lqn_text
@@ -64,9 +64,11 @@ if __name__ == '__main__':
 
     max_len = len(str(args.number))
 
+    today_folder_path = create_today_folder()
+
     for i in range(0, args.number):
         padded_id = str(i).zfill(max_len)
         num_functions = random.randint(args.min_functions, args.max_functions)
-        lqn_text = generate_random_lqn(f'lqn{padded_id}', num_functions, args.call_avg, args.call_var,
+        lqn_text = generate_random_lqn(today_folder_path, f'lqn{padded_id}', num_functions, args.call_avg, args.call_var,
                                        args.p_edge, args.p_async, args.p_parallelism)
         #print(lqn_text)

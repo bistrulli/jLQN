@@ -2,6 +2,7 @@ import random
 import numpy as np
 import argparse
 import os
+from datetime import datetime
 
 out_lqn_folder = os.path.join(os.getcwd(), "LQNs")
 
@@ -105,3 +106,18 @@ def get_probability(node_position, num_edges):
         return p
     else:
         return round(1 - ((num_edges-1) * p), 2)
+    
+def create_today_folder():
+    # Get today's date in YYYYMMDD format
+    today = datetime.today().strftime('%Y%m%d')
+    
+    # Create the full path for the new folder
+    folder_path = os.path.join(out_lqn_folder, today)
+    
+    # Create the folder if it doesn't exist
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        print(f"Folder '{folder_path}' created.")
+    else:
+        print(f"Folder '{folder_path}' already exists.")
+    return folder_path

@@ -32,34 +32,41 @@ A Entr{{ i }} acti{{ i }}
 
 # Activities declaration
 {% for i in range(num_tasks) -%}
+{# Leaf task -#}
 {% if dag[i] | length == 0 -%}
 A Task{{ i }}
 s acti{{ i }} {% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif %}
 :
     acti{{ i }}{% if get_call_type(i, async_tasks) == 'y' %}[Entr{{ i }}]{% endif %}
 -1
+{# Task with a single call -#}
 {% elif dag[i] | length == 1 -%}
 A Task{{ i }}
-s acti{{ i }} 0.0001
-s acti{{ i }}{{ dag[i][0] }} {% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif %}
+s acti{{ i }} {{ random_service_time() }} {# 0.0001 #}
+s acti{{ i }}{{ dag[i][0] }} 0.0001 {#{% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif %}#}
 {{ get_call_type(dag[i][0], async_tasks) }} acti{{ i }}{{ dag[i][0] }} Entr{{ dag[i][0] }} {{ get_call_number(call_avg, call_var) }}
 :
     acti{{ i }} -> acti{{ i }}{{ dag[i][0] }}{% if i != 0 %};
     acti{{ i }}{{ dag[i][0] }}{% if get_call_type(i, async_tasks) == 'y' %}[Entr{{ i }}]{% endif %}{% endif %}
 -1
+{# Task with multiple calls -#}
 {% else -%}
 A Task{{ i }}
-s acti{{ i }} 0.0001 {% for j in dag[i] %}
-s acti{{ i }}{{ j }} {% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif %}{% endfor %}{% if is_parallel_type(i, parallel_tasks) %}
-s acti{{ i }}j 0.0001 {% endif %}
+s acti{{ i }} {{ random_service_time() }}{# 0.0001 #}
+{%- for j in dag[i] %}
+s acti{{ i }}{{ j }} 0.0001 {# {% if i == 0 %}0.0001{% else %}{{ random_service_time() }}{% endif %} #}
+{%- endfor %}
+{%- if is_parallel_type(i, parallel_tasks) %}
+s acti{{ i }}j 0.0001
+{%- endif %}
 {% for j in dag[i] -%}
 {{ get_call_type(j, async_tasks) }} acti{{ i }}{{ j }} Entr{{ j }} {{ get_call_number(call_avg, call_var) }}
-{% endfor -%}
+{% endfor -%}{# parallel -#}
 :{% if is_parallel_type(i, parallel_tasks) %}
-    acti{{ i }} -> acti{{ i }}{{ dag[i][0] }}{% for j in dag[i][1:] %} & acti{{ i }}{{ j }}{% endfor %}{% if i != 0%};
-    acti{{ i }}{{ dag[i][0] }}{% for j in dag[i][1:] %} & acti{{ i }}{{ j }}{% endfor %} -> acti{{ i }}j{% endif %};
+    acti{{ i }} -> acti{{ i }}{{ dag[i][0] }}{% for j in dag[i][1:] %} & acti{{ i }}{{ j }}{% endfor %}{% if i != 0%}; {# fork #}
+    acti{{ i }}{{ dag[i][0] }}{% for j in dag[i][1:] %} & acti{{ i }}{{ j }}{% endfor %} -> acti{{ i }}j{% endif %}; {# join #}
     acti{{ i }}j[Entr{{ i }}]
-{% else %}
+{% else %}{# probabilistic #}
     acti{{ i }} -> ({{ get_probability(0, dag[i] | length) }})acti{{ i }}{{ dag[i][0] }}{% for j in dag[i][1:] %} + ({{ get_probability(1, dag[i] | length) }})acti{{ i }}{{ j }}{% endfor %}{% if i != 0%}{% for j in dag[i] %}{% if i != 0 %};
     acti{{ i }}{{ j }}{% if get_call_type(i, async_tasks) == 'y' %}[Entr{{ i }}]{% endif %}{% endif %}{% endfor %}{% endif %}
 {% endif -%}
