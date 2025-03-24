@@ -28,7 +28,9 @@ def generate_random_lqn(folder_path, lqn_id, num_tasks, call_avg, call_var, p_ed
     # The list of tasks that receive calls that are only asynchronous
     async_tasks = random.sample(eligible_async_tasks, int(p_async * len(eligible_async_tasks)))
 
-    eligible_parallel_tasks = list(range(1, num_tasks))
+    eligible_parallel_tasks = [task for task in tasks if len(dag[task]) == 2]
+    
+    #list(range(1, num_tasks))
     parallel_tasks = random.sample(eligible_parallel_tasks, int(p_parallelism * len(eligible_parallel_tasks)))
 
     
@@ -67,14 +69,14 @@ def get_highest_lqn_value(folder_path):
     :param folder_path: The path to the folder to search in.
     :return: The highest xx value found.
     """
-    highest_value = '0'
+    highest_value = 0
     pattern = re.compile(r'lqn(\d+)-\d+f\.lqn')
 
     for filename in os.listdir(folder_path):
         match = pattern.match(filename)
         if match:
             value = int(match.group(1))
-            if highest_value == '0' or value > highest_value:
+            if value > highest_value:
                 highest_value = value
 
     return highest_value

@@ -13,7 +13,9 @@ import java.util.logging.FileHandler;
 import java.util.logging.SimpleFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
+import java.util.Map;
 import java.lang.Thread;
 
 import org.apache.commons.math3.distribution.ExponentialDistribution;
@@ -29,8 +31,8 @@ public class Logic implements HttpFunction {
     private static ThreadMXBean mgm = ManagementFactory.getThreadMXBean();
     private static HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
     private HttpResponse response = null;
-    private HashMap<String, Boolean> act_exec = new HashMap<String, Boolean>();
-    private HashMap<String, Thread> act_thread = new HashMap<String, Thread>();
+    //private HashMap<String, Boolean> act_exec = new HashMap<String, Boolean>();
+    //private HashMap<String, Thread> act_thread = new HashMap<String, Thread>();
 
     static {
         try {
@@ -48,8 +50,8 @@ public class Logic implements HttpFunction {
      * activities
      */
     #foreach ( $act in $f.getActivities() )
-    public void $act.getName()(){
-        this.act_exec.put("$act.getName()", true);
+    public void $act.getName()(Map<String, Boolean> act_exec){
+        act_exec.put("$act.getName()", true);
         this.doWork($act.getDemand());
         #if ($act.getCall() != $null)
         #if(${config.getTestOption()})
@@ -92,13 +94,13 @@ public class Logic implements HttpFunction {
      * Dnodes
      */
     #foreach ( $node in $f.getDnodes() )
-    public void $node.getName()(){
+    public void $node.getName()(Map<String, Boolean> act_exec, Map<String, Thread> act_thread){
     #if($node.class.getSimpleName()=="OrNode")
         #if($node.getJoinList().size()>1)
         //JoinNode Logic
         try {
             #foreach ( $act in $node.getJoinList())
-            this.act_thread.get("$act").join();
+            act_thread.get("$act").join();
             #end
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -113,7 +115,7 @@ public class Logic implements HttpFunction {
         String randomChoice = distribution.sample();
         #foreach ( $act in $node.getForkList())
         if(randomChoice=="$act"){
-            $act();
+            $act(act_exec);
         }
         #end
     #end
@@ -130,12 +132,12 @@ public class Logic implements HttpFunction {
         Thread ${act}Thread = new Thread(() -> {
             //TBA all the activated Dnodes by ${act} to allow a more complex parallel execution
             //in this way only asynch call are supported
-            mainLogic.$act();
+            mainLogic.$act(act_exec);
         });
-        this.act_thread.put("${act}", ${act}Thread);
-        this.act_thread.get("${act}").start();
+        act_thread.put("${act}", ${act}Thread);
+        act_thread.get("${act}").start();
         #end
-        this.act_exec.put(joinEvt, true);
+        act_exec.put(joinEvt, true);
     #end
     #if($node.class.getSimpleName()=="ReplyNode")
         //ReplyNode Logic
@@ -157,14 +159,19 @@ public class Logic implements HttpFunction {
         mgm.setThreadCpuTimeEnabled(true);
         Long startCpuTime = mgm.getCurrentThreadCpuTime();
         Long startExecTime = System.nanoTime();
+
+
+        // Create a new act_exec map for this execution
+        Map<String, Boolean> act_exec = new ConcurrentHashMap<>();
+        HashMap<String, Thread> act_thread = new HashMap<String, Thread>();
         
         // Execute the entry activity
-        ${f.getMainAct()}();
+        ${f.getMainAct()}(act_exec);
         // Execute the decision node of already executed evt
         #foreach ( $node in $f.getDnodes())
-        if(this.act_exec.get("${node.getOriginEvt()}")!=null && this.act_exec.get("${node.getOriginEvt()}")) {
-          this.act_exec.put("${node.getOriginEvt()}",false);
-          ${node.getName()}();
+        if(act_exec.get("${node.getOriginEvt()}")!=null && act_exec.get("${node.getOriginEvt()}")) {
+          act_exec.put("${node.getOriginEvt()}",false);
+          ${node.getName()}(act_exec, act_thread);
         }
         #end
         String logstring=String.format("cpu:=%d  rt:=%d",mgm.getCurrentThreadCpuTime() - startCpuTime,

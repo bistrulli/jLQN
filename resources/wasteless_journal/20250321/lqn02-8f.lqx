@@ -1,0 +1,307 @@
+<?xml version="1.0"?>
+<!-- lqns -xml -->
+<lqn-model name="./LQNs/20250320/lqn02-8f" description="lqns 6.2.31 solution for ./LQNs/20250320/lqn02-8f.lqn." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/usr/local/share/lqns/lqn.xsd">
+  <solver-params comment="lqn02-8f.lqn" conv_val="0.01" it_limit="10000" underrelax_coeff="0.5" print_int="1">
+    <result-general solver-info="lqns 6.2.31" valid="true" conv-val="0.0060756" iterations="18" platform-info="corvus Linux 6.11.0-19-generic" user-cpu-time=" 0:00:00.021" system-cpu-time=" 0:00:00.001" elapsed-time=" 0:00:00.022" max-rss="8908">
+      <mva-info submodels="6" core="108" step="1747" step-squared="50673" wait="1.31965e+06" wait-squared="1.5437e+11" faults="0"/>
+    </result-general>
+  </solver-params>
+  <processor name="Proc0" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.30506"/>
+    <task name="Task0" scheduling="ref">
+      <result-task throughput="0.204724" utilization="1.0165" phase1-utilization="1.0165" proc-utilization="0.30506"/>
+      <entry name="Entr0" type="NONE">
+        <result-entry utilization="1.0165" throughput="0.204724" proc-utilization="0" squared-coeff-variation="0.634626" throughput-bound="0.224622" phase1-service-time="4.96523" phase1-service-time-variance="15.6458" phase1-utilization="1.0165"/>
+      </entry>
+      <task-activities>
+        <activity name="acti0" bound-to-entry="Entr0" host-demand-mean="1.49" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="1.46672" utilization="0.300273" service-time-variance="2.2201" throughput="0.204724" proc-utilization="0.305039"/>
+        </activity>
+        <activity name="acti01" host-demand-mean="0.0001" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="1.79176" utilization="0.124718" service-time-variance="2.90683" throughput="0.0696063" proc-utilization="6.96063e-06"/>
+          <synch-call dest="Entr1" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <activity name="acti02" host-demand-mean="0.0001" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="8.04665" utilization="0.543624" service-time-variance="24.3194" throughput="0.0675591" proc-utilization="6.75591e-06"/>
+          <synch-call dest="Entr2" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <activity name="acti07" host-demand-mean="0.0001" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="0.708848" utilization="0.0478891" service-time-variance="0.5184" throughput="0.0675591" proc-utilization="6.75591e-06"/>
+          <synch-call dest="Entr7" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti0"/>
+          </pre>
+          <post-OR>
+            <activity name="acti02" prob="0.33"/>
+            <activity name="acti07" prob="0.33"/>
+            <activity name="acti01" prob="0.34"/>
+          </post-OR>
+        </precedence>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc1" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.117642"/>
+    <task name="Task1" scheduling="fcfs" multiplicity="1000">
+      <result-task throughput="0.0696063" utilization="0.12669" phase1-utilization="0.12669" proc-utilization="0.117642"/>
+      <entry name="Entr1" type="NONE">
+        <result-entry utilization="0.12669" throughput="0.0696063" proc-utilization="0" squared-coeff-variation="0.877463" throughput-bound="549.42" phase1-service-time="1.8201" phase1-service-time-variance="2.90683" phase1-utilization="0.12669"/>
+      </entry>
+      <task-activities>
+        <activity name="acti1" bound-to-entry="Entr1" host-demand-mean="1.69" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="1.69" utilization="0.117635" service-time-variance="2.8561" throughput="0.0696063" proc-utilization="0.117635"/>
+        </activity>
+        <activity name="acti13" host-demand-mean="0.0001" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="0.1301" utilization="0.00905578" service-time-variance="0.050726" throughput="0.0696063" proc-utilization="6.96063e-06"/>
+          <synch-call dest="Entr3" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti1"/>
+          </pre>
+          <post>
+            <activity name="acti13"/>
+          </post>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti13"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr1">
+          <reply-activity name="acti13"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc2" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.266865"/>
+    <task name="Task2" scheduling="fcfs" multiplicity="1000">
+      <result-task throughput="0.0675591" utilization="0.533116" phase1-utilization="0.533116" proc-utilization="0.266865"/>
+      <entry name="Entr2" type="NONE">
+        <result-entry utilization="0.533116" throughput="0.0675591" proc-utilization="0" squared-coeff-variation="0.652544" throughput-bound="156.741" phase1-service-time="7.89111" phase1-service-time-variance="40.6336" phase1-utilization="0.533116"/>
+      </entry>
+      <task-activities>
+        <activity name="acti2" bound-to-entry="Entr2" host-demand-mean="3.95" host-demand-cvsq="0.0"  >
+          <result-activity proc-waiting="0" service-time="3.95" utilization="0.266858" service-time-variance="15.6025" throughput="0.0675591" proc-utilization="0.266858"/>
+        </activity>
+        <activity name="acti24" host-demand-mean="0.0001" host-demand-cvsq="0.0" >
+          <result-activity proc-waiting="0" service-time="6.85511" utilization="0.157462" service-time-variance="132.677" throughput="0.0229701" proc-utilization="2.29701e-06"/>
+          <synch-call dest="Entr4" calls-mean="1">
+            <result-call waiting="0.00663307"/>
+          </synch-call>
+        </activity>
+        <activity name="acti25" host-demand-mean="0.0001" host-demand-cvsq="0.0" >
+          <result-activity proc-waiting="0" service-time="3.57999" utilization="0.079814" service-time-variance="35.9" throughput="0.0222945" proc-utilization="2.22945e-06"/>
+          <synch-call dest="Entr5" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <activity name="acti26" host-demand-mean="0.0001" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="1.29993" utilization="0.0289813" service-time-variance="5.06942" throughput="0.0222945" proc-utilization="2.22945e-06"/>
+          <synch-call dest="Entr6" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti2"/>
+          </pre>
+          <post-OR>
+            <activity name="acti25" prob="0.33"/>
+            <activity name="acti26" prob="0.33"/>
+            <activity name="acti24" prob="0.34"/>
+          </post-OR>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti24"/>
+          </pre>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti25"/>
+          </pre>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti26"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr2">
+          <reply-activity name="acti24"/>
+          <reply-activity name="acti25"/>
+          <reply-activity name="acti26"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc3" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.0089019"/>
+    <task name="Task3" scheduling="fcfs" multiplicity="1000">
+      <result-task throughput="0.0684762" utilization="0.0089019" phase1-utilization="0.0089019" proc-utilization="0.0089019"/>
+      <entry name="Entr3" type="NONE">
+        <result-entry utilization="0.0089019" throughput="0.0684762" proc-utilization="0" squared-coeff-variation="1" throughput-bound="7692.31" phase1-service-time="0.13" phase1-service-time-variance="0.0169" phase1-utilization="0.0089019"/>
+      </entry>
+      <task-activities>
+        <activity name="acti3" bound-to-entry="Entr3" host-demand-mean="0.13" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="0.13" utilization="0.0089019" service-time-variance="0.0169" throughput="0.0684762" proc-utilization="0.0089019"/>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti3"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr3">
+          <reply-activity name="acti3"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc4" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.0556429"/>
+    <task name="Task4" scheduling="fcfs" multiplicity="1000">
+      <result-task throughput="0.0230855" utilization="0.155721" phase1-utilization="0.155721" proc-utilization="0.0556429"/>
+      <entry name="Entr4" type="NONE">
+        <result-entry utilization="0.155721" throughput="0.0230855" proc-utilization="0" squared-coeff-variation="0.904285" throughput-bound="414.921" phase1-service-time="6.74541" phase1-service-time-variance="41.1454" phase1-utilization="0.155721"/>
+      </entry>
+      <task-activities>
+        <activity name="acti4" bound-to-entry="Entr4" host-demand-mean="2.41" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="2.41" utilization="0.055636" service-time-variance="5.8081" throughput="0.0230855" proc-utilization="0.055636"/>
+        </activity>
+        <activity name="acti45" host-demand-mean="0.0001" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="3.58726" utilization="0.0828136" service-time-variance="35.9002" throughput="0.0230855" proc-utilization="2.30855e-06"/>
+          <synch-call dest="Entr5" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <activity name="acti46" host-demand-mean="0.0001" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="1.29993" utilization="0.0300095" service-time-variance="5.06943" throughput="0.0230855" proc-utilization="2.30855e-06"/>
+          <synch-call dest="Entr6" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <activity name="acti4j" host-demand-mean="0.0001" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="0.0001" utilization="2.30855e-06" service-time-variance="1e-08" throughput="0.0230855" proc-utilization="2.30855e-06"/>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti4"/>
+          </pre>
+          <post-AND>
+            <activity name="acti45"/>
+            <activity name="acti46"/>
+          </post-AND>
+        </precedence>
+        <precedence>
+          <pre-AND>
+            <result-join-delay join-waiting="4.33531" join-variance="35.3373"/>
+            <activity name="acti45"/>
+            <activity name="acti46"/>
+          </pre-AND>
+          <post>
+            <activity name="acti4j"/>
+          </post>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti4j"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr4">
+          <reply-activity name="acti4j"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc5" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.103622"/>
+    <task name="Task5" scheduling="fcfs" multiplicity="1000">
+      <result-task throughput="0.0454463" utilization="0.162695" phase1-utilization="0.162695" proc-utilization="0.103622"/>
+      <entry name="Entr5" type="NONE">
+        <result-entry utilization="0.162695" throughput="0.0454463" proc-utilization="0" squared-coeff-variation="0.801177" throughput-bound="279.322" phase1-service-time="3.57993" phase1-service-time-variance="10.2678" phase1-utilization="0.162695"/>
+      </entry>
+      <task-activities>
+        <activity name="acti5" bound-to-entry="Entr5" host-demand-mean="2.28" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="2.28" utilization="0.103618" service-time-variance="5.1984" throughput="0.0454463" proc-utilization="0.103618"/>
+        </activity>
+        <activity name="acti56" host-demand-mean="0.0001" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="1.29993" utilization="0.0590771" service-time-variance="5.06942" throughput="0.0454463" proc-utilization="4.54463e-06"/>
+          <synch-call dest="Entr6" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti5"/>
+          </pre>
+          <post>
+            <activity name="acti56"/>
+          </post>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti56"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr5">
+          <reply-activity name="acti56"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc6" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.117881"/>
+    <task name="Task6" scheduling="fcfs" multiplicity="1000">
+      <result-task throughput="0.0906776" utilization="0.117866" phase1-utilization="0.117866" proc-utilization="0.117881"/>
+      <entry name="Entr6" type="NONE">
+        <result-entry utilization="0.117866" throughput="0.0906776" proc-utilization="0" squared-coeff-variation="1.00025" throughput-bound="769.231" phase1-service-time="1.29984" phase1-service-time-variance="1.69" phase1-utilization="0.117866"/>
+      </entry>
+      <task-activities>
+        <activity name="acti6" bound-to-entry="Entr6" host-demand-mean="1.3" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="1.29984" utilization="0.117866" service-time-variance="1.69" throughput="0.0906776" proc-utilization="0.117881"/>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti6"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr6">
+          <reply-activity name="acti6"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc7" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.0486425"/>
+    <task name="Task7" scheduling="fcfs" multiplicity="1000">
+      <result-task throughput="0.0675591" utilization="0.0486425" phase1-utilization="0.0486425" proc-utilization="0.0486425"/>
+      <entry name="Entr7" type="NONE">
+        <result-entry utilization="0.0486425" throughput="0.0675591" proc-utilization="0" squared-coeff-variation="1" throughput-bound="1388.89" phase1-service-time="0.72" phase1-service-time-variance="0.5184" phase1-utilization="0.0486425"/>
+      </entry>
+      <task-activities>
+        <activity name="acti7" bound-to-entry="Entr7" host-demand-mean="0.72" host-demand-cvsq="0.0" call-order="DETERMINISTIC" >
+          <result-activity proc-waiting="0" service-time="0.72" utilization="0.0486425" service-time-variance="0.5184" throughput="0.0675591" proc-utilization="0.0486425"/>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti7"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr7">
+          <reply-activity name="acti7"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+</lqn-model>

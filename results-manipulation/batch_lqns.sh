@@ -9,7 +9,7 @@ for lqn_file in "$directory"/*.lqn; do
     if [ -e "$lqn_file" ]; then
         echo "Processing $lqn_file"
         # Execute the lqns command with the specified options
-        lqns "$lqn_file" -P stop-on-message-loss=false
+        lqns "$lqn_file" -P stop-on-message-loss=false --exact-mva
     else
         echo "No .lqn files found in the directory $directory."
         break

@@ -1,0 +1,354 @@
+<?xml version="1.0"?>
+<!-- lqns -xml -->
+<lqn-model name="./LQNs/20250320/lqn03-9f" description="lqns 6.2.31 solution for ./LQNs/20250320/lqn03-9f.lqn." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/usr/local/share/lqns/lqn.xsd">
+  <processor name="Proc0" scheduling="fcfs" multiplicity="1000">
+    <task name="Task0" scheduling="ref">
+      <entry name="Entr0" type="NONE">
+      </entry>
+      <task-activities>
+        <activity name="acti0" bound-to-entry="Entr0" host-demand-mean="0.7" host-demand-cvsq="0.0">
+        </activity>
+        <activity name="acti01" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr1" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti02" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr2" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti03" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr3" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti04" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr4" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti05" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr5" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti06" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr6" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti07" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr7" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti08" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr8" calls-mean="1">
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti0"/>
+          </pre>
+          <post-OR>
+            <activity name="acti02" prob="0.12"/>
+            <activity name="acti03" prob="0.12"/>
+            <activity name="acti04" prob="0.12"/>
+            <activity name="acti05" prob="0.12"/>
+            <activity name="acti06" prob="0.12"/>
+            <activity name="acti07" prob="0.12"/>
+            <activity name="acti08" prob="0.12"/>
+            <activity name="acti01" prob="0.16"/>
+          </post-OR>
+        </precedence>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc1" scheduling="fcfs" multiplicity="1000">
+    <task name="Task1" scheduling="fcfs" multiplicity="1000">
+      <entry name="Entr1" type="NONE">
+      </entry>
+      <task-activities>
+        <activity name="acti1" bound-to-entry="Entr1" host-demand-mean="1.72" host-demand-cvsq="0.0">
+        </activity>
+        <activity name="acti13" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr3" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti15" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr5" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti16" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr6" calls-mean="1">
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti1"/>
+          </pre>
+          <post-OR>
+            <activity name="acti15" prob="0.33"/>
+            <activity name="acti16" prob="0.33"/>
+            <activity name="acti13" prob="0.34"/>
+          </post-OR>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti13"/>
+          </pre>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti15"/>
+          </pre>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti16"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr1">
+          <reply-activity name="acti13"/>
+          <reply-activity name="acti15"/>
+          <reply-activity name="acti16"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc2" scheduling="fcfs" multiplicity="1000">
+    <task name="Task2" scheduling="fcfs" multiplicity="1000">
+      <entry name="Entr2" type="NONE">
+      </entry>
+      <task-activities>
+        <activity name="acti2" bound-to-entry="Entr2" host-demand-mean="1.25" host-demand-cvsq="0.0">
+        </activity>
+        <activity name="acti25" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr5" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti26" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr6" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti28" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr8" calls-mean="1">
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti2"/>
+          </pre>
+          <post-OR>
+            <activity name="acti26" prob="0.33"/>
+            <activity name="acti28" prob="0.33"/>
+            <activity name="acti25" prob="0.34"/>
+          </post-OR>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti25"/>
+          </pre>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti26"/>
+          </pre>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti28"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr2">
+          <reply-activity name="acti25"/>
+          <reply-activity name="acti26"/>
+          <reply-activity name="acti28"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc3" scheduling="fcfs" multiplicity="1000">
+    <task name="Task3" scheduling="fcfs" multiplicity="1000">
+      <entry name="Entr3" type="NONE">
+      </entry>
+      <task-activities>
+        <activity name="acti3" bound-to-entry="Entr3" host-demand-mean="1.12" host-demand-cvsq="0.0">
+        </activity>
+        <activity name="acti35" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr5" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti36" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr6" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti38" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr8" calls-mean="1">
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti3"/>
+          </pre>
+          <post-OR>
+            <activity name="acti36" prob="0.33"/>
+            <activity name="acti38" prob="0.33"/>
+            <activity name="acti35" prob="0.34"/>
+          </post-OR>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti35"/>
+          </pre>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti36"/>
+          </pre>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti38"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr3">
+          <reply-activity name="acti35"/>
+          <reply-activity name="acti36"/>
+          <reply-activity name="acti38"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc4" scheduling="fcfs" multiplicity="1000">
+    <task name="Task4" scheduling="fcfs" multiplicity="1000">
+      <entry name="Entr4" type="NONE">
+      </entry>
+      <task-activities>
+        <activity name="acti4" bound-to-entry="Entr4" host-demand-mean="1.5" host-demand-cvsq="0.0">
+        </activity>
+        <activity name="acti47" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr7" calls-mean="1">
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti4"/>
+          </pre>
+          <post>
+            <activity name="acti47"/>
+          </post>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti47"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr4">
+          <reply-activity name="acti47"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc5" scheduling="fcfs" multiplicity="1000">
+    <task name="Task5" scheduling="fcfs" multiplicity="1000">
+      <entry name="Entr5" type="NONE">
+      </entry>
+      <task-activities>
+        <activity name="acti5" bound-to-entry="Entr5" host-demand-mean="2.95" host-demand-cvsq="0.0">
+        </activity>
+        <activity name="acti57" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr7" calls-mean="1">
+          </synch-call>
+        </activity>
+        <activity name="acti58" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr8" calls-mean="1">
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti5"/>
+          </pre>
+          <post-OR>
+            <activity name="acti58" prob="0.5"/>
+            <activity name="acti57" prob="0.5"/>
+          </post-OR>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti57"/>
+          </pre>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti58"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr5">
+          <reply-activity name="acti57"/>
+          <reply-activity name="acti58"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc6" scheduling="fcfs" multiplicity="1000">
+    <task name="Task6" scheduling="fcfs" multiplicity="1000">
+      <entry name="Entr6" type="NONE">
+      </entry>
+      <task-activities>
+        <activity name="acti6" bound-to-entry="Entr6" host-demand-mean="1.64" host-demand-cvsq="0.0">
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti6"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr6">
+          <reply-activity name="acti6"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc7" scheduling="fcfs" multiplicity="1000">
+    <task name="Task7" scheduling="fcfs" multiplicity="1000">
+      <entry name="Entr7" type="NONE">
+      </entry>
+      <task-activities>
+        <activity name="acti7" bound-to-entry="Entr7" host-demand-mean="2.88" host-demand-cvsq="0.0">
+        </activity>
+        <activity name="acti78" host-demand-mean="0.0001" host-demand-cvsq="0.0">
+          <synch-call dest="Entr8" calls-mean="1">
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti7"/>
+          </pre>
+          <post>
+            <activity name="acti78"/>
+          </post>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti78"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr7">
+          <reply-activity name="acti78"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc8" scheduling="fcfs" multiplicity="1000">
+    <task name="Task8" scheduling="fcfs" multiplicity="1000">
+      <entry name="Entr8" type="NONE">
+      </entry>
+      <task-activities>
+        <activity name="acti8" bound-to-entry="Entr8" host-demand-mean="1" host-demand-cvsq="0.0">
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti8"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr8">
+          <reply-activity name="acti8"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+</lqn-model>

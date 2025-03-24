@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<!-- lqns -exact-mva -->
+<lqn-model name="./LQNs/20250320/simple_2" description="lqns 6.2.31 solution for ./LQNs/20250320/simple_2.lqx." xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/usr/local/share/lqns/lqn.xsd">
+  <solver-params comment="simple_2.lqn" conv_val="0.01" it_limit="10000" underrelax_coeff="0.5" print_int="1">
+    <pragma param="mva" value="exact-mva"/>
+    <result-general solver-info="lqns 6.2.31" valid="true" conv-val="0.00758044" iterations="6" platform-info="corvus Linux 6.11.0-19-generic" user-cpu-time=" 0:00:00.000" system-cpu-time=" 0:00:00.000" elapsed-time=" 0:00:00.000" max-rss="8504">
+      <mva-info submodels="4" core="24" step="66" step-squared="354" wait="3978" wait-squared="2.10562e+06" faults="0"/>
+    </result-general>
+  </solver-params>
+  <processor name="Proc0" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.333333"/>
+    <task name="Task0" scheduling="ref">
+      <result-task throughput="0.3333" utilization="0.989583" phase1-utilization="0.989583" proc-utilization="0.333333"/>
+      <entry name="Entr0" type="NONE">
+        <result-entry utilization="0.989583" throughput="0.3333" proc-utilization="0" squared-coeff-variation="0" throughput-bound="0.49995" phase1-service-time="2.96905" phase1-utilization="0.989583"/>
+      </entry>
+      <task-activities>
+        <activity name="acti0" bound-to-entry="Entr0" host-demand-mean="1" host-demand-cvsq="0">
+          <result-activity proc-waiting="0" service-time="1" utilization="0.3333" throughput="0.3333" proc-utilization="0.3333"/>
+        </activity>
+        <activity name="acti01" host-demand-mean="0.0001" host-demand-cvsq="0" call-order="DETERMINISTIC">
+          <result-activity proc-waiting="0" service-time="1.96905" utilization="0.656283" throughput="0.3333" proc-utilization="3.333e-05"/>
+          <synch-call dest="Entr1" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti0"/>
+          </pre>
+          <post>
+            <activity name="acti01"/>
+          </post>
+        </precedence>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc1" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.3334"/>
+    <task name="Task1" scheduling="fcfs" multiplicity="1000">
+      <result-task throughput="0.3333" utilization="0.666667" phase1-utilization="0.666667" proc-utilization="0.3334"/>
+      <entry name="Entr1" type="NONE">
+        <result-entry utilization="0.666667" throughput="0.3333" proc-utilization="0" squared-coeff-variation="0" throughput-bound="999.9" phase1-service-time="2.0002" phase1-utilization="0.666667"/>
+      </entry>
+      <task-activities>
+        <activity name="acti1" bound-to-entry="Entr1" host-demand-mean="1" host-demand-cvsq="0">
+          <result-activity proc-waiting="0" service-time="1" utilization="0.3333" throughput="0.3333" proc-utilization="0.3333"/>
+        </activity>
+        <activity name="acti12" host-demand-mean="0.0001" host-demand-cvsq="0" call-order="DETERMINISTIC">
+          <result-activity proc-waiting="0" service-time="1.0001" utilization="0.333333" throughput="0.3333" proc-utilization="3.333e-05"/>
+          <synch-call dest="Entr2" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <activity name="acti13" host-demand-mean="0.0001" host-demand-cvsq="0" call-order="DETERMINISTIC">
+          <result-activity proc-waiting="0" service-time="1.0001" utilization="0.333333" throughput="0.3333" proc-utilization="3.333e-05"/>
+          <synch-call dest="Entr3" calls-mean="1">
+            <result-call waiting="0"/>
+          </synch-call>
+        </activity>
+        <activity name="acti1j" host-demand-mean="0.0001" host-demand-cvsq="0">
+          <result-activity proc-waiting="0" service-time="0.0001" utilization="3.333e-05" throughput="0.3333" proc-utilization="3.333e-05"/>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti1"/>
+          </pre>
+          <post-AND>
+            <activity name="acti12"/>
+            <activity name="acti13"/>
+          </post-AND>
+        </precedence>
+        <precedence>
+          <pre-AND>
+            <result-join-delay join-waiting="1.0001" join-variance="0"/>
+            <activity name="acti12"/>
+            <activity name="acti13"/>
+          </pre-AND>
+          <post>
+            <activity name="acti1j"/>
+          </post>
+        </precedence>
+        <precedence>
+          <pre>
+            <activity name="acti1j"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr1">
+          <reply-activity name="acti1j"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc2" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.3333"/>
+    <task name="Task2" scheduling="fcfs" multiplicity="1000">
+      <result-task throughput="0.3333" utilization="0.3333" phase1-utilization="0.3333" proc-utilization="0.3333"/>
+      <entry name="Entr2" type="NONE">
+        <result-entry utilization="0.3333" throughput="0.3333" proc-utilization="0" squared-coeff-variation="0" throughput-bound="1000" phase1-service-time="1" phase1-utilization="0.3333"/>
+      </entry>
+      <task-activities>
+        <activity name="acti2" bound-to-entry="Entr2" host-demand-mean="1" host-demand-cvsq="0">
+          <result-activity proc-waiting="0" service-time="1" utilization="0.3333" throughput="0.3333" proc-utilization="0.3333"/>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti2"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr2">
+          <reply-activity name="acti2"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+  <processor name="Proc3" scheduling="fcfs" multiplicity="1000">
+    <result-processor utilization="0.3333"/>
+    <task name="Task3" scheduling="fcfs" multiplicity="1000">
+      <result-task throughput="0.3333" utilization="0.3333" phase1-utilization="0.3333" proc-utilization="0.3333"/>
+      <entry name="Entr3" type="NONE">
+        <result-entry utilization="0.3333" throughput="0.3333" proc-utilization="0" squared-coeff-variation="0" throughput-bound="1000" phase1-service-time="1" phase1-utilization="0.3333"/>
+      </entry>
+      <task-activities>
+        <activity name="acti3" bound-to-entry="Entr3" host-demand-mean="1" host-demand-cvsq="0">
+          <result-activity proc-waiting="0" service-time="1" utilization="0.3333" throughput="0.3333" proc-utilization="0.3333"/>
+        </activity>
+        <precedence>
+          <pre>
+            <activity name="acti3"/>
+          </pre>
+        </precedence>
+        <reply-entry name="Entr3">
+          <reply-activity name="acti3"/>
+        </reply-entry>
+      </task-activities>
+    </task>
+  </processor>
+</lqn-model>

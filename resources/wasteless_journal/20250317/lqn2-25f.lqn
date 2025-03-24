@@ -1,0 +1,430 @@
+# Generated with Jinja2
+# Header declaration
+G
+"lqn2-25f.lqn"
+0.01
+10000
+1
+0.5
+-1
+
+# Processors declaration, with multiplicity
+P 0
+p Proc0 f m 1000
+p Proc1 f m 1000
+p Proc2 f m 1000
+p Proc3 f m 1000
+p Proc4 f m 1000
+p Proc5 f m 1000
+p Proc6 f m 1000
+p Proc7 f m 1000
+p Proc8 f m 1000
+p Proc9 f m 1000
+p Proc10 f m 1000
+p Proc11 f m 1000
+p Proc12 f m 1000
+p Proc13 f m 1000
+p Proc14 f m 1000
+p Proc15 f m 1000
+p Proc16 f m 1000
+p Proc17 f m 1000
+p Proc18 f m 1000
+p Proc19 f m 1000
+p Proc20 f m 1000
+p Proc21 f m 1000
+p Proc22 f m 1000
+p Proc23 f m 1000
+p Proc24 f m 1000
+-1
+
+# Tasks declaration
+T 0
+t Task0 r Entr0 -1 Proc0 m 1
+t Task1 n Entr1 -1 Proc1 m 1000
+t Task2 n Entr2 -1 Proc2 m 1000
+t Task3 n Entr3 -1 Proc3 m 1000
+t Task4 n Entr4 -1 Proc4 m 1000
+t Task5 n Entr5 -1 Proc5 m 1000
+t Task6 n Entr6 -1 Proc6 m 1000
+t Task7 n Entr7 -1 Proc7 m 1000
+t Task8 n Entr8 -1 Proc8 m 1000
+t Task9 n Entr9 -1 Proc9 m 1000
+t Task10 n Entr10 -1 Proc10 m 1000
+t Task11 n Entr11 -1 Proc11 m 1000
+t Task12 n Entr12 -1 Proc12 m 1000
+t Task13 n Entr13 -1 Proc13 m 1000
+t Task14 n Entr14 -1 Proc14 m 1000
+t Task15 n Entr15 -1 Proc15 m 1000
+t Task16 n Entr16 -1 Proc16 m 1000
+t Task17 n Entr17 -1 Proc17 m 1000
+t Task18 n Entr18 -1 Proc18 m 1000
+t Task19 n Entr19 -1 Proc19 m 1000
+t Task20 n Entr20 -1 Proc20 m 1000
+t Task21 n Entr21 -1 Proc21 m 1000
+t Task22 n Entr22 -1 Proc22 m 1000
+t Task23 n Entr23 -1 Proc23 m 1000
+t Task24 n Entr24 -1 Proc24 m 1000
+-1
+
+# Entries declaration
+E 0
+A Entr0 acti0 
+A Entr1 acti1 
+A Entr2 acti2 
+A Entr3 acti3 
+A Entr4 acti4 
+A Entr5 acti5 
+A Entr6 acti6 
+A Entr7 acti7 
+A Entr8 acti8 
+A Entr9 acti9 
+A Entr10 acti10 
+A Entr11 acti11 
+A Entr12 acti12 
+A Entr13 acti13 
+A Entr14 acti14 
+A Entr15 acti15 
+A Entr16 acti16 
+A Entr17 acti17 
+A Entr18 acti18 
+A Entr19 acti19 
+A Entr20 acti20 
+A Entr21 acti21 
+A Entr22 acti22 
+A Entr23 acti23 
+A Entr24 acti24 
+-1
+
+# Activities declaration
+A Task0
+s acti0 0.0001 
+s acti01 0.0001
+s acti02 0.0001
+s acti03 0.0001
+s acti04 0.0001
+s acti06 0.0001
+s acti012 0.0001
+s acti013 0.0001
+s acti015 0.0001
+s acti019 0.0001
+s acti020 0.0001
+y acti01 Entr1 1
+y acti02 Entr2 1
+y acti03 Entr3 1
+y acti04 Entr4 1
+y acti06 Entr6 1
+y acti012 Entr12 1
+y acti013 Entr13 1
+y acti015 Entr15 1
+y acti019 Entr19 1
+y acti020 Entr20 1
+:
+    acti0 -> (0.1)acti01 + (0.1)acti02 + (0.1)acti03 + (0.1)acti04 + (0.1)acti06 + (0.1)acti012 + (0.1)acti013 + (0.1)acti015 + (0.1)acti019 + (0.1)acti020
+-1
+
+A Task1
+s acti1 0.0001 
+s acti110 1.69
+s acti119 3.68
+s acti124 0.74
+y acti110 Entr10 1
+y acti119 Entr19 1
+y acti124 Entr24 1
+:
+    acti1 -> (0.34)acti110 + (0.33)acti119 + (0.33)acti124;
+    acti110[Entr1];
+    acti119[Entr1];
+    acti124[Entr1]
+-1
+
+A Task2
+s acti2 0.0001 
+s acti23 1.54
+s acti27 1.58
+s acti210 0.7
+s acti220 2.27
+s acti221 3.16
+s acti224 0.54
+y acti23 Entr3 1
+y acti27 Entr7 1
+y acti210 Entr10 1
+y acti220 Entr20 1
+y acti221 Entr21 1
+y acti224 Entr24 1
+:
+    acti2 -> (0.15)acti23 + (0.17)acti27 + (0.17)acti210 + (0.17)acti220 + (0.17)acti221 + (0.17)acti224;
+    acti23[Entr2];
+    acti27[Entr2];
+    acti210[Entr2];
+    acti220[Entr2];
+    acti221[Entr2];
+    acti224[Entr2]
+-1
+
+A Task3
+s acti3 0.0001 
+s acti35 1.21
+s acti314 0.94
+s acti323 3.35
+y acti35 Entr5 1
+y acti314 Entr14 1
+y acti323 Entr23 1
+:
+    acti3 -> (0.34)acti35 + (0.33)acti314 + (0.33)acti323;
+    acti35[Entr3];
+    acti314[Entr3];
+    acti323[Entr3]
+-1
+
+A Task4
+s acti4 0.0001 
+s acti45 3.27
+s acti414 2.17
+y acti45 Entr5 1
+y acti414 Entr14 1
+:
+    acti4 -> (0.5)acti45 + (0.5)acti414;
+    acti45[Entr4];
+    acti414[Entr4]
+-1
+
+A Task5
+s acti5 0.0001 
+s acti58 1.31
+s acti510 3.81
+s acti515 3.29
+s acti516 2.97
+s acti521 3.95
+y acti58 Entr8 1
+y acti510 Entr10 1
+y acti515 Entr15 1
+y acti516 Entr16 1
+y acti521 Entr21 1
+:
+    acti5 -> (0.2)acti58 + (0.2)acti510 + (0.2)acti515 + (0.2)acti516 + (0.2)acti521;
+    acti58[Entr5];
+    acti510[Entr5];
+    acti515[Entr5];
+    acti516[Entr5];
+    acti521[Entr5]
+-1
+
+A Task6
+s acti6 0.0001 
+s acti67 0.23
+s acti619 2.72
+s acti621 0.67
+y acti67 Entr7 1
+y acti619 Entr19 1
+y acti621 Entr21 1
+:
+    acti6 -> (0.34)acti67 + (0.33)acti619 + (0.33)acti621;
+    acti67[Entr6];
+    acti619[Entr6];
+    acti621[Entr6]
+-1
+
+A Task7
+s acti7 0.0001
+s acti79 1.28
+y acti79 Entr9 1
+:
+    acti7 -> acti79;
+    acti79[Entr7]
+-1
+
+A Task8
+s acti8 0.0001 
+s acti89 1.96
+s acti810 2.74
+s acti812 2.6
+s acti816 0.46
+s acti817 0.71
+s acti819 3.53
+s acti824 0.75
+y acti89 Entr9 1
+y acti810 Entr10 1
+y acti812 Entr12 1
+y acti816 Entr16 1
+y acti817 Entr17 1
+y acti819 Entr19 1
+y acti824 Entr24 1
+:
+    acti8 -> (0.16)acti89 + (0.14)acti810 + (0.14)acti812 + (0.14)acti816 + (0.14)acti817 + (0.14)acti819 + (0.14)acti824;
+    acti89[Entr8];
+    acti810[Entr8];
+    acti812[Entr8];
+    acti816[Entr8];
+    acti817[Entr8];
+    acti819[Entr8];
+    acti824[Entr8]
+-1
+
+A Task9
+s acti9 0.0001 
+s acti911 1.52
+s acti913 1.98
+s acti915 0.61
+s acti920 2.64
+s acti922 1.04
+y acti911 Entr11 1
+y acti913 Entr13 1
+y acti915 Entr15 1
+y acti920 Entr20 1
+y acti922 Entr22 1
+:
+    acti9 -> (0.2)acti911 + (0.2)acti913 + (0.2)acti915 + (0.2)acti920 + (0.2)acti922;
+    acti911[Entr9];
+    acti913[Entr9];
+    acti915[Entr9];
+    acti920[Entr9];
+    acti922[Entr9]
+-1
+
+A Task10
+s acti10 0.0001 
+s acti1016 1.63
+s acti1022 1.79
+y acti1016 Entr16 1
+y acti1022 Entr22 1
+:
+    acti10 -> (0.5)acti1016 + (0.5)acti1022;
+    acti1016[Entr10];
+    acti1022[Entr10]
+-1
+
+A Task11
+s acti11 0.0001 
+s acti1118 2.02
+s acti1119 2.81
+s acti1120 0.62
+y acti1118 Entr18 1
+y acti1119 Entr19 1
+y acti1120 Entr20 1
+:
+    acti11 -> (0.34)acti1118 + (0.33)acti1119 + (0.33)acti1120;
+    acti1118[Entr11];
+    acti1119[Entr11];
+    acti1120[Entr11]
+-1
+
+A Task12
+s acti12 0.0001 
+s acti1217 2.05
+s acti1219 2.43
+s acti1223 3.45
+y acti1217 Entr17 1
+y acti1219 Entr19 1
+y acti1223 Entr23 1
+:
+    acti12 -> (0.34)acti1217 + (0.33)acti1219 + (0.33)acti1223;
+    acti1217[Entr12];
+    acti1219[Entr12];
+    acti1223[Entr12]
+-1
+
+A Task13
+s acti13 0.0001 
+s acti1316 2.12
+s acti1318 2.58
+s acti1319 3.63
+y acti1316 Entr16 1
+y acti1318 Entr18 1
+y acti1319 Entr19 1
+:
+    acti13 -> (0.34)acti1316 + (0.33)acti1318 + (0.33)acti1319;
+    acti1316[Entr13];
+    acti1318[Entr13];
+    acti1319[Entr13]
+-1
+
+A Task14
+s acti14 2.31
+:
+    acti14[Entr14]
+-1
+
+A Task15
+s acti15 3.56
+:
+    acti15[Entr15]
+-1
+
+A Task16
+s acti16 0.0001
+s acti1622 2.97
+y acti1622 Entr22 1
+:
+    acti16 -> acti1622;
+    acti1622[Entr16]
+-1
+
+A Task17
+s acti17 0.0001 
+s acti1718 3.54
+s acti1722 1.17
+s acti1724 2.3
+y acti1718 Entr18 1
+y acti1722 Entr22 1
+y acti1724 Entr24 1
+:
+    acti17 -> (0.34)acti1718 + (0.33)acti1722 + (0.33)acti1724;
+    acti1718[Entr17];
+    acti1722[Entr17];
+    acti1724[Entr17]
+-1
+
+A Task18
+s acti18 0.0001 
+s acti1820 0.11
+s acti1821 1.52
+y acti1820 Entr20 1
+y acti1821 Entr21 1
+:
+    acti18 -> (0.5)acti1820 + (0.5)acti1821;
+    acti1820[Entr18];
+    acti1821[Entr18]
+-1
+
+A Task19
+s acti19 1.88
+:
+    acti19[Entr19]
+-1
+
+A Task20
+s acti20 0.0001
+s acti2022 3.48
+y acti2022 Entr22 1
+:
+    acti20 -> acti2022;
+    acti2022[Entr20]
+-1
+
+A Task21
+s acti21 0.0001
+s acti2124 3.76
+y acti2124 Entr24 1
+:
+    acti21 -> acti2124;
+    acti2124[Entr21]
+-1
+
+A Task22
+s acti22 2.97
+:
+    acti22[Entr22]
+-1
+
+A Task23
+s acti23 2.6
+:
+    acti23[Entr23]
+-1
+
+A Task24
+s acti24 3.76
+:
+    acti24[Entr24]
+-1
+

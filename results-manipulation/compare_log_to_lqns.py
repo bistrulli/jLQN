@@ -41,14 +41,14 @@ if __name__ == '__main__':
 
     # Calculate average relative error
     average_relative_error = sum(relative_errors) / len(relative_errors) if relative_errors else 0
-    print(f"Average Relative Error: {round(average_relative_error*100,2)}%")
+    print(f"{lqn_name}: {round(average_relative_error*100,2)}%") #Average Relative Error: 
 
     # Generate CSV file
     csv_file_path = f'/home/robb/git/jLQN/results-manipulation/comparison/{lqn_name}_comparison.csv'
     with open(csv_file_path, 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(['LQNS Service Time', 'Log Service Time', 'Relative Error'])
+        csv_writer.writerow(['LQNS', 'LOGS', 'ERROR'])
         for lqns_time, log_time, relative_error in zip(lqns_service_times, log_service_times, relative_errors):
-            csv_writer.writerow([lqns_time, log_time, relative_error])
+            csv_writer.writerow([lqns_time, log_time, round(relative_error,4)])
 
-    print(f"Comparison CSV file generated at {csv_file_path}")
+    #print(f"Comparison CSV file generated at {csv_file_path}")
