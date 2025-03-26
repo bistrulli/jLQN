@@ -31,8 +31,6 @@ public class Logic implements HttpFunction {
     private static ThreadMXBean mgm = ManagementFactory.getThreadMXBean();
     private static HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
     private HttpResponse response = null;
-    //private HashMap<String, Boolean> act_exec = new HashMap<String, Boolean>();
-    //private HashMap<String, Thread> act_thread = new HashMap<String, Thread>();
 
     static {
         try {
@@ -50,14 +48,14 @@ public class Logic implements HttpFunction {
      * activities
      */
     #foreach ( $act in $f.getActivities() )
-    public void $act.getName()(Map<String, Boolean> act_exec){
+    public void $act.getName()(Map<String, Boolean> act_exec) {
         act_exec.put("$act.getName()", true);
         this.doWork($act.getDemand());
         #if ($act.getCall() != $null)
         #if(${config.getTestOption()})
-        String url =  "http://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
+        String url = "http://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
         #else
-        String url =  "https://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
+        String url = "https://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
         #end
         var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
@@ -69,7 +67,6 @@ public class Logic implements HttpFunction {
             e.printStackTrace();
         }
         #end
-
         #if ($act.getAsyncCall() != $null)
         #if(${config.getTestOption()})
         String url =  "http://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getAsyncCall().getDest().toLowerCase()}";
@@ -88,6 +85,7 @@ public class Logic implements HttpFunction {
         ${act.getAsyncCall().getSource().toLowerCase()}${act.getAsyncCall().getDest().toLowerCase()}Thread.start();
         #end
     }
+
     #end
 
     /*
@@ -106,7 +104,7 @@ public class Logic implements HttpFunction {
             e.printStackTrace();
         }
         #end
-        //OrNode Logic
+        // OrNode Logic
         List<Pair<String, Double>> distributionData = new ArrayList<>();
         #foreach ( $act in $node.getForkList())
         distributionData.add(new Pair<>("$act", $node.getProb().get($foreach.index)));
@@ -114,24 +112,24 @@ public class Logic implements HttpFunction {
         EnumeratedDistribution<String> distribution = new EnumeratedDistribution<>(distributionData);
         String randomChoice = distribution.sample();
         #foreach ( $act in $node.getForkList())
-        if(randomChoice=="$act"){
+        if(randomChoice == "$act"){
             $act(act_exec);
         }
         #end
     #end
     #if($node.class.getSimpleName()=="ForkNode")
-        //TBA ForkNode Logic
-        final Logic mainLogic=this;
-        String joinEvt="";
+        // TBA ForkNode Logic
+        final Logic mainLogic = this;
+        String joinEvt = "";
         #foreach ( $act in $node.getForkList())
         #if($foreach.index==0)
-        joinEvt="${act}";
+        joinEvt = "${act}";
         #else
-        joinEvt+="&${act}";
+        joinEvt += "&${act}";
         #end
         Thread ${act}Thread = new Thread(() -> {
-            //TBA all the activated Dnodes by ${act} to allow a more complex parallel execution
-            //in this way only asynch call are supported
+            // TBA all the activated Dnodes by ${act} to allow a more complex parallel execution
+            // in this way only asynch call are supported
             mainLogic.$act(act_exec);
         });
         act_thread.put("${act}", ${act}Thread);
@@ -169,7 +167,7 @@ public class Logic implements HttpFunction {
         ${f.getMainAct()}(act_exec);
         // Execute the decision node of already executed evt
         #foreach ( $node in $f.getDnodes())
-        if(act_exec.get("${node.getOriginEvt()}")!=null && act_exec.get("${node.getOriginEvt()}")) {
+        if(act_exec.get("${node.getOriginEvt()}") != null && act_exec.get("${node.getOriginEvt()}")) {
           act_exec.put("${node.getOriginEvt()}",false);
           ${node.getName()}(act_exec, act_thread);
         }
