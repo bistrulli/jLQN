@@ -7,6 +7,6 @@ scrape_configs:
   - job_name: 'logic_${entry.getName().toLowerCase()}'
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['localhost:${ports.get($index)}']
+      - targets: ['${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net:${ports.get($index)}']
 
     #end

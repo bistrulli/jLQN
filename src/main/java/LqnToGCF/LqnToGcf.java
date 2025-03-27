@@ -282,6 +282,7 @@ public class LqnToGcf {
         List<Function> filteredFunctions = functions.stream().filter(f -> !f.getKind().equals("r")).collect(Collectors.toList());
 
         VelocityContext context = new VelocityContext();
+        context.put("config", Main.config);
         context.put("entries", filteredFunctions);
 
         // Generate a list of ports starting from 8081
