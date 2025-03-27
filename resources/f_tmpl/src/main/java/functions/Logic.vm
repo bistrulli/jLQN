@@ -26,11 +26,29 @@ import com.google.cloud.functions.HttpFunction;
 import com.google.cloud.functions.HttpRequest;
 import com.google.cloud.functions.HttpResponse;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
+import io.micrometer.prometheus.PrometheusConfig;
+
 public class Logic implements HttpFunction {
     private static final Logger logger = Logger.getLogger("$f.getName()");
     private static ThreadMXBean mgm = ManagementFactory.getThreadMXBean();
     private static HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
     private HttpResponse response = null;
+
+    // Prometheus registry
+    private static final PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+
+    // Timer for response time
+    private static final Timer responseTimeTimer = Timer.builder("logic_response_time_seconds")
+        .description("Response time in seconds")
+        .register(prometheusRegistry);
+
+    // Counter for throughput
+    private static final Counter throughputCounter = Counter.builder("logic_throughput")
+        .description("Number of requests processed")
+        .register(prometheusRegistry);
 
     static {
         try {
@@ -153,6 +171,29 @@ public class Logic implements HttpFunction {
 
     @Override
     public void service(HttpRequest request, HttpResponse response) throws IOException {
+        // Increment the throughput counter
+        throughputCounter.increment();
+
+
+        // Check if the request is for metrics
+        if ("/metrics".equals(request.getPath())) {
+            // Expose the Prometheus metrics
+            response.appendHeader("Content-Type", "text/plain; version=0.0.4");
+            response.setStatusCode(200);
+            response.getWriter().write(prometheusRegistry.scrape());
+            return;
+        }
+        
+        responseTimeTimer.record(() -> {
+            try {
+                this.handleRequest(request, response);
+                } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+    
+    private void handleRequest(HttpRequest request, HttpResponse response) throws IOException {
         this.response = response;
         mgm.setThreadCpuTimeEnabled(true);
         Long startCpuTime = mgm.getCurrentThreadCpuTime();
@@ -167,16 +208,17 @@ public class Logic implements HttpFunction {
         ${f.getMainAct()}(act_exec);
         // Execute the decision node of already executed evt
         #foreach ( $node in $f.getDnodes())
-        if(act_exec.get("${node.getOriginEvt()}") != null && act_exec.get("${node.getOriginEvt()}")) {
-          act_exec.put("${node.getOriginEvt()}",false);
-          ${node.getName()}(act_exec, act_thread);
+        if (act_exec.get("${node.getOriginEvt()}") != null && act_exec.get("${node.getOriginEvt()}")) {
+        act_exec.put("${node.getOriginEvt()}", false);
+        ${node.getName()}(act_exec, act_thread);
         }
         #end
         String logstring=String.format("cpu:=%d  rt:=%d",mgm.getCurrentThreadCpuTime() - startCpuTime,
-                                       System.nanoTime() - startExecTime);
+                                    System.nanoTime() - startExecTime);
         Logic.logger.info(logstring);
     }
-    
+
+
     private void doWork(Double stime) {
         #if(${config.getTestOption()})
             try {

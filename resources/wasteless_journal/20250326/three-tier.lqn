@@ -1,6 +1,6 @@
 # Header declaration
 G
-"simple_2.lqn"
+"three-tier.lqn"
 0.01
 10000
 1
@@ -10,17 +10,17 @@ G
 # Processors declaration, with multiplicity
 P 0
 p Proc0 f m 1000
-p Proc1 f m 1000
-p Proc2 f m 1000
-p Proc3 f m 1000
+p Proc1 f m 4
+p Proc2 f m 3
+p Proc3 f m 1
 -1
 
 # Tasks declaration
 T 0
-t Task0 r Entr0 -1 Proc0 m 1
-t Task1 n Entr1 -1 Proc1 m 1000
-t Task2 n Entr2 -1 Proc2 m 1000
-t Task3 n Entr3 -1 Proc3 m 1000
+t Task0 r Entr0 -1 Proc0 m 3
+t Task1 n Entr1 -1 Proc1 m 4
+t Task2 n Entr2 -1 Proc2 m 3
+t Task3 n Entr3 -1 Proc3 m 2
 -1
 
 # Entries declaration
@@ -41,22 +41,21 @@ y acti01 Entr1 1
 -1
 
 A Task1
-s acti1 0.9997
+s acti1 0.9999
 s acti12 0.0001 
-s acti13 0.0001
-s acti1j 0.0001
 y acti12 Entr2 1
-y acti13 Entr3 1
 :
-    acti1 -> acti12 & acti13;
-    acti12 & acti13 -> acti1j;
-    acti1j[Entr1]
+    acti1 -> acti12;
+    acti12[Entr1]
 -1
 
 A Task2
-s acti2 1.0
+s acti2 0.9999
+s acti23 0.0001 
+y acti23 Entr3 1
 :
-    acti2[Entr2]
+    acti2 -> acti23;
+    acti23[Entr2]
 -1
 
 A Task3
