@@ -28,6 +28,7 @@ import com.google.cloud.functions.HttpResponse;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.micrometer.prometheus.PrometheusConfig;
 
@@ -49,6 +50,27 @@ public class Logic implements HttpFunction {
     private static final Counter throughputCounter = Counter.builder("logic_throughput")
         .description("Number of requests processed")
         .register(prometheusRegistry);
+
+    // Gauge for CPU utilization
+    private static final io.micrometer.core.instrument.Gauge cpuUtilizationGauge = io.micrometer.core.instrument.Gauge.builder(
+            "logic_cpu_utilization",
+            () -> {
+                if (mgm.isThreadCpuTimeSupported() && mgm.isThreadCpuTimeEnabled()) {
+                    return (double) mgm.getCurrentThreadCpuTime() / 1e9; // Convert nanoseconds to seconds
+                }
+                return 0.0;
+            })
+        .description("CPU utilization in seconds")
+        .register(prometheusRegistry);
+
+    // Gauge for CPU utilization percentage
+    private static volatile double cpuUtilizationPercentage = 0.0;
+
+    static {
+        Gauge.builder("logic_cpu_utilization_percentage", () -> cpuUtilizationPercentage)
+            .description("CPU utilization as a percentage of wall-clock time")
+            .register(prometheusRegistry);
+    }
 
     static {
         try {
@@ -199,6 +221,9 @@ public class Logic implements HttpFunction {
         Long startCpuTime = mgm.getCurrentThreadCpuTime();
         Long startExecTime = System.nanoTime();
 
+        // Update CPU utilization gauge
+        cpuUtilizationGauge.measure();
+
 
         // Create a new act_exec map for this execution
         Map<String, Boolean> act_exec = new ConcurrentHashMap<>();
@@ -213,8 +238,16 @@ public class Logic implements HttpFunction {
         ${node.getName()}(act_exec, act_thread);
         }
         #end
-        String logstring=String.format("cpu:=%d  rt:=%d",mgm.getCurrentThreadCpuTime() - startCpuTime,
-                                    System.nanoTime() - startExecTime);
+        // Calculate CPU utilization percentage
+        
+        long cpuTimeUsed = mgm.getCurrentThreadCpuTime() - startCpuTime;
+        long elapsedTime = System.nanoTime() - startExecTime;    
+        cpuUtilizationPercentage = (double) cpuTimeUsed / elapsedTime * 100;
+
+        // Update the gauge dynamically
+        prometheusRegistry.gauge("logic_cpu_utilization_percentage", cpuUtilizationPercentage);
+
+        String logstring = String.format("cpu:=%d  rt:=%d  cpu%%:=%.2f", cpuTimeUsed, elapsedTime, cpuUtilizationPercentage);
         Logic.logger.info(logstring);
     }
 
