@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+    #foreach($entry in $entries)
+    #set($index = $foreach.index)
+  - job_name: 'logic_${entry.getName().toLowerCase()}'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['localhost:${ports.get($index)}']
+
+    #end

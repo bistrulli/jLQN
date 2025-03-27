@@ -66,10 +66,12 @@ public class LqnToGcf {
 
         if(Main.config.getTestOption()) {
             this.generateNginxConfig(lqnApp.getName().replace("\"", ""), lqnApp.getFunctions(), destPath);
+            this.generatePrometheusConfig(lqnApp.getName().replace("\"", ""), lqnApp.getFunctions(), destPath);
             this.updatePlaceholder(appDir.resolve("deploy_local_sys.sh"), "$project", Main.config.getProjectName());
             this.updatePlaceholder(appDir.resolve("deploy_local_sys.sh"), "$region", Main.config.getRegionName());
             try {
                 Files.deleteIfExists(appDir.resolve("nginx_conf.vm"));
+                Files.deleteIfExists(appDir.resolve("prometheus.vm"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -267,6 +269,48 @@ public class LqnToGcf {
 
         try {
             FileWriter fw = new FileWriter(nginxPath.toFile() + File.separator + appName + File.separator + "nginx_conf.conf");
+            fw.write(sw.toString());
+            fw.flush();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void generatePrometheusConfig(String appName, List<Function> functions, Path dest) {
+        // Filter out functions of kind "r"
+        List<Function> filteredFunctions = functions.stream().filter(f -> !f.getKind().equals("r")).collect(Collectors.toList());
+
+        VelocityContext context = new VelocityContext();
+        context.put("entries", filteredFunctions);
+
+        // Generate a list of ports starting from 8081
+        List<Integer> ports = new ArrayList<>();
+        int startingPort = 8081;
+        for (int i = 0; i < filteredFunctions.size(); i++) {
+            ports.add(startingPort + i);
+        }
+        context.put("ports", ports);
+
+        Template template = null;
+        try {
+            template = this.velocityEngine.getTemplate(tmpSysScriptsPath.toString() + "/prometheus.vm");
+        } catch (ResourceNotFoundException rnfe) {
+            rnfe.printStackTrace();
+        } catch (ParseErrorException pee) {
+            pee.printStackTrace();
+        } catch (MethodInvocationException mie) {
+            mie.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        StringWriter sw = new StringWriter();
+        template.merge(context, sw);
+
+        Path prometheusPath = Paths.get(dest.toString(), appName, "prometheus.yml");
+        try {
+            FileWriter fw = new FileWriter(prometheusPath.toFile());
             fw.write(sw.toString());
             fw.flush();
             fw.close();
