@@ -1,6 +1,7 @@
 import subprocess
 import os
 import shutil
+import utils
 
 
 def turn_lqn_into_deterministic_lqx(filepath):
@@ -72,7 +73,7 @@ def turn_lqn_into_deterministic_lqx(filepath):
 
 
 # Process all .lqn files in the LQNs folder
-lqns_folder = './LQNs/20250320/'
+lqns_folder = utils.get_today_folder()
 print(f"Processing all .lqn files in {lqns_folder}")
 for filename in os.listdir(lqns_folder):
     if filename.endswith('.lqn'):

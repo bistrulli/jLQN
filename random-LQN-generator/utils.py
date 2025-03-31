@@ -107,12 +107,27 @@ def get_probability(node_position, num_edges):
     else:
         return round(1 - ((num_edges-1) * p), 2)
     
-def create_today_folder():
+
+
+def get_today_folder():
+    """
+    Get the path to the folder for today's date.
+    
+    :return: The path to the folder for today's date.
+    """
     # Get today's date in YYYYMMDD format
     today = datetime.today().strftime('%Y%m%d')
     
     # Create the full path for the new folder
     folder_path = os.path.join(out_lqn_folder, today)
+    
+    return folder_path
+
+def create_today_folder():
+    """
+    Create a folder for today's date if it doesn't already exist.
+    """
+    folder_path = get_today_folder()
     
     # Create the folder if it doesn't exist
     if not os.path.exists(folder_path):
