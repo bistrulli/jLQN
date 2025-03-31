@@ -47,7 +47,7 @@ public class Logic implements HttpFunction {
         .register(prometheusRegistry);
 
     // Counter for throughput
-    private static final Counter throughputCounter = Counter.builder("logic_throughput")
+    private static final Counter requestsCounter = Counter.builder("logic_requests")
         .description("Number of requests processed")
         .register(prometheusRegistry);
 
@@ -193,8 +193,8 @@ public class Logic implements HttpFunction {
 
     @Override
     public void service(HttpRequest request, HttpResponse response) throws IOException {
-        // Increment the throughput counter
-        throughputCounter.increment();
+        // Increment the requests counter
+        requestsCounter.increment();
 
 
         // Check if the request is for metrics
@@ -253,7 +253,7 @@ public class Logic implements HttpFunction {
 
 
     private void doWork(Double stime) {
-        #if(${config.getTestOption()})
+        #if(${config.getSleepOption()})
             try {
                 long sleepTime = Math.round(stime * 1e3); // Convert stime to milliseconds
                 Thread.sleep(sleepTime);

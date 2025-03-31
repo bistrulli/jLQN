@@ -103,6 +103,10 @@ public class Main {
         testOption.setRequired(false);
         options.addOption(testOption);
 
+        Option sleepOption = new Option("s", "sleep", false, "Sleep mode");
+        sleepOption.setRequired(false);
+        options.addOption(sleepOption);
+
 
         // Option zoneName = new Option("z", "zone", true, "Zone name");
         // zoneName.setRequired(true);
@@ -116,9 +120,10 @@ public class Main {
             String project = cmd.getOptionValue("project");
             String region = cmd.getOptionValue("region");
             boolean isTest = cmd.hasOption("test");
+            boolean isSleep = cmd.hasOption("sleep");
             // String zone = cmd.getOptionValue("zone");
 
-            return new Config(project, region, isTest); // , zone);
+            return new Config(project, region, isTest, isSleep); // , zone);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("utility-name", options);

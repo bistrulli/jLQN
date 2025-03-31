@@ -64,14 +64,23 @@ public class LqnToGcf {
         // copy file at the lqnsystem level
         this.copySysScripts(tmpSysScriptsPath, appDir);
 
+
+        // Generate the Prometheus configuration file
+        this.generatePrometheusConfig(lqnApp.getName().replace("\"", ""), lqnApp.getFunctions(), destPath);
+        try {
+            Files.deleteIfExists(appDir.resolve("prometheus.vm"));
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+        // Generate the Nginx configuration file and the scripts necessary for local deployment
         if(Main.config.getTestOption()) {
             this.generateNginxConfig(lqnApp.getName().replace("\"", ""), lqnApp.getFunctions(), destPath);
-            this.generatePrometheusConfig(lqnApp.getName().replace("\"", ""), lqnApp.getFunctions(), destPath);
             this.updatePlaceholder(appDir.resolve("deploy_local_sys.sh"), "$project", Main.config.getProjectName());
             this.updatePlaceholder(appDir.resolve("deploy_local_sys.sh"), "$region", Main.config.getRegionName());
             try {
                 Files.deleteIfExists(appDir.resolve("nginx_conf.vm"));
-                Files.deleteIfExists(appDir.resolve("prometheus.vm"));
+                
             } catch (IOException e) {
                 e.printStackTrace();
             }
