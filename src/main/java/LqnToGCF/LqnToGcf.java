@@ -56,7 +56,7 @@ public class LqnToGcf {
                 this.translate(appDir, f);
             } else {
                 this.copyTmpFun(tmpLocustPath, appDir, f);
-                this.translateLocust(appDir, f);
+                this.translateLocust(appDir, f, lqnApp.getFunctions());
             }
         }
 
@@ -65,13 +65,13 @@ public class LqnToGcf {
         this.copySysScripts(tmpSysScriptsPath, appDir);
 
 
-        // Generate the Prometheus configuration file
-        this.generatePrometheusConfig(lqnApp.getName().replace("\"", ""), lqnApp.getFunctions(), destPath);
-        try {
-            Files.deleteIfExists(appDir.resolve("prometheus.vm"));
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
+        // // Generate the Prometheus configuration file
+        // this.generatePrometheusConfig(lqnApp.getName().replace("\"", ""), lqnApp.getFunctions(), destPath);
+        // try {
+        //     Files.deleteIfExists(appDir.resolve("prometheus.vm"));
+        // } catch(IOException e) {
+        //     e.printStackTrace();
+        // }
 
         // Generate the Nginx configuration file and the scripts necessary for local deployment
         if(Main.config.getTestOption()) {
@@ -102,16 +102,22 @@ public class LqnToGcf {
         }
     }
 
-    public void translateLocust(Path fDir, Function f) {
+    public void translateLocust(Path fDir, Function f, List<Function> functions) {
         fDir = Paths.get(fDir.toString() + File.separator + f.getName());
         
+        // Filter out functions of kind "r"
+        List<Function> filteredFunctions = functions.stream().filter(f_iter -> !f_iter.getKind().equals("r")).collect(Collectors.toList());
+
         VelocityContext context = new VelocityContext();
         context.put("f", f);
         context.put("config", Main.config);
-        Template template = null;
+        context.put("entries", filteredFunctions);
+        Template templateSimpleWorkload = null;
+        Template templatePrometheus = null;
 
         try {
-            template = this.velocityEngine.getTemplate(tmpLocustPath.toString() + File.separator + "SimpleWorkload.vm");
+            templateSimpleWorkload = this.velocityEngine.getTemplate(tmpLocustPath.toString() + File.separator + "SimpleWorkload.vm");
+            templatePrometheus = this.velocityEngine.getTemplate(tmpLocustPath.toString() + File.separator + "prometheus.vm");
         } catch (ResourceNotFoundException rnfe) {
             rnfe.printStackTrace();
         } catch (ParseErrorException pee) {
@@ -122,20 +128,28 @@ public class LqnToGcf {
             e.printStackTrace();
         }
 
+        generateFileFromTemplate(templateSimpleWorkload, context, fDir, "SimpleWorkload.vm", "SimpleWorkload.py");
+        generateFileFromTemplate(templatePrometheus, context, fDir, "prometheus.vm", "prometheus.yml");
+    }
+
+
+    public void generateFileFromTemplate(Template template, VelocityContext context, Path fDir, String vmFilename, String outFilename) {
         StringWriter sw = new StringWriter();
         template.merge(context, sw);
         //System.out.println(sw.toString());
         try {
             FileWriter fw = new FileWriter(
-                    Paths.get(fDir.toString() + File.separator + "SimpleWorkload.py").toFile());
+                    Paths.get(fDir.toString() + File.separator + outFilename).toFile());
             fw.write(sw.toString());
             fw.flush();
             fw.close();
-            FileUtils.delete(Paths.get(fDir.toString() + File.separator + "SimpleWorkload.vm").toFile());
+            FileUtils.delete(Paths.get(fDir.toString() + File.separator + vmFilename).toFile());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
 
     public void translate(Path fDir, Function f) {
         fDir = Paths.get(fDir.toString() + File.separator + f.getName());
@@ -286,46 +300,48 @@ public class LqnToGcf {
         }
     }
 
-    public void generatePrometheusConfig(String appName, List<Function> functions, Path dest) {
-        // Filter out functions of kind "r"
-        List<Function> filteredFunctions = functions.stream().filter(f -> !f.getKind().equals("r")).collect(Collectors.toList());
-
-        VelocityContext context = new VelocityContext();
-        context.put("config", Main.config);
-        context.put("entries", filteredFunctions);
-
-        // Generate a list of ports starting from 8081
-        List<Integer> ports = new ArrayList<>();
-        int startingPort = 8081;
-        for (int i = 0; i < filteredFunctions.size(); i++) {
-            ports.add(startingPort + i);
-        }
-        context.put("ports", ports);
-
-        Template template = null;
-        try {
-            template = this.velocityEngine.getTemplate(tmpSysScriptsPath.toString() + "/prometheus.vm");
-        } catch (ResourceNotFoundException rnfe) {
-            rnfe.printStackTrace();
-        } catch (ParseErrorException pee) {
-            pee.printStackTrace();
-        } catch (MethodInvocationException mie) {
-            mie.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        StringWriter sw = new StringWriter();
-        template.merge(context, sw);
-
-        Path prometheusPath = Paths.get(dest.toString(), appName, "prometheus.yml");
-        try {
-            FileWriter fw = new FileWriter(prometheusPath.toFile());
-            fw.write(sw.toString());
-            fw.flush();
-            fw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
+
+//     public void generatePrometheusConfig(String appName, List<Function> functions, Path dest) {
+//         // Filter out functions of kind "r"
+//         List<Function> filteredFunctions = functions.stream().filter(f -> !f.getKind().equals("r")).collect(Collectors.toList());
+
+//         VelocityContext context = new VelocityContext();
+//         context.put("config", Main.config);
+//         context.put("entries", filteredFunctions);
+
+//         // // Generate a list of ports starting from 8081
+//         // List<Integer> ports = new ArrayList<>();
+//         // int startingPort = 8081;
+//         // for (int i = 0; i < filteredFunctions.size(); i++) {
+//         //     ports.add(startingPort + i);
+//         // }
+//         // context.put("ports", ports);
+
+//         Template template = null;
+//         try {
+//             template = this.velocityEngine.getTemplate(tmpLocustPath.toString() + "/prometheus.vm");
+//         } catch (ResourceNotFoundException rnfe) {
+//             rnfe.printStackTrace();
+//         } catch (ParseErrorException pee) {
+//             pee.printStackTrace();
+//         } catch (MethodInvocationException mie) {
+//             mie.printStackTrace();
+//         } catch (Exception e) {
+//             e.printStackTrace();
+//         }
+
+//         StringWriter sw = new StringWriter();
+//         template.merge(context, sw);
+
+//         Path prometheusPath = Paths.get(dest.toString(), appName, "prometheus.yml");
+//         try {
+//             FileWriter fw = new FileWriter(prometheusPath.toFile());
+//             fw.write(sw.toString());
+//             fw.flush();
+//             fw.close();
+//         } catch (IOException e) {
+//             e.printStackTrace();
+//         }
+//     }
+// }

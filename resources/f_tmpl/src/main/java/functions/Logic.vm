@@ -46,11 +46,6 @@ public class Logic implements HttpFunction {
         .description("Response time in seconds")
         .register(prometheusRegistry);
 
-    // Counter for throughput
-    private static final Counter requestsCounter = Counter.builder("logic_requests")
-        .description("Number of requests processed")
-        .register(prometheusRegistry);
-
     // Gauge for CPU utilization
     private static final io.micrometer.core.instrument.Gauge cpuUtilizationGauge = io.micrometer.core.instrument.Gauge.builder(
             "logic_cpu_utilization",
@@ -193,9 +188,6 @@ public class Logic implements HttpFunction {
 
     @Override
     public void service(HttpRequest request, HttpResponse response) throws IOException {
-        // Increment the requests counter
-        requestsCounter.increment();
-
 
         // Check if the request is for metrics
         if ("/metrics".equals(request.getPath())) {
@@ -254,18 +246,25 @@ public class Logic implements HttpFunction {
 
     private void doWork(Double stime) {
         #if(${config.getSleepOption()})
+            boolean isSleep = true; 
+        #else
+            boolean isSleep = false;
+        #end
+        if (isSleep) {
+            // Simulate work by sleeping for stime seconds
             try {
                 long sleepTime = Math.round(stime * 1e3); // Convert stime to milliseconds
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        #else
+        } else {
             ExponentialDistribution dist = new ExponentialDistribution(stime);
             long delay = Long.valueOf(Math.round(dist.sample() * 1e9));
             long start = mgm.getCurrentThreadCpuTime();
             while ((mgm.getCurrentThreadCpuTime() - start) < delay) {
             }
-        #end
+        }
+        
     }
 }
