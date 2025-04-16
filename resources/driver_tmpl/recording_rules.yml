@@ -1,0 +1,15 @@
+groups:
+  - name: logic_metrics
+    interval: 15s # How often to evaluate these rules
+    rules:
+      # Save the throughput query
+      - record: logic_throughput_rps
+        expr: rate(logic_response_time_seconds_count[1m])
+
+      # Save the average response time query
+      - record: logic_avg_response_time
+        expr: rate(logic_response_time_seconds_sum[1m]) / rate(logic_response_time_seconds_count[1m])
+
+      # Save the CPU utilization percentage
+      - record: logic_cpu_utilization_percentage
+        expr: avg(logic_cpu_utilization_percentage)

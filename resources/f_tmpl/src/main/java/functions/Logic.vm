@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.lang.Thread;
 
+import java.lang.management.RuntimeMXBean;
+
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
@@ -31,6 +33,8 @@ import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.micrometer.prometheus.PrometheusConfig;
+import io.prometheus.client.exporter.PushGateway;
+import java.util.concurrent.TimeUnit;
 
 public class Logic implements HttpFunction {
     private static final Logger logger = Logger.getLogger("$f.getName()");
@@ -38,34 +42,27 @@ public class Logic implements HttpFunction {
     private static HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
     private HttpResponse response = null;
 
-    // Prometheus registry
+    private static final String FUNCTION_NAME = "$f.getName()";
+
+    private static final PushGateway pushGateway = new PushGateway("127.0.0.1:9091");
+
     private static final PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
 
-    // Timer for response time
     private static final Timer responseTimeTimer = Timer.builder("logic_response_time_seconds")
         .description("Response time in seconds")
+        .tag("function_name", FUNCTION_NAME)
         .register(prometheusRegistry);
 
-    // Gauge for CPU utilization
-    private static final io.micrometer.core.instrument.Gauge cpuUtilizationGauge = io.micrometer.core.instrument.Gauge.builder(
-            "logic_cpu_utilization",
-            () -> {
-                if (mgm.isThreadCpuTimeSupported() && mgm.isThreadCpuTimeEnabled()) {
-                    return (double) mgm.getCurrentThreadCpuTime() / 1e9; // Convert nanoseconds to seconds
-                }
-                return 0.0;
-            })
-        .description("CPU utilization in seconds")
+    private static final Timer cpuTimeTimer = Timer.builder("logic_cpu_time_seconds")
+        .description("CPU time used in seconds")
+        .tag("function_name", FUNCTION_NAME)
         .register(prometheusRegistry);
 
-    // Gauge for CPU utilization percentage
-    private static volatile double cpuUtilizationPercentage = 0.0;
+    private static final Counter httpRequestsTotal = Counter.builder("http_requests_total")
+        .description("Total number of HTTP requests")
+        .tag("function_name", FUNCTION_NAME)
+        .register(prometheusRegistry);
 
-    static {
-        Gauge.builder("logic_cpu_utilization_percentage", () -> cpuUtilizationPercentage)
-            .description("CPU utilization as a percentage of wall-clock time")
-            .register(prometheusRegistry);
-    }
 
     static {
         try {
@@ -188,23 +185,38 @@ public class Logic implements HttpFunction {
 
     @Override
     public void service(HttpRequest request, HttpResponse response) throws IOException {
+int httpStatusCode = 200; // Default status code
 
-        // Check if the request is for metrics
-        if ("/metrics".equals(request.getPath())) {
-            // Expose the Prometheus metrics
-            response.appendHeader("Content-Type", "text/plain; version=0.0.4");
-            response.setStatusCode(200);
-            response.getWriter().write(prometheusRegistry.scrape());
-            return;
-        }
-        
-        responseTimeTimer.record(() -> {
-            try {
-                this.handleRequest(request, response);
+        // Start timers
+        Timer.Sample responseTimeSample = Timer.start(prometheusRegistry);
+        long startCpuTime = mgm.getCurrentThreadCpuTime();
+
+        try {
+            // Handle request
+            this.handleRequest(request, response);
+        } catch (Exception e) {
+            httpStatusCode = 500; // Internal server error
+            throw e;
+        } finally {
+            // Update metrics
+            long cpuTimeUsed = mgm.getCurrentThreadCpuTime() - startCpuTime;
+            cpuTimeTimer.record(cpuTimeUsed, TimeUnit.NANOSECONDS);
+            responseTimeSample.stop(responseTimeTimer);
+            httpRequestsTotal.increment();
+
+            if (pushGateway != null) {
+                try {
+                    Map<String, String> groupingKey = Map.of(
+                        "function_name", FUNCTION_NAME,
+                        "status_code", String.valueOf(httpStatusCode)
+                    );
+                    pushGateway.pushAdd(prometheusRegistry.getPrometheusRegistry(), FUNCTION_NAME, groupingKey);
                 } catch (IOException e) {
-                e.printStackTrace();
+                    logger.warning("Failed to push metrics to PushGateway: " + e.getMessage());
+                    //e.printStackTrace();
+                }
             }
-        });
+        }
     }
     
     private void handleRequest(HttpRequest request, HttpResponse response) throws IOException {
@@ -213,13 +225,9 @@ public class Logic implements HttpFunction {
         Long startCpuTime = mgm.getCurrentThreadCpuTime();
         Long startExecTime = System.nanoTime();
 
-        // Update CPU utilization gauge
-        cpuUtilizationGauge.measure();
-
-
         // Create a new act_exec map for this execution
         Map<String, Boolean> act_exec = new ConcurrentHashMap<>();
-        HashMap<String, Thread> act_thread = new HashMap<String, Thread>();
+        HashMap<String, Thread> act_thread = new HashMap<>();
         
         // Execute the entry activity
         ${f.getMainAct()}(act_exec);
@@ -230,15 +238,11 @@ public class Logic implements HttpFunction {
         ${node.getName()}(act_exec, act_thread);
         }
         #end
-        // Calculate CPU utilization percentage
         
+        // Display times in the log
         long cpuTimeUsed = mgm.getCurrentThreadCpuTime() - startCpuTime;
         long elapsedTime = System.nanoTime() - startExecTime;    
-        cpuUtilizationPercentage = (double) cpuTimeUsed / elapsedTime * 100;
-
-        // Update the gauge dynamically
-        prometheusRegistry.gauge("logic_cpu_utilization_percentage", cpuUtilizationPercentage);
-
+        double cpuUtilizationPercentage = (double) cpuTimeUsed / elapsedTime * 100;
         String logstring = String.format("cpu:=%d  rt:=%d  cpu%%:=%.2f", cpuTimeUsed, elapsedTime, cpuUtilizationPercentage);
         Logic.logger.info(logstring);
     }
