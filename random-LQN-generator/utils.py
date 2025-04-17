@@ -69,27 +69,32 @@ def get_call_number(average, variance):
     return 1.0 if sample <= 0 else sample
 
 def generate_random_dag_with_one_root(num_vertices, p_edge):
-    """Generate a random DAG with a single root.
+    """Generate a random DAG with a single root (0) connected to a single access point (1).
 
     :param num_vertices:    The number of vertices in the DAG.
     :param prob_edge:       The probability of an edge to be formed.
     :return:                An adjacency list describing the randomly formed DAG.     
     """
+    # Initialize the adjacency list
+    # The first vertex is the root (0) and the second is the access point (1)
     adj_list = [list() for _ in range(num_vertices)]
 
-    # Create edges ensuring no cycles are formed
-    for i in range(0, num_vertices): # for i in range(1, num_vertices):
+    # Connect the root to the access point
+    adj_list[0].append(1)
+
+    # Create edges ensuring no cycles are formed (excluding the root)
+    for i in range(1, num_vertices):
         for j in range(i + 1, num_vertices):
             if random.random() < p_edge:
                 adj_list[i].append(j)
 
-    # Add vertices that have no parent to the root
-    for i in range(1, num_vertices):
+    # Add vertices that have no parent to the access point
+    for i in range(2, num_vertices):
         if not any(i in sublist for sublist in adj_list):
-            adj_list[0].append(i)
+            adj_list[1].append(i)
 
-    # Order list of the root
-    adj_list[0].sort()
+    # Order list of the access point
+    adj_list[1].sort()
 
     return adj_list
 
