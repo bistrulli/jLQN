@@ -4,7 +4,7 @@ groups:
     rules:
       # Save the throughput query
       - record: logic_throughput_rps
-        expr: rate(logic_response_time_seconds_count[1m])
+        expr: rate(http_requests_total[1m])
 
       # Save the average response time query
       - record: logic_avg_response_time
@@ -12,4 +12,4 @@ groups:
 
       # Save the CPU utilization percentage
       - record: logic_cpu_utilization_percentage
-        expr: avg(logic_cpu_utilization_percentage)
+        expr: rate(logic_cpu_time_seconds_sum[1m]) / rate(logic_cpu_time_seconds_count[1m])
