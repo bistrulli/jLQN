@@ -13,7 +13,7 @@ def is_parallel_type(task, parallel_tasks):
 def generate_random_lqn(folder_path, lqn_id, num_tasks, call_avg, call_var, p_edge, p_async, p_parallelism):
 
     # Set up Jinja2 environment
-    env = Environment(loader=FileSystemLoader(searchpath='/home/robb/git/jLQN/random-LQN-generator'))
+    env = Environment(loader=FileSystemLoader(searchpath=os.path.dirname(os.path.abspath(__file__))))
 
     # Load the template
     template = env.get_template('lqn_template.j2')
