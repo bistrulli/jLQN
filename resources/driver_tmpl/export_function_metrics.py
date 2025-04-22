@@ -4,14 +4,14 @@ import sys
 import time
 import datetime
 import collections
-import argparse # Import argparse
+import argparse
 
 PROMETHEUS_URL = 'http://localhost:9090' # Adjust if your Prometheus is elsewhere
 OUTPUT_CSV = 'function_metrics.csv'
 
-QUERY_TEMPLATE_AVG_THROUGHPUT = 'rate(http_requests_total[{duration_m}m])'
-QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'rate(logic_cpu_time_seconds_sum[{duration_m}m]) / rate(logic_cpu_time_seconds_count[{duration_m}m])'
-QUERY_TEMPLATE_AVG_CPU_METRIC = 'rate(logic_cpu_time_seconds_sum[{duration_m}m])'
+QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(http_requests_total[{duration_m}m])) by (function_name)' #'rate(http_requests_total[{duration_m}m])'
+QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name) / sum(rate(logic_cpu_time_seconds_count[{duration_m}m])) by (function_name)' #'rate(logic_cpu_time_seconds_sum[{duration_m}m]) / rate(logic_cpu_time_seconds_count[{duration_m}m])'
+QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name)' #'rate(logic_cpu_time_seconds_sum[{duration_m}m])'
 
 
 def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
