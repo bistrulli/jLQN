@@ -44,7 +44,7 @@ public class Logic implements HttpFunction {
 
     private static final String FUNCTION_NAME = "$f.getName()";
 
-    private static final PushGateway pushGateway = new PushGateway("ip-prometheus-machine:9091");
+    private static final PushGateway pushGateway = new PushGateway("${config.getPrometheusIp()}:9091");
 
     private static final PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
 

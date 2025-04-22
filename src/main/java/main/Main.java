@@ -107,10 +107,9 @@ public class Main {
         sleepOption.setRequired(false);
         options.addOption(sleepOption);
 
-
-        // Option zoneName = new Option("z", "zone", true, "Zone name");
-        // zoneName.setRequired(true);
-        // options.addOption(zoneName);
+        Option prometheusOption = new Option("pi", "prometheus-ip", true, "The IP address of the Prometheus server");
+        prometheusOption.setRequired(true);
+        options.addOption(prometheusOption);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -121,9 +120,9 @@ public class Main {
             String region = cmd.getOptionValue("region");
             boolean isTest = cmd.hasOption("test");
             boolean isSleep = cmd.hasOption("sleep");
-            // String zone = cmd.getOptionValue("zone");
+            String prometheusIp = cmd.getOptionValue("prometheus-ip");
 
-            return new Config(project, region, isTest, isSleep); // , zone);
+            return new Config(project, region, isTest, isSleep, prometheusIp);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("utility-name", options);
