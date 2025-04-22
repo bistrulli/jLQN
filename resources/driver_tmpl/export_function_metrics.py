@@ -141,6 +141,8 @@ if __name__ == "__main__":
                 ])
         print(f"Successfully wrote {len(aggregated_results)} rows to '{args.output}'.")
 
+        
+
     except IOError as e:
         print(f"Error writing CSV file '{args.output}': {e}", file=sys.stderr)
         sys.exit(1)
@@ -149,3 +151,22 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print("Script finished.")
+
+    # --- Print CSV content in a human-readable way ---
+    print("\nCSV Content (rounded):")
+    try:
+        with open(args.output, 'r', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile)
+            headers = next(reader)  # Read the header row
+            print(f"{' | '.join(headers)}")  # Print headers
+
+            for row in reader:
+                rounded_row = [
+                    f"{float(value):.3f}" if value.replace('.', '', 1).isdigit() else value
+                    for value in row
+                ]
+                print(f"{' | '.join(rounded_row)}")
+    except IOError as e:
+        print(f"Error reading CSV file '{args.output}': {e}", file=sys.stderr)
+    except Exception as e:
+        print(f"Unexpected error during CSV reading: {e}", file=sys.stderr)
