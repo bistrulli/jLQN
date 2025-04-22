@@ -37,6 +37,10 @@ import io.prometheus.client.exporter.PushGateway;
 import java.util.concurrent.TimeUnit;
 
 public class Logic implements HttpFunction {
+    // Random UUID for the instance, used to identify the instance
+    // in the logs and metrics
+    private static final String INSTANCE_UUID = UUID.randomUUID().toString();
+
     private static final Logger logger = Logger.getLogger("$f.getName()");
     private static ThreadMXBean mgm = ManagementFactory.getThreadMXBean();
     private static HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
@@ -208,7 +212,8 @@ int httpStatusCode = 200; // Default status code
                 try {
                     Map<String, String> groupingKey = Map.of(
                         "function_name", FUNCTION_NAME,
-                        "status_code", String.valueOf(httpStatusCode)
+                        "status_code", String.valueOf(httpStatusCode),
+                        "instance", INSTANCE_UUID
                     );
                     pushGateway.pushAdd(prometheusRegistry.getPrometheusRegistry(), FUNCTION_NAME, groupingKey);
                 } catch (IOException e) {
