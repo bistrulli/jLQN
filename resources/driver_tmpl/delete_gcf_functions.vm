@@ -1,0 +1,22 @@
+#! /bin/sh
+
+# Specify the region
+REGION="northamerica-northeast1"
+
+# List all functions in the specified region
+echo "Fetching list of functions in region '${REGION}'..."
+functions=$(gcloud functions list --regions="${REGION}" --format="value(name)")
+
+if [ -z "$functions" ]; then
+  echo "No functions found in region '${REGION}'."
+  exit 0
+fi
+
+# Loop through each function and delete it
+echo "Deleting all functions in region '${REGION}'..."
+for function in $functions; do
+  echo "Deleting function: $function"
+  gcloud functions delete "$function" --region="${REGION}" --quiet
+done
+
+echo "All functions in region '${REGION}' have been deleted."

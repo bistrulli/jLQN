@@ -8,7 +8,9 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -113,11 +115,11 @@ public class LqnToGcf {
         context.put("config", Main.config);
         context.put("entries", filteredFunctions);
         Template templateSimpleWorkload = null;
-        Template templatePrometheus = null;
+        Template templateDeleteGCF = null;
 
         try {
             templateSimpleWorkload = this.velocityEngine.getTemplate(tmpLocustPath.toString() + File.separator + "SimpleWorkload.vm");
-            templatePrometheus = this.velocityEngine.getTemplate(tmpLocustPath.toString() + File.separator + "prometheus.vm");
+            templateDeleteGCF = this.velocityEngine.getTemplate(tmpLocustPath.toString() + File.separator + "delete_gcf_functions.vm");
         } catch (ResourceNotFoundException rnfe) {
             rnfe.printStackTrace();
         } catch (ParseErrorException pee) {
@@ -129,14 +131,14 @@ public class LqnToGcf {
         }
 
         generateFileFromTemplate(templateSimpleWorkload, context, fDir, "SimpleWorkload.vm", "SimpleWorkload.py");
-        generateFileFromTemplate(templatePrometheus, context, fDir, "prometheus.vm", "prometheus.yml");
+        generateFileFromTemplate(templateDeleteGCF, context, fDir, "delete_gcf_functions.vm", "delete_gcf_functions.sh");
+        
     }
 
 
     public void generateFileFromTemplate(Template template, VelocityContext context, Path fDir, String vmFilename, String outFilename) {
         StringWriter sw = new StringWriter();
         template.merge(context, sw);
-        //System.out.println(sw.toString());
         try {
             FileWriter fw = new FileWriter(
                     Paths.get(fDir.toString() + File.separator + outFilename).toFile());
@@ -144,6 +146,16 @@ public class LqnToGcf {
             fw.flush();
             fw.close();
             FileUtils.delete(Paths.get(fDir.toString() + File.separator + vmFilename).toFile());
+
+            // Make the file executable if it is a shell script
+            if (outFilename.endsWith(".sh")) {
+                Path scriptPath = Paths.get(fDir.toString(), outFilename);
+                Set<PosixFilePermission> permissions = Files.getPosixFilePermissions(scriptPath);
+                permissions.add(PosixFilePermission.OWNER_EXECUTE);
+                permissions.add(PosixFilePermission.GROUP_EXECUTE);
+                permissions.add(PosixFilePermission.OTHERS_EXECUTE);
+                Files.setPosixFilePermissions(scriptPath, permissions);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
