@@ -9,9 +9,9 @@ import argparse # Import argparse
 PROMETHEUS_URL = 'http://localhost:9090' # Adjust if your Prometheus is elsewhere
 OUTPUT_CSV = 'function_metrics.csv'
 
-QUERY_TEMPLATE_THROUGHPUT = 'rate(http_requests_total[{duration_m}m])'
-QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'avg_over_time(logic_avg_response_time[{duration_m}m:])'
-QUERY_TEMPLATE_CPU_METRIC = 'rate(logic_cpu_time_seconds_sum[{duration_m}m])'
+QUERY_TEMPLATE_AVG_THROUGHPUT = 'rate(http_requests_total[{duration_m}m])'
+QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'rate(logic_cpu_time_seconds_sum[{duration_m}m]) / rate(logic_cpu_time_seconds_count[{duration_m}m])'
+QUERY_TEMPLATE_AVG_CPU_METRIC = 'rate(logic_cpu_time_seconds_sum[{duration_m}m])'
 
 
 def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
@@ -98,9 +98,9 @@ if __name__ == "__main__":
     duration_s = args.minutes * 60
 
     # Construct queries dynamically
-    query1 = QUERY_TEMPLATE_THROUGHPUT.format(duration_m=duration_m)
+    query1 = QUERY_TEMPLATE_AVG_THROUGHPUT.format(duration_m=duration_m)
     query2 = QUERY_TEMPLATE_AVG_RESPONSE_TIME.format(duration_m=duration_m)
-    query3 = QUERY_TEMPLATE_CPU_METRIC.format(duration_m=duration_m)
+    query3 = QUERY_TEMPLATE_AVG_CPU_METRIC.format(duration_m=duration_m)
 
     # Use current time for evaluation
     current_eval_time = str(time.time())
