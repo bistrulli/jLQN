@@ -119,7 +119,7 @@ if __name__ == "__main__":
     process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result') # Matches the 3rd query
 
     # Prepare for CSV writing
-    csv_headers = ['function_name', 'throughput', 'avg_response_time', 'cpu_metric_result']
+    csv_headers = ['Func ', ' RPS ', ' RT  ', ' CPU']
 
     print(f"\nWriting aggregated data to '{args.output}'...")
     try:
