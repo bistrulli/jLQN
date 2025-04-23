@@ -19,7 +19,7 @@ p Proc5 f m 1000
 
 # Tasks declaration
 T 0
-t Task0 r Entr0 -1 Proc0 m 5
+t Task0 r Entr0 -1 Proc0 m 1
 t Task1 n Entr1 -1 Proc1 m 1000
 t Task2 n Entr2 -1 Proc2 m 1000
 t Task3 n Entr3 -1 Proc3 m 1000

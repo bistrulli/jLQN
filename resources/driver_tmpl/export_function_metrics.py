@@ -119,25 +119,37 @@ if __name__ == "__main__":
     process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result') # Matches the 3rd query
 
     # Prepare for CSV writing
-    csv_headers = ['Func ', ' RPS ', ' RT  ', ' CPU']
+    csv_headers = ['Func', 'RPS', 'RT', 'CPU', 'Conc']
 
     print(f"\nWriting aggregated data to '{args.output}'...")
     try:
         with open(args.output, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(csv_headers) # Write header
+            writer.writerow(csv_headers)  # Write header
 
             # Sort function names for consistent output order
             sorted_function_names = sorted(aggregated_results.keys())
 
             for func_name in sorted_function_names:
                 data = aggregated_results[func_name]
+                # Retrieve metrics
+                rps = data.get('throughput', None)
+                rt = data.get('avg_response_time', None)
+                cpu = data.get('cpu_metric_result', None)
+
+                # Calculate "Conc" if all required metrics are available
+                try:
+                    conc = (float(rps) * float(rt)) / float(cpu) if rps and rt and cpu else ''
+                except ZeroDivisionError:
+                    conc = ''  # Handle division by zero gracefully
+
                 # Write row, using .get() with default '' if a metric wasn't found for a function
                 writer.writerow([
                     func_name,
-                    data.get('throughput', ''),
-                    data.get('avg_response_time', ''),
-                    data.get('cpu_metric_result', '')
+                    rps,
+                    rt,
+                    cpu,
+                    conc
                 ])
         print(f"Successfully wrote {len(aggregated_results)} rows to '{args.output}'.")
 
@@ -153,19 +165,26 @@ if __name__ == "__main__":
     print("Script finished.")
 
     # --- Print CSV content in a human-readable way ---
-    print("\nCSV Content (rounded):")
+    print("\nCSV Content (formatted):")
     try:
         with open(args.output, 'r', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile)
-            headers = next(reader)  # Read the header row
-            print(f"{' | '.join(headers)}")  # Print headers
+            rows = list(reader)  # Read all rows into a list
+            headers = rows[0]  # First row is the header
+            data_rows = rows[1:]  # Remaining rows are data
 
-            for row in reader:
-                rounded_row = [
-                    f"{float(value):.3f}" if value.replace('.', '', 1).isdigit() else value
-                    for value in row
-                ]
-                print(f"{' | '.join(rounded_row)}")
+            # Calculate the maximum width for each column
+            column_widths = [max(len(str(row[i])) for row in rows) for i in range(len(headers))]
+
+            # Print the header row with proper spacing
+            formatted_headers = " | ".join(f"{header:<{column_widths[i]}}" for i, header in enumerate(headers))
+            print(formatted_headers)
+            print("-" * len(formatted_headers))  # Print a separator line
+
+            # Print each data row with proper spacing
+            for row in data_rows:
+                formatted_row = " | ".join(f"{value:<{column_widths[i]}}" for i, value in enumerate(row))
+                print(formatted_row)
     except IOError as e:
         print(f"Error reading CSV file '{args.output}': {e}", file=sys.stderr)
     except Exception as e:
