@@ -65,7 +65,7 @@ y acti23 Entr3 1
 -1
 
 A Task3
-s acti3 0.10
+s acti3 1.80
 s acti34 0.0001
 y acti34 Entr4 1
 :
@@ -74,7 +74,7 @@ y acti34 Entr4 1
 -1
 
 A Task4
-s acti4 1.00
+s acti4 0.7
 s acti45 0.0001
 y acti45 Entr5 1
 :
@@ -84,7 +84,7 @@ y acti45 Entr5 1
 
 
 A Task5
-s acti5 0.40
+s acti5 0.5
 :
     acti5[Entr5]
 -1
