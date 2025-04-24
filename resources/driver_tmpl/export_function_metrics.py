@@ -149,7 +149,7 @@ if __name__ == "__main__":
     process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result') # Matches the 3rd query
 
     # Prepare for CSV writing
-    csv_headers = ['Func', 'RPS', 'RT', 'CPU', 'Conc']
+    csv_headers = ['Func', 'RPS', 'RT', 'CPU', 'Conc', 'ScaledConc']
 
     print(f"\nWriting aggregated data to '{args.output}'...")
     try:
@@ -173,17 +173,22 @@ if __name__ == "__main__":
                 except ZeroDivisionError:
                     conc = ''  # Handle division by zero gracefully
 
+                # Calculate "ScaledConc" as max(1, round(Conc * 0.4))
+                try:
+                    scaled_conc = max(1, round(float(conc) * 0.4)) if conc else ''
+                except ValueError:
+                    scaled_conc = ''  # Handle invalid Conc gracefully
+
                 # Write row, using .get() with default '' if a metric wasn't found for a function
                 writer.writerow([
                     func_name,
                     rps,
                     rt,
                     cpu,
-                    conc
+                    conc,
+                    scaled_conc
                 ])
         print(f"Successfully wrote {len(aggregated_results)} rows to '{args.output}'.")
-
-        
 
     except IOError as e:
         print(f"Error writing CSV file '{args.output}': {e}", file=sys.stderr)
