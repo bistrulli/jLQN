@@ -13,7 +13,7 @@ OUTPUT_CSV = 'function_metrics.csv'
 QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(http_requests_total[{duration_m}m])) by (function_name)' #'rate(http_requests_total[{duration_m}m])'
 QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'sum(rate(logic_response_time_seconds_sum[{duration_m}m])) by (function_name) / sum(rate(logic_response_time_seconds_count[{duration_m}m])) by (function_name)' #'rate(logic_cpu_time_seconds_sum[{duration_m}m]) / rate(logic_cpu_time_seconds_count[{duration_m}m])'
 QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name)' #'rate(logic_cpu_time_seconds_sum[{duration_m}m])'
-QUERY_TEMPLATE_BILL = 'avg_over_time(stackdriver_cloud_run_revision_run_googleapis_com_container_instance_count[{duration_m}s]) * {duration_s}'
+QUERY_TEMPLATE_BILL = 'avg_over_time(stackdriver_cloud_run_revision_run_googleapis_com_container_instance_count{{state="active"}}[{duration_m}s]) * {duration_s}'
 
 def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
     """Executes an instant query and returns the 'result' list or None on error."""
@@ -56,7 +56,7 @@ def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
         print(f"  Unexpected error during query: {e}", file=sys.stderr)
         return None
 
-def process_results(results_dict, query_results, metric_key):
+def process_results(results_dict, query_results, metric_key, label_key='function_name'):
     """Helper function to add query results to the main dictionary."""
     if query_results is None:
         print(f"  Skipping processing for {metric_key} due to query error.")
@@ -64,20 +64,24 @@ def process_results(results_dict, query_results, metric_key):
 
     for item in query_results:
         labels = item.get('metric', {})
-        func_name = labels.get('function_name')
+        func_name = labels.get(label_key)
+
+        # Normalize service_name to match function_name format if needed
+        if metric_key == 'bill' and label_key == 'service_name' and func_name:
+            func_name = func_name.capitalize()  # Convert 'entr1' to 'Entr1', etc.
+
         if func_name:
             try:
-                value = float(item['value'][1]) # Get value as float
+                value = float(item['value'][1])  # Get value as float
                 # If function_name not seen before, defaultdict creates a new dict
                 results_dict[func_name][metric_key] = value
             except ValueError:
-                 print(f"  Warning: Could not convert value '{item['value'][1]}' to float for {metric_key} in {func_name}", file=sys.stderr)
+                print(f"  Warning: Could not convert value '{item['value'][1]}' to float for {metric_key} in {func_name}", file=sys.stderr)
             except KeyError:
-                 print(f"  Warning: Unexpected result format for {metric_key} in {func_name}: {item}", file=sys.stderr)
+                print(f"  Warning: Unexpected result format for {metric_key} in {func_name}: {item}", file=sys.stderr)
         else:
-            # Handle results that might not have the function_name label
-            print(f"  Warning: Result for {metric_key} found without 'function_name' label: {labels}", file=sys.stderr)
-
+            # Handle results that might not have the expected label
+            print(f"  Warning: Result for {metric_key} found without '{label_key}' label: {labels}", file=sys.stderr)
 
 def print_csv(file_path):
     """Prints the content of a CSV file in a human-readable format using tabulate."""
