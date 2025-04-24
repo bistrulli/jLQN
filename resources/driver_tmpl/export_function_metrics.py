@@ -13,7 +13,7 @@ OUTPUT_CSV = 'function_metrics.csv'
 QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(http_requests_total[{duration_m}m])) by (function_name)' #'rate(http_requests_total[{duration_m}m])'
 QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'sum(rate(logic_response_time_seconds_sum[{duration_m}m])) by (function_name) / sum(rate(logic_response_time_seconds_count[{duration_m}m])) by (function_name)' #'rate(logic_cpu_time_seconds_sum[{duration_m}m]) / rate(logic_cpu_time_seconds_count[{duration_m}m])'
 QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name)' #'rate(logic_cpu_time_seconds_sum[{duration_m}m])'
-
+QUERY_TEMPLATE_BILL = 'avg_over_time(stackdriver_cloud_run_revision_run_googleapis_com_container_instance_count{state="active"}[{duration_m}s]) * {duration_s}'
 
 def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
     """Executes an instant query and returns the 'result' list or None on error."""
@@ -120,6 +120,7 @@ if __name__ == "__main__":
     query1 = QUERY_TEMPLATE_AVG_THROUGHPUT.format(duration_m=duration_m)
     query2 = QUERY_TEMPLATE_AVG_RESPONSE_TIME.format(duration_m=duration_m)
     query3 = QUERY_TEMPLATE_AVG_CPU_METRIC.format(duration_m=duration_m)
+    query4 = QUERY_TEMPLATE_BILL.format(duration_m=duration_m, duration_s=duration_s)
 
     # Use current time for evaluation
     current_eval_time = str(time.time())
@@ -128,6 +129,7 @@ if __name__ == "__main__":
     throughput_results = query_prometheus_instant(PROMETHEUS_URL, query1, current_eval_time)
     response_time_results = query_prometheus_instant(PROMETHEUS_URL, query2, current_eval_time)
     cpu_metric_results = query_prometheus_instant(PROMETHEUS_URL, query3, current_eval_time)
+    bill_results = query_prometheus_instant(PROMETHEUS_URL, query4, current_eval_time)
 
     # Aggregate results by function_name
     aggregated_results = collections.defaultdict(dict)
@@ -136,9 +138,10 @@ if __name__ == "__main__":
     process_results(aggregated_results, throughput_results, 'throughput')
     process_results(aggregated_results, response_time_results, 'avg_response_time')
     process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result') # Matches the 3rd query
+    process_results(aggregated_results, bill_results, 'bill')  # Matches the 4th query
 
     # Prepare for CSV writing
-    csv_headers = ['Func', 'RPS', 'RT', 'CPU', 'Conc', 'ScaledConc']
+    csv_headers = ['Func', 'RPS', 'RT', 'CPU', 'BILL', 'Conc', 'ScaledConc']
 
     print(f"\nWriting aggregated data to '{args.output}'...")
     try:
@@ -155,6 +158,7 @@ if __name__ == "__main__":
                 rps = data.get('throughput', None)
                 rt = data.get('avg_response_time', None)
                 cpu = data.get('cpu_metric_result', None)
+                bill = data.get('bill', None)
 
                 # Calculate "Conc" if all required metrics are available
                 try:
@@ -174,6 +178,7 @@ if __name__ == "__main__":
                     rps,
                     rt,
                     cpu,
+                    bill,
                     conc,
                     scaled_conc
                 ])
