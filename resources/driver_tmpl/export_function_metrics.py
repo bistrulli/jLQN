@@ -5,6 +5,7 @@ import time
 import datetime
 import collections
 import argparse
+from tabulate import tabulate  # Add this import
 
 PROMETHEUS_URL = 'http://localhost:9090' # Adjust if your Prometheus is elsewhere
 OUTPUT_CSV = 'function_metrics.csv'
@@ -79,7 +80,7 @@ def process_results(results_dict, query_results, metric_key):
 
 
 def print_csv(file_path):
-    """Prints the content of a CSV file in a human-readable format."""
+    """Prints the content of a CSV file in a human-readable format using tabulate."""
     print("\nCSV Content (formatted):")
     try:
         with open(file_path, 'r', encoding='utf-8') as csvfile:
@@ -88,21 +89,9 @@ def print_csv(file_path):
             headers = rows[0]  # First row is the header
             data_rows = rows[1:]  # Remaining rows are data
 
-            # Calculate the maximum width for each column
-            column_widths = [max(len(str(row[i])) for row in rows) for i in range(len(headers))]
-
-            # Print the header row with proper spacing
-            formatted_headers = " | ".join(f"{header:<{column_widths[i]}}" for i, header in enumerate(headers))
-            print(formatted_headers)
-            print("-" * len(formatted_headers))  # Print a separator line
-
-            # Print each data row with proper spacing
-            for row in data_rows:
-                formatted_row = " | ".join(
-                    f"{float(value):.3f}" if value.replace('.', '', 1).isdigit() else f"{value:<{column_widths[i]}}"
-                    for i, value in enumerate(row)
-                )
-                print(formatted_row)
+            # Use tabulate to format the table
+            table = tabulate(data_rows, headers=headers, tablefmt="grid", floatfmt=".3f")
+            print(table)
     except IOError as e:
         print(f"Error reading CSV file '{file_path}': {e}", file=sys.stderr)
     except Exception as e:
