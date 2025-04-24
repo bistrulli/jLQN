@@ -141,8 +141,8 @@ if __name__ == "__main__":
     print("\nProcessing results...")
     process_results(aggregated_results, throughput_results, 'throughput')
     process_results(aggregated_results, response_time_results, 'avg_response_time')
-    process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result') # Matches the 3rd query
-    process_results(aggregated_results, bill_results, 'bill')  # Matches the 4th query
+    process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result')  # Matches the 3rd query
+    process_results(aggregated_results, bill_results, 'bill', label_key='service_name')  # Use service_name for bill
 
     # Prepare for CSV writing
     csv_headers = ['Func', 'RPS', 'RT', 'CPU', 'BILL', 'Conc', 'ScaledConc']
