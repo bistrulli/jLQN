@@ -1,0 +1,19 @@
+# /etc/prometheus/stackdriver_config.yml
+
+project_id: my-microservice-test-project
+
+metrics:
+  - type: run.googleapis.com/container/instance_count
+
+
+# docker run -d \
+#     --name stackdriver-exporter \
+#     -p 9255:9255 \
+#     -v "/etc/prometheus/stackdriver-key.json:/etc/stackdriver_exporter/key.json" \
+#     -v "/etc/prometheus/stackdriver_config.yml:/etc/stackdriver_exporter/config.yml" \
+#     -e "GOOGLE_APPLICATION_CREDENTIALS=/etc/stackdriver_exporter/key.json" \
+#     --restart=unless-stopped \
+#     prometheuscommunity/stackdriver-exporter:latest \
+#     --stackdriver.project-id="my-microservice-test-project" \
+#     --stackdriver.metrics.config-file=/etc/stackdriver_exporter/config.yml \
+#     --web.listen-address=":9255"
