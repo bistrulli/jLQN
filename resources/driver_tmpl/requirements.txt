@@ -1,4 +1,0 @@
-locust==2.32.10
-numpy==2.2.3
-scipy==1.15.2
-tabulate>=0.8.10
