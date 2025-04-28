@@ -1,0 +1,4 @@
+project_id: my-microservice-test-project
+
+metrics:
+  - type: run.googleapis.com/container/instance_count
