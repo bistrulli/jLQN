@@ -13,7 +13,7 @@ OUTPUT_CSV = 'function_metrics.csv'
 QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(http_requests_total[{duration_m}m])) by (function_name)' #'rate(http_requests_total[{duration_m}m])'
 QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'sum(rate(logic_response_time_seconds_sum[{duration_m}m])) by (function_name) / sum(rate(logic_response_time_seconds_count[{duration_m}m])) by (function_name)' #'rate(logic_cpu_time_seconds_sum[{duration_m}m]) / rate(logic_cpu_time_seconds_count[{duration_m}m])'
 QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name)' #'rate(logic_cpu_time_seconds_sum[{duration_m}m])'
-QUERY_TEMPLATE_BILL = 'avg_over_time(stackdriver_cloud_run_revision_run_googleapis_com_container_instance_count{{state="active"}}[{duration_m}s]) * {duration_s}'
+QUERY_TEMPLATE_BILL = 'avg_over_time(stackdriver_cloud_run_revision_run_googleapis_com_container_instance_count{{state="active"}}[{duration_m}m]) * {duration_s}'
 
 def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
     """Executes an instant query and returns the 'result' list or None on error."""
