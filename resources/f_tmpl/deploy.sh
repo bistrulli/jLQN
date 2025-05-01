@@ -9,7 +9,8 @@ gcloud beta functions deploy $fname \
 --memory=1024MB \
 --cpu=1 \
 --trigger-http \
---allow-unauthenticated \
+--no-allow-unauthenticated \
+--service-account="$EXPERIMENT_SA_EMAIL"
 --project $project \
 --max-instances=100 \
 --min-instances=1
