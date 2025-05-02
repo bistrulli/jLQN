@@ -2,9 +2,9 @@ from locust import HttpUser, task, between, events
 import time, logging
 import locust.stats
 import numpy as np
-import subprocess
 from queue import Queue
-import threading
+import google.auth.transport.requests
+import google.oauth2.id_token
 
 locust.stats.CSV_STATS_INTERVAL_SEC = 1
 
@@ -23,89 +23,106 @@ class SimpleWorkload(HttpUser):
 		super().__init__(*args, **kwargs)
 		self.nreq = 0
 		self.act_exec = {}
-		self.act_thread = {}
-	
-	def doWait(self,ttime):
-		delay=np.random.exponential(scale=ttime)
+		#self.act_thread = {} # This does not seem to be used, you could remove it?
+
+	# Variables added for token cache
+	_id_token = None
+	_token_expiry = 0
+
+	# Helper method added to obtain/cache the ID token
+	def _get_id_token(self, target_function_url): 
+		"""
+		Obtains a valid ID token for the specified URL, using the cache.
+		Automatically uses the credentials of the GCE environment.
+		"""
+		now = time.time()
+		# Renew the token if it is missing, expired, or expires in less than 60 seconds
+		if not self._id_token or now + 60 > self._token_expiry:
+			# print(f"Obtaining new ID token for audience: {target_function_url}") 
+			try:
+				auth_req = google.auth.transport.requests.Request()
+				# fetch_id_token uses the environment credentials (GCE SA)
+				new_token = google.oauth2.id_token.fetch_id_token(auth_req, target_function_url) 
+				
+				self._id_token = new_token
+				self._token_expiry = now + (55 * 60) # Estimate expiration at 55 minutes
+				# print("New ID token obtained.")
+
+			except Exception as e:
+				print(f"!!! ERROR obtaining ID token for {target_function_url}: {e}")
+				self._id_token = None 
+				self._token_expiry = 0
+				return None # Failure to obtain the token
+				
+		return self._id_token
+
+	def doWait(self, ttime):
+		delay = np.random.exponential(scale = ttime)
 		time.sleep(delay)
 	
 	
-	#[[#]]#Activities
-	#foreach ( $act in $f.getActivities() )
-	def $act.getName()(self):
-		self.act_exec["$act.getName()"]=True;
-		self.doWait($act.getDemand());
+	# Activities
+	def acti0(self):
+		self.act_exec["acti0"] = True;
+		self.doWait(1.5);
 
-		#if ($act.getCall() != $null)
-		tgt_url = "${act.getCall().getDest().toLowerCase()}";
-		self.client.get(tgt_url)
-		#end
 
-		#if ($act.getAsyncCall() != $null)
-		tgt_url = "${act.getAsyncCall().getDest().toLowerCase()}";
-		self.client.get(tgt_url)
-		#end
-	#end
-	
-	#[[#]]#Dnodes
-	#foreach ( $node in $f.getDnodes() )
-	def ${node.getName()}(self):
-	#if($node.class.getSimpleName()=="OrNode")
-		#if($node.getJoinList().size()>1)
-		#[[#]]#JoinNode Logic
-		#foreach ( $act in $node.getJoinList())
-		self.act_thread["$act"].join();
-		#end
-		#end
-		#[[#]]#OrNode Logic
+	def acti01(self):
+		self.act_exec["acti01"] = True;
+		self.doWait(1.0E-4);
+		
+		# Define the HTTPS URL of the 'entr1' function 
+		# Necessary for string concatenation
+		region = "$config.getRegionName()"
+		projectId = "$config.getProjectName()"
+		function_full_url = f"https://{region}-{projectId}.cloudfunctions.net/entr1" 
+
+		# Obtain the ID token for that specific URL
+		token = self._get_id_token(function_full_url)
+		#print(f"Token = {token}")
+		
+        # Check if the token was obtained
+		if not token:
+			print(f"ERROR: Unable to obtain token for {function_full_url}, skipping request in acti01.")
+			return # Exit the acti01 function if there is no token
+
+		# Prepare the authorization header
+		auth_header = {"Authorization": f"Bearer {token}"}
+
+		# Perform the GET request using the Locust client, passing the header
+		# and using catch_response to mark success/failure
+		with self.client.get(
+			function_full_url,      # Use the full URL
+			headers = auth_header,    # Pass the header with the token!
+			name = "entr1",           # Name to group statistics in Locust
+			catch_response=True 
+		) as response:
+			if response.ok:
+				# print(f"Request to {function_full_url} succeeded: {response.status_code}")
+				response.success()
+			else:
+				print(f"Request to {function_full_url} failed: {response.status_code} - {response.text}")
+				response.failure(f"Status code {response.status_code}")
+
+	#Dnodes
+	def OrNode_acti0(self):
+		#OrNode Logic
 		label = []
 		p = []
-		#foreach ( $act in $node.getForkList())
-		label.append("$act")
-		p.append($node.getProb().get($foreach.index))
-		#end
+		label.append("acti01")
+		p.append(1.0)
 		
-		randomChoice = np.random.choice(a=label,p=p)
-		#foreach ( $act in $node.getForkList())
-		if(randomChoice=="$act"):
-			self.$act()
-		#end
-	#end
-	#if($node.class.getSimpleName()=="ForkNode")
-		#[[#]]#ForkNode Logic
-		final Logic mainLogic=this;
-		String joinEvt="";
-		#foreach ( $act in $node.getForkList())
-		#if($foreach.index==0)
-		joinEvt="${act}";
-		#else
-		joinEvt+="&${act}";
-		#end
-		Thread ${act}Thread = new Thread(() -> {
-			//TBA all the activated Dnodes by ${act} to allow a more complex parallel execution
-			//in this way only asynch call are supported
-			mainLogic.$act();
-		});
-		this.act_thread.put("${act}", ${act}Thread);
-		this.act_thread.get("${act}").start();
-		#end
-		this.act_exec.put(joinEvt, true);
-	#end
-	#end
+		randomChoice = np.random.choice(a = label, p = p)
+		if(randomChoice == "acti01"):
+			self.acti01()
 	
 	@task
 	def visit_homepage(self):
-		#[[#]]# execetute the entry activity
-		strat_time=time.time()
-		self.${f.getMainAct()}()
-		#foreach ( $node in $f.getDnodes())
-		#[[#]]# execetute the decision node of already executed evt
-		if(self.act_exec["${node.getOriginEvt()}"]!=None and self.act_exec["${node.getOriginEvt()}"]):
-			self.act_exec["${node.getOriginEvt()}"]=False
-			self.${node.getName()}()
-		#end
-		rtQue.put(time.time()-strat_time)
-		
-if __name__ == "__main__":
-	SimpleWorkload().run()
-	
+		# Execute the entry activity
+		start_time = time.time()
+		self.acti0()
+		# Execute the decision node of already executed evt
+		if(self.act_exec["acti0"] != None and self.act_exec["acti0"]):
+			self.act_exec["acti0"] = False
+			self.OrNode_acti0()
+		rtQue.put(time.time() - start_time)
