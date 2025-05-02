@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Specify the region
-REGION="northamerica-northeast1"
+REGION="$config.getRegionName()"
 
 # List all functions in the specified region
 echo "Fetching list of functions in region '${REGION}'..."
