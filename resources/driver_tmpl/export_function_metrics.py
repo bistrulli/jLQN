@@ -5,32 +5,33 @@ import time
 import datetime
 import collections
 import argparse
-from tabulate import tabulate  # Add this import
+from tabulate import tabulate  # For formatting CSV output
+import os  # For filesystem operations
 
-PROMETHEUS_URL = 'http://localhost:9090' # Adjust if your Prometheus is elsewhere
+PROMETHEUS_URL = 'http://localhost:9090'  # Adjust if Prometheus is hosted elsewhere
 OUTPUT_CSV = 'function_metrics.csv'
 
-QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(http_requests_total[{duration_m}m])) by (function_name)' #'rate(http_requests_total[{duration_m}m])'
-QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'sum(rate(logic_response_time_seconds_sum[{duration_m}m])) by (function_name) / sum(rate(logic_response_time_seconds_count[{duration_m}m])) by (function_name)' #'rate(logic_cpu_time_seconds_sum[{duration_m}m]) / rate(logic_cpu_time_seconds_count[{duration_m}m])'
-QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name)' #'rate(logic_cpu_time_seconds_sum[{duration_m}m])'
+# Query templates for Prometheus metrics
+QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(http_requests_total[{duration_m}m])) by (function_name)'
+QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'sum(rate(logic_response_time_seconds_sum[{duration_m}m])) by (function_name) / sum(rate(logic_response_time_seconds_count[{duration_m}m])) by (function_name)'
+QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name)'
 QUERY_TEMPLATE_BILL = 'avg_over_time(stackdriver_cloud_run_revision_run_googleapis_com_container_instance_count{{state="active"}}[{duration_m}m]) * {duration_s}'
 
 def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
-    """Executes an instant query and returns the 'result' list or None on error."""
+    """Executes a Prometheus instant query and returns the 'result' list or None on error."""
     api_endpoint = f"{prometheus_url.rstrip('/')}/api/v1/query"
     params = {'query': query}
     if evaluation_time:
         params['time'] = evaluation_time
     else:
-        evaluation_time = str(time.time()) # Use current time if not provided
+        evaluation_time = str(time.time())  # Use current time if not provided
         params['time'] = evaluation_time
 
     formatted_time = datetime.datetime.fromtimestamp(float(evaluation_time)).strftime("%Y-%m-%d %H:%M:%S")
 
-    # Shorten query for printing if too long
+    # Print query details
     query_print = query[:100] + '...' if len(query) > 103 else query
     print(f"Executing Query: {query_print} at time {formatted_time}")
-    # print(f"  Full Query: {query}") # Uncomment for debugging full query
     print(f"  URL: {api_endpoint}")
 
     try:
@@ -57,7 +58,7 @@ def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
         return None
 
 def process_results(results_dict, query_results, metric_key, label_key='function_name'):
-    """Helper function to add query results to the main dictionary."""
+    """Processes Prometheus query results and aggregates them into a dictionary."""
     if query_results is None:
         print(f"  Skipping processing for {metric_key} due to query error.")
         return
@@ -72,19 +73,17 @@ def process_results(results_dict, query_results, metric_key, label_key='function
 
         if func_name:
             try:
-                value = float(item['value'][1])  # Get value as float
-                # If function_name not seen before, defaultdict creates a new dict
+                value = float(item['value'][1])  # Convert value to float
                 results_dict[func_name][metric_key] = value
             except ValueError:
                 print(f"  Warning: Could not convert value '{item['value'][1]}' to float for {metric_key} in {func_name}", file=sys.stderr)
             except KeyError:
                 print(f"  Warning: Unexpected result format for {metric_key} in {func_name}: {item}", file=sys.stderr)
         else:
-            # Handle results that might not have the expected label
             print(f"  Warning: Result for {metric_key} found without '{label_key}' label: {labels}", file=sys.stderr)
 
 def print_csv(file_path):
-    """Prints the content of a CSV file in a human-readable format using tabulate."""
+    """Prints the content of a CSV file in a formatted table."""
     print("\nCSV Content (formatted):")
     try:
         with open(file_path, 'r', encoding='utf-8') as csvfile:
@@ -93,7 +92,7 @@ def print_csv(file_path):
             headers = rows[0]  # First row is the header
             data_rows = rows[1:]  # Remaining rows are data
 
-            # Use tabulate to format the table
+            # Format the table using tabulate
             table = tabulate(data_rows, headers=headers, tablefmt="grid", floatfmt=".3f")
             print(table)
     except IOError as e:
@@ -102,51 +101,50 @@ def print_csv(file_path):
         print(f"Unexpected error during CSV reading: {e}", file=sys.stderr)
 
 if __name__ == "__main__":
-    # --- Argument Parsing ---
-    parser = argparse.ArgumentParser(description='Executes specific Prometheus instant queries for multiple functions and saves results to CSV.')
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='Executes Prometheus queries and saves results to CSV.')
     parser.add_argument('--minutes', type=int, default=10, help='Time duration in minutes for query ranges (default: 10)')
     parser.add_argument('--output', default=OUTPUT_CSV, help=f'Output CSV filename (default: {OUTPUT_CSV})')
-    
-    # Add back other arguments if needed later, e.g.:
-    # parser.add_argument('--url', default=PROMETHEUS_URL, help=f'Prometheus server URL (default: {PROMETHEUS_URL})')
-    # parser.add_argument('--eval-time', default=None, help='Evaluation timestamp (Unix format or RFC3339). Default: current time.')
-
     args = parser.parse_args()
-    # --- End Argument Parsing ---
 
     print(f"Starting Prometheus data export for a duration of {args.minutes} minutes...")
 
-    # Calculate durations for queries
+    # Create the "experiments" folder if it does not exist
+    output_dir = "experiments"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"Created directory: {output_dir}")
+
+    # Update the output file path to save it in the "experiments" folder
+    args.output = os.path.join(output_dir, args.output)
+
+    # Calculate query durations
     duration_m = args.minutes
     duration_s = args.minutes * 60
 
-    # Construct queries dynamically
+    # Construct Prometheus queries
     query1 = QUERY_TEMPLATE_AVG_THROUGHPUT.format(duration_m=duration_m)
     query2 = QUERY_TEMPLATE_AVG_RESPONSE_TIME.format(duration_m=duration_m)
     query3 = QUERY_TEMPLATE_AVG_CPU_METRIC.format(duration_m=duration_m)
     query4 = QUERY_TEMPLATE_BILL.format(duration_m=duration_m, duration_s=duration_s)
 
-    # Use current time for evaluation
+    # Execute Prometheus queries
     current_eval_time = str(time.time())
-
-    # Execute the queries
     throughput_results = query_prometheus_instant(PROMETHEUS_URL, query1, current_eval_time)
     response_time_results = query_prometheus_instant(PROMETHEUS_URL, query2, current_eval_time)
     cpu_metric_results = query_prometheus_instant(PROMETHEUS_URL, query3, current_eval_time)
     bill_results = query_prometheus_instant(PROMETHEUS_URL, query4, current_eval_time)
 
-    # Aggregate results by function_name
+    # Aggregate query results
     aggregated_results = collections.defaultdict(dict)
-
     print("\nProcessing results...")
     process_results(aggregated_results, throughput_results, 'throughput')
     process_results(aggregated_results, response_time_results, 'avg_response_time')
-    process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result')  # Matches the 3rd query
-    process_results(aggregated_results, bill_results, 'bill', label_key='service_name')  # Use service_name for bill
+    process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result')
+    process_results(aggregated_results, bill_results, 'bill', label_key='service_name')
 
-    # Prepare for CSV writing
+    # Write results to CSV
     csv_headers = ['Func', 'RPS', 'RT', 'CPU', 'BILL', 'Conc', 'ScaledConc']
-
     print(f"\nWriting aggregated data to '{args.output}'...")
     try:
         with open(args.output, 'w', newline='', encoding='utf-8') as csvfile:
@@ -158,7 +156,6 @@ if __name__ == "__main__":
 
             for func_name in sorted_function_names:
                 data = aggregated_results[func_name]
-                # Retrieve metrics
                 rps = data.get('throughput', None)
                 rt = data.get('avg_response_time', None)
                 cpu = data.get('cpu_metric_result', None)
@@ -176,16 +173,9 @@ if __name__ == "__main__":
                 except ValueError:
                     scaled_conc = ''  # Handle invalid Conc gracefully
 
-                # Write row, using .get() with default '' if a metric wasn't found for a function
-                writer.writerow([
-                    func_name,
-                    rps,
-                    rt,
-                    cpu,
-                    bill,
-                    conc,
-                    scaled_conc
-                ])
+                # Write row to CSV
+                writer.writerow([func_name, rps, rt, cpu, bill, conc, scaled_conc])
+
         print(f"Successfully wrote {len(aggregated_results)} rows to '{args.output}'.")
 
     except IOError as e:
@@ -197,5 +187,5 @@ if __name__ == "__main__":
 
     print("Script finished.")
 
-    # Call the new function to print the CSV content
+    # Print the CSV content in a formatted table
     print_csv(args.output)
