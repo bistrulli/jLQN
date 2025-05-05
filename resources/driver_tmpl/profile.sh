@@ -12,7 +12,8 @@ if [ ! -d "$output_dir" ]; then
 fi
 
 # Run Locust and save output files in the "experiments" folder
-locust --headless --csv ${output_dir}/${EXPERIMENT_NAME} -f SimpleWorkload.py --users $N_USERS --run-time=${DURATION}m --host=$protocol://$region-$project.cloudfunctions.net/
+#locust --headless --csv ${output_dir}/${EXPERIMENT_NAME} -f SimpleWorkload.py --users $N_USERS --run-time=${DURATION}m --host=$protocol://$region-$project.cloudfunctions.net/
+locust --headless --csv ${output_dir}/${EXPERIMENT_NAME} -f SimpleWorkload.py,traceShape.py --users $N_USERS --host=$protocol://$region-$project.cloudfunctions.net/
 
 # Export metrics to a CSV file in the "experiments" folder
 python export_function_metrics.py --minutes ${DURATION} --output ${output_dir}/${EXPERIMENT_NAME}_metrics.csv
