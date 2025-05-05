@@ -109,15 +109,6 @@ if __name__ == "__main__":
 
     print(f"Starting Prometheus data export for a duration of {args.minutes} minutes...")
 
-    # Create the "experiments" folder if it does not exist
-    output_dir = "experiments"
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-        print(f"Created directory: {output_dir}")
-
-    # Update the output file path to save it in the "experiments" folder
-    args.output = os.path.join(output_dir, args.output)
-
     # Calculate query durations
     duration_m = args.minutes
     duration_s = args.minutes * 60
