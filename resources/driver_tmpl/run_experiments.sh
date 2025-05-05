@@ -51,7 +51,7 @@ echo "[Step 1/8] Completed."
 
 # Step 2: Validation profile run
 log_step 2 8 "Running validation profile (1 user, ${DURATION}m)..."
-./profile.sh validation 1 "$DURATION" || error_exit "Step 2 failed: ./profile.sh validation 1 $DURATION"
+./profile.sh validation 1 "$DURATION" fixed || error_exit "Step 2 failed: ./profile.sh validation 1 $DURATION" fixed
 echo "[Step 2/8] Completed. Validation CSV expected at '$VALIDATION_CSV_PATH'"
 
 # Step 3: Update system for NC profile
