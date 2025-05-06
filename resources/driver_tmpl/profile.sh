@@ -3,7 +3,8 @@
 EXPERIMENT_NAME=$1
 N_USERS=$2
 DURATION=$3
-EXEC_TYPE=$4 # Fourth argument to determine execution type
+EXEC_TYPE=$4
+UTILIZATION=$5 # The level of utilization used by WasteLess
 
 # Create the "experiments" folder if it does not exist
 output_dir="experiments"
@@ -20,4 +21,4 @@ else
 fi
 
 # Export metrics to a CSV file in the "experiments" folder
-python export_function_metrics.py --minutes ${DURATION} --output ${output_dir}/${EXPERIMENT_NAME}_metrics.csv
+python export_function_metrics.py --minutes ${DURATION} --output ${output_dir}/${EXPERIMENT_NAME}_metrics.csv --utilization $UTILIZATION

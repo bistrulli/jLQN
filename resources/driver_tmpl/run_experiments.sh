@@ -27,6 +27,7 @@ fi
 
 N_USERS=$1
 DURATION=$2
+UTILIZATION=$3
 
 # Validate if inputs look like positive integers (basic check)
 if ! [[ "$N_USERS" =~ ^[1-9][0-9]*$ ]]; then
@@ -51,7 +52,7 @@ echo "[Step 1/8] Completed."
 
 # Step 2: Validation profile run
 log_step 2 8 "Running validation profile (1 user, ${DURATION}m)..."
-./profile.sh validation 1 "$DURATION" fixed || error_exit "Step 2 failed: ./profile.sh validation 1 $DURATION" fixed
+./profile.sh validation 1 "$DURATION" fixed "$UTILIZATION" || error_exit "Step 2 failed: ./profile.sh validation 1 $DURATION" fixed
 echo "[Step 2/8] Completed. Validation CSV expected at '$VALIDATION_CSV_PATH'"
 
 # Step 3: Update system for NC profile
