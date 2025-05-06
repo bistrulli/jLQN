@@ -105,6 +105,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Executes Prometheus queries and saves results to CSV.')
     parser.add_argument('--minutes', type=int, default=10, help='Time duration in minutes for query ranges (default: 10)')
     parser.add_argument('--output', default=OUTPUT_CSV, help=f'Output CSV filename (default: {OUTPUT_CSV})')
+    parser.add_argument('--utilization', type=float, default=0.4, help='Utilization factor for ScaledConc calculation (default: 0.4)')
     args = parser.parse_args()
 
     print(f"Starting Prometheus data export for a duration of {args.minutes} minutes...")
@@ -158,9 +159,9 @@ if __name__ == "__main__":
                 except ZeroDivisionError:
                     conc = ''  # Handle division by zero gracefully
 
-                # Calculate "ScaledConc" as max(1, round(Conc * 0.4))
+                # Calculate "ScaledConc" using the utilization argument
                 try:
-                    scaled_conc = max(1, round(float(conc) * 0.4)) if conc else ''
+                    scaled_conc = max(1, round(float(conc) * args.utilization)) if conc else ''
                 except ValueError:
                     scaled_conc = ''  # Handle invalid Conc gracefully
 
