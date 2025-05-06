@@ -21,4 +21,8 @@ else
 fi
 
 # Export metrics to a CSV file in the "experiments" folder
-python export_function_metrics.py --minutes ${DURATION} --output ${output_dir}/${EXPERIMENT_NAME}_metrics.csv --utilization $UTILIZATION
+if [ -z "$UTILIZATION" ]; then
+    python export_function_metrics.py --minutes ${DURATION} --output ${output_dir}/${EXPERIMENT_NAME}_metrics.csv
+else
+    python export_function_metrics.py --minutes ${DURATION} --output ${output_dir}/${EXPERIMENT_NAME}_metrics.csv --utilization $UTILIZATION
+fi

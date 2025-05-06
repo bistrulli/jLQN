@@ -108,7 +108,7 @@ if __name__ == "__main__":
     parser.add_argument('--utilization', type=float, default=0.4, help='Utilization factor for ScaledConc calculation (default: 0.4)')
     args = parser.parse_args()
 
-    print(f"Starting Prometheus data export for a duration of {args.minutes} minutes...")
+    print(f"Starting Prometheus data export for a duration of {args.minutes} minutes with utilization {args.utilization}...")
 
     # Calculate query durations
     duration_m = args.minutes
