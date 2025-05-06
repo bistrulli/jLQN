@@ -21,8 +21,8 @@ log_step() {
 }
 
 # === Input Argument Handling ===
-if [ "$#" -ne 2 ]; then
-    error_exit "Invalid number of arguments. Usage: $0 <N_USERS> <DURATION>"
+if [ "$#" -ne 3 ]; then
+    error_exit "Invalid number of arguments. Usage: $0 <N_USERS> <DURATION> <UTILIZATION>"
 fi
 
 N_USERS=$1
