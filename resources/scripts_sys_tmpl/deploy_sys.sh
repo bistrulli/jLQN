@@ -1,3 +1,7 @@
+#!/bin/bash
+
+./Entr0/delete_gcf_functions.sh
+
 dfiles=$(find . -type f -name "deploy.sh")
 for d in $dfiles 
 do
