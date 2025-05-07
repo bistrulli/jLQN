@@ -41,7 +41,7 @@ COLUMN_RT = "Average Response Time"
 COLUMN_BILL = "BILL"
 
 # Updated headers to include percentage delta columns
-OUTPUT_HEADERS = ["Algorithm", "RPS", "%RPS", "RT", "%RT", "BILL", "%BILL"]
+OUTPUT_HEADERS = ["Algorithm", "RPS", "RT", "BILL", "%RPS", "%RT", "%BILL"]
 
 # Placeholder for missing values
 MISSING_VALUE = "N/A"
@@ -147,15 +147,15 @@ if summary_data_rows:
     for row in summary_data_rows:
         # Calculate %RPS
         rps = float(row[1]) if row[1] != MISSING_VALUE else None
-        row.append(f"{(rps - base_rps) / base_rps:.5f}" if base_rps and rps else MISSING_VALUE)
+        row.append(f"{((rps - base_rps) / base_rps * 100):.2f}" if base_rps and rps else MISSING_VALUE)
 
         # Calculate %RT
         rt = float(row[2]) if row[2] != MISSING_VALUE else None
-        row.append(f"{(rt - base_rt) / base_rt:.5f}" if base_rt and rt else MISSING_VALUE)
+        row.append(f"{((rt - base_rt) / base_rt * 100):.2f}" if base_rt and rt else MISSING_VALUE)
 
         # Calculate %BILL
         bill = float(row[3]) if row[3] != MISSING_VALUE else None
-        row.append(f"{(bill - base_bill) / base_bill:.5f}" if base_bill and bill else MISSING_VALUE)
+        row.append(f"{((bill - base_bill) / base_bill * 100):.2f}" if base_bill and bill else MISSING_VALUE)
 
 # --- Output Generation ---
 
