@@ -74,7 +74,7 @@ echo "Step,Duration (seconds)" > "$STEP_TIMES_CSV"
 
 # Step 1: Initial system update
 log_step 1 8 "Running initial system update (1, 1, 1)..."
-measure_step_time 1 "../update_sys.sh" 1 1 1 || error_exit "Step 1 failed: ../update_sys.sh 1 1 1"
+measure_step_time 1 "Initial system update" ../update_sys.sh 1 1 1 || error_exit "Step 1 failed: ../update_sys.sh 1 1 1"
 echo "[Step 1/8] Completed."
 
 # Step 2: Validation profile run
