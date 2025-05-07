@@ -27,10 +27,12 @@ log_step() {
 measure_step_time() {
     local step_number=$1
     local step_description=$2
+    shift 2  # Remove the first two arguments (step_number and step_description)
+
     local start_time=$(date +%s)
 
     # Execute the step
-    "$@"
+    "$@" || error_exit "Step $step_number failed: $*"
 
     local end_time=$(date +%s)
     local duration=$((end_time - start_time))
