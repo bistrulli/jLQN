@@ -7,7 +7,7 @@ gcloud beta functions deploy $fname \
 --source=. \
 --entry-point=functions.Logic \
 --memory=1024MB \
---cpu=3 \
+--cpu=1 \
 --trigger-http \
 --no-allow-unauthenticated \
 --service-account="$EXPERIMENT_SA_EMAIL" \
