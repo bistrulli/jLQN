@@ -49,7 +49,6 @@ public class Logic implements HttpFunction {
 
     private static final Logger logger = Logger.getLogger("$f.getName()");
     private static ThreadMXBean mgm = ManagementFactory.getThreadMXBean();
-    private static HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
     private HttpResponse response = null;
 
     private static final String FUNCTION_NAME = "$f.getName()";
@@ -101,6 +100,7 @@ public class Logic implements HttpFunction {
         #end
         //var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
+        HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
         try {
             // Environment credentials
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
@@ -127,7 +127,7 @@ public class Logic implements HttpFunction {
                     .build();
 
                 // Make the call
-                java.net.http.HttpResponse<String> response = Logic.client.send(request, BodyHandlers.ofString());
+                java.net.http.HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
                 // Process the answer
                 System.out.println("Status Code: " + response.statusCode());
@@ -151,7 +151,7 @@ public class Logic implements HttpFunction {
 
         Thread ${act.getAsyncCall().getSource().toLowerCase()}${act.getAsyncCall().getDest().toLowerCase()}Thread = new Thread(() -> {
             try {
-                var getResponse = Logic.client.send(getRequest, BodyHandlers.ofString());
+                var getResponse = client.send(getRequest, BodyHandlers.ofString());
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
