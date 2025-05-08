@@ -13,4 +13,4 @@ gcloud beta functions deploy $fname \
 --service-account="$EXPERIMENT_SA_EMAIL" \
 --project $project \
 --max-instances=100 \
---min-instances=1
+--min-instances=0
