@@ -2,31 +2,60 @@
 
 Follow the steps below to set up the compute engine:
 
+## General
+### Environment variables
+Define the required environment variables:
+```bash
+echo 'export GCP_PROJECT_ID="your-google-cloud-project-id"' >> ~/.bashrc
+echo 'export GCP_ZONE="your-google-cloud-zone"' >> ~/.bashrc
+echo 'export GCP_REGION="your-google-cloud-region"' >> ~/.bashrc
+echo 'export EXPERIMENT_SA_EMAIL="your-service-account"' >> ~/.bashrc
+source ~/.bashrc
+echo $GCP_PROJECT_ID
+echo $GCP_ZONE
+echo $GCP_REGION
+echo $EXPERIMENT_SA_EMAIL
+```
+Replace `your-google-cloud-project-id` with your actual Google Cloud project ID, `your-google-cloud-zone` with your actual Google Cloud zone, and `your-google-cloud-region` with your actual Google Cloud region. If you are not using a Service Account for Google Cloud, there's no need to define `your-service-account`. The last commands verify that the environment variables are correctly set.
 
-## General 
-1. Define the required environment variables:
-    ```bash
-    echo 'export GCP_PROJECT_ID="your-google-cloud-project-id"' >> ~/.bashrc
-    source ~/.bashrc
-    echo $GCP_PROJECT_ID
-    ```
-    Replace `your-google-cloud-project-id` with your actual Google Cloud project ID. The last command verifies that the environment variable is correctly set.
+### Maven
 
+```bash
+sudo apt install maven
+```
+
+### Docker
+To install Docker, run the script `install_docker.sh`.
+```bash
+./install_docker.sh
+```
 
 ## Python
-1. Install the required Python packages:
-    ```bash
-    sudo pip install -r requirements.txt
-    ```
+
+Python is used to run experiments (for example with locust). If you need it, generate a virutal environment and install the required Python packages:
+
+```bash
+sudo apt install python3.12-venv
+python3 -m venv .ven
+sudo pip install -r requirements.txt
+```
+
+From now on make sure to be using this virtual environment (unless you are using the random-LQN-generator tool).
+
+```bash
+source .venv/bin/activate
+```
 
 ## Prometheus
-1. Run the `run_prometheus` script located in the `prometheus` folder:
-    ```bash
-    ./prometheus/run_prometheus
-    ```
-    This script starts the Prometheus monitoring service, which collects and stores metrics data for the compute engine.
+Run the `run_prometheus` script located in the `prometheus` folder:
+```bash
+./prometheus/run_prometheus.sh
+```
+This script starts the Prometheus monitoring service, which collects and stores metrics data for the compute engine.
 
 ### Stackdriver Exporter
+
+Installing Stackdriver Exporter is a little more tricky and requires the following steps.
 
 This guide explains how to deploy the `prometheuscommunity/stackdriver-exporter` as a Docker container to collect metrics from Google Cloud Monitoring (specifically Cloud Run active instance counts) and expose them for a Prometheus instance (also running in Docker) to scrape.
 
