@@ -51,6 +51,8 @@ public class Logic implements HttpFunction {
     private static ThreadMXBean mgm = ManagementFactory.getThreadMXBean();
     private HttpResponse response = null;
 
+    private static String sharedIdToken = null;
+
     private static final String FUNCTION_NAME = "$f.getName()";
 
     private static final PushGateway pushGateway = new PushGateway("${config.getPrometheusIp()}:9091");
@@ -98,27 +100,13 @@ public class Logic implements HttpFunction {
         #else
         String url = "https://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
         #end
-        //var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+
 
         HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
         try {
-            // Environment credentials
-            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            String idToken = getSharedIdToken(url);
 
-            // Verify that the credentials support tokens ID
-            if (credentials instanceof IdTokenProvider) {
-                IdTokenProvider idTokenProvider = (IdTokenProvider) credentials;
-
-                // Ask for a Token ID specifying the audience (target function URL)
-                IdTokenCredentials idTokenCredentials = IdTokenCredentials.newBuilder()
-                    .setIdTokenProvider(idTokenProvider)
-                    .setTargetAudience(url)
-                    .build();
-
-                // Force the update to obtain a valid token
-                idTokenCredentials.refresh();
-                String idToken = idTokenCredentials.getIdToken().getTokenValue();
-
+            if (idToken != null) {
                 // Prepare the HTTP request with the Authorization header
                 java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -130,16 +118,16 @@ public class Logic implements HttpFunction {
                 java.net.http.HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
                 // Process the answer
+                System.out.println("HTTP Version: " + response.version());
                 System.out.println("Status Code: " + response.statusCode());
                 System.out.println("Response Body: " + response.body());
             } else {
-                System.err.println("Credentials do not support token IDs.");
+                System.err.println("Failed to obtain ID token.");
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-        } catch (Exception e) {
-            System.err.println("Errore while obtaining the token or sending the request: " + e.getMessage());
         }
+
         #end
         #if ($act.getAsyncCall() != $null)
         #if(${config.getTestOption()})
@@ -314,4 +302,29 @@ public class Logic implements HttpFunction {
         }
         
     }
+
+    private static synchronized String getSharedIdToken(String audience) throws IOException, InterruptedException {
+        if (sharedIdToken == null) {
+            try {
+                GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+                if (credentials instanceof IdTokenProvider) {
+                    IdTokenProvider idTokenProvider = (IdTokenProvider) credentials;
+                    IdTokenCredentials idTokenCredentials = IdTokenCredentials.newBuilder()
+                        .setIdTokenProvider(idTokenProvider)
+                        .setTargetAudience(audience)
+                        .build();
+                    idTokenCredentials.refresh();
+                    sharedIdToken = idTokenCredentials.getIdToken().getTokenValue();
+                } else {
+                    System.err.println("Credentials do not support token IDs.");
+                    return null;
+                }
+            } catch (Exception e) {
+                System.err.println("Errore while obtaining the token: " + e.getMessage());
+                throw e;
+            }
+        }
+        return sharedIdToken;
+    }
+
 }
