@@ -83,9 +83,12 @@ measure_step_time 2 "Validation profile run" ./profile.sh validation 1 "$DURATIO
 echo "[Step 2/8] Completed. Validation CSV expected at '$VALIDATION_CSV_PATH'"
 
 # Step 3: Update system for NC profile
-log_step 3 8 "Updating system for NC profile (1, 100, 1)..."
-measure_step_time 3 "Update system for NC profile" ../update_sys.sh 1 100 1 || error_exit "Step 3 failed: ../update_sys.sh 1 100 1"
+log_step 3 8 "Updating system for NC profile (1, 300, 1)..."
+measure_step_time 3 "Update system for NC profile" ../update_sys.sh 1 300 0 || error_exit "Step 3 failed: ../update_sys.sh 1 300 0"
 echo "[Step 3/8] Completed."
+
+log_step 2 8 "Waiting for Validation profile to Cool Down..."
+../waitWarmIstance.sh
 
 # Step 4: NC profile run
 log_step 4 8 "Running NC profile (${N_USERS} users, ${DURATION}m)..."
@@ -93,9 +96,12 @@ measure_step_time 4 "NC profile run" ./profile.sh NC "$N_USERS" "$DURATION" || e
 echo "[Step 4/8] Completed."
 
 # Step 5: Update system for GCR profile
-log_step 5 8 "Updating system for GCR profile (80, 100, 1)..."
-measure_step_time 5 "Update system for GCR profile" ../update_sys.sh 80 100 1 || error_exit "Step 5 failed: ../update_sys.sh 80 100 1"
+log_step 5 8 "Updating system for GCR profile (80, 300, 0)..."
+measure_step_time 5 "Update system for GCR profile" ../update_sys.sh 80 300 0 || error_exit "Step 5 failed: ../update_sys.sh 80 300 0"
 echo "[Step 5/8] Completed."
+
+log_step 4 8 "Waiting for NC profile to Cool Down..."
+../waitWarmIstance.sh
 
 # Step 6: GCR profile run
 log_step 6 8 "Running GCR profile (${N_USERS} users, ${DURATION}m)..."
@@ -123,6 +129,9 @@ measure_step_time 7 "Multi-function update" bash -c "
     ../update_all_functions.sh \$concurrency_args || error_exit \"Step 7 failed: ../update_all_functions.sh with extracted arguments\"
 " || error_exit "Step 7 failed"
 echo "[Step 7/8] Completed."
+
+log_step 6 8 "Waiting for GCR profile to Cool Down..."
+../waitWarmIstance.sh
 
 # Step 8: WL profile run
 log_step 8 8 "Running WL profile (${N_USERS} users, ${DURATION}m)..."

@@ -70,10 +70,10 @@ if [ "$num_dirs" -gt 0 ]; then
         if [ -f "$update_script" ]; then
             echo "--------------------------------------------------"
             # Message indicating execution via sh
-            echo "Running with sh: sh $update_script $concurrency 100 1"
+            echo "Running with sh: sh $update_script $concurrency 300 0"
             echo "--------------------------------------------------"
             # Execute the update.sh script explicitly using the 'sh' interpreter
-            sh "$update_script" "$concurrency" 100 1
+            sh "$update_script" "$concurrency" 300 0
             echo "Completed for directory: $dir_name"
         else
             echo "--------------------------------------------------"
