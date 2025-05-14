@@ -40,7 +40,8 @@ public class Main {
         projectPath = currentFilePath.getParent().getParent(); 
         // Find the current path (run the jar file from the root of the project)
         
-        Path directoryPath = projectPath.resolve("resources/wasteless_journal");
+        //Path directoryPath = projectPath.resolve("resources/wasteless_journal");
+        Path directoryPath = projectPath.resolve("resources/"+config.getLqnModelPath());
         String wildcardPattern = "*.lqn";
         try {
             Collection<File> matchingFiles = FileUtils.listFiles(directoryPath.toFile(),
@@ -95,6 +96,10 @@ public class Main {
         projectName.setRequired(true);
         options.addOption(projectName);
 
+        Option lqnPathOpt = new Option("l", "lqnPath", true, "LQN models Directory");
+        lqnPathOpt.setRequired(true);
+        options.addOption(lqnPathOpt);
+
         Option regionName = new Option("r", "region", true, "Region name");
         regionName.setRequired(true);
         options.addOption(regionName);
@@ -121,8 +126,9 @@ public class Main {
             boolean isTest = cmd.hasOption("test");
             boolean isSleep = cmd.hasOption("sleep");
             String prometheusIp = cmd.getOptionValue("prometheus-ip");
+            String lqnPath = cmd.getOptionValue("lqnPath");
 
-            return new Config(project, region, isTest, isSleep, prometheusIp);
+            return new Config(project, region, isTest, isSleep, prometheusIp, lqnPath);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("utility-name", options);

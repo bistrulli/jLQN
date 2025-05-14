@@ -74,17 +74,17 @@ echo "Step,Duration (seconds)" > "$STEP_TIMES_CSV"
 
 # Step 1: Initial system update
 log_step 1 8 "Running initial system update (1, 1, 1)..."
-measure_step_time 1 "Initial system update" ../update_sys.sh 1 1 1 || error_exit "Step 1 failed: ../update_sys.sh 1 1 1"
+measure_step_time 1 "Initial system update" ../update_sys.sh 1 5 5 || error_exit "Step 1 failed: ../update_sys.sh 1 1 1"
 echo "[Step 1/8] Completed."
 
 # Step 2: Validation profile run
 log_step 2 8 "Running validation profile (1 user, ${DURATION}m)..."
-measure_step_time 2 "Validation profile run" ./profile.sh validation 1 "$DURATION" fixed "$UTILIZATION" || error_exit "Step 2 failed: ./profile.sh validation 1 $DURATION fixed $UTILIZATION"
+measure_step_time 2 "Validation profile run" ./profile.sh validation 5 "$DURATION" fixed "$UTILIZATION" || error_exit "Step 2 failed: ./profile.sh validation 1 $DURATION fixed $UTILIZATION"
 echo "[Step 2/8] Completed. Validation CSV expected at '$VALIDATION_CSV_PATH'"
 
 # Step 3: Update system for NC profile
-log_step 3 8 "Updating system for NC profile (1, 300, 1)..."
-measure_step_time 3 "Update system for NC profile" ../update_sys.sh 1 300 0 || error_exit "Step 3 failed: ../update_sys.sh 1 300 0"
+log_step 3 8 "Updating system for NC profile (1, 400, 1)..."
+measure_step_time 3 "Update system for NC profile" ../update_sys.sh 1 400 0 || error_exit "Step 3 failed: ../update_sys.sh 1 400 0"
 echo "[Step 3/8] Completed."
 
 log_step 2 8 "Waiting for Validation profile to Cool Down..."
@@ -96,8 +96,8 @@ measure_step_time 4 "NC profile run" ./profile.sh NC "$N_USERS" "$DURATION" || e
 echo "[Step 4/8] Completed."
 
 # Step 5: Update system for GCR profile
-log_step 5 8 "Updating system for GCR profile (80, 300, 0)..."
-measure_step_time 5 "Update system for GCR profile" ../update_sys.sh 80 300 0 || error_exit "Step 5 failed: ../update_sys.sh 80 300 0"
+log_step 5 8 "Updating system for GCR profile (80, 400, 0)..."
+measure_step_time 5 "Update system for GCR profile" ../update_sys.sh 80 400 0 || error_exit "Step 5 failed: ../update_sys.sh 80 400 0"
 echo "[Step 5/8] Completed."
 
 log_step 4 8 "Waiting for NC profile to Cool Down..."
