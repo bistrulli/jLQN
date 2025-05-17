@@ -51,7 +51,7 @@ public class Logic implements HttpFunction {
     private static ThreadMXBean mgm = ManagementFactory.getThreadMXBean();
     private HttpResponse response = null;
 
-    private static String sharedIdToken = null;
+    //private static String sharedIdToken = null;
 
     private static final String FUNCTION_NAME = "$f.getName()";
 
@@ -102,7 +102,7 @@ public class Logic implements HttpFunction {
         #end
 
 
-        HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(180)).build();
+        HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(300)).build();
         try {
             String idToken = getSharedIdToken(url);
 
@@ -303,28 +303,28 @@ public class Logic implements HttpFunction {
         
     }
 
-    private static synchronized String getSharedIdToken(String audience) throws IOException, InterruptedException {
-        if (sharedIdToken == null) {
-            try {
-                GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-                if (credentials instanceof IdTokenProvider) {
-                    IdTokenProvider idTokenProvider = (IdTokenProvider) credentials;
-                    IdTokenCredentials idTokenCredentials = IdTokenCredentials.newBuilder()
-                        .setIdTokenProvider(idTokenProvider)
-                        .setTargetAudience(audience)
-                        .build();
-                    idTokenCredentials.refresh();
-                    sharedIdToken = idTokenCredentials.getIdToken().getTokenValue();
-                } else {
-                    System.err.println("Credentials do not support token IDs.");
-                    return null;
-                }
-            } catch (Exception e) {
-                System.err.println("Errore while obtaining the token: " + e.getMessage());
-                throw e;
+    private static String getSharedIdToken(String audience) throws IOException, InterruptedException {
+        String token = null;
+        try {
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            if (credentials instanceof IdTokenProvider) {
+                IdTokenProvider idTokenProvider = (IdTokenProvider) credentials;
+                IdTokenCredentials idTokenCredentials = IdTokenCredentials.newBuilder()
+                    .setIdTokenProvider(idTokenProvider)
+                    .setTargetAudience(audience)
+                    .build();
+                idTokenCredentials.refresh();
+                token = idTokenCredentials.getIdToken().getTokenValue();
+            } else {
+                System.err.println("Credentials do not support token IDs.");
+                return null;
             }
+        } catch (Exception e) {
+            System.err.println("Errore while obtaining the token: " + e.getMessage());
+            throw e;
         }
-        return sharedIdToken;
+        
+        return token;
     }
 
 }
