@@ -5,6 +5,8 @@ import numpy as np
 from queue import Queue
 import google.auth.transport.requests
 import google.oauth2.id_token
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 locust.stats.CSV_STATS_INTERVAL_SEC = 1
 
@@ -24,6 +26,21 @@ class SimpleWorkload(HttpUser):
 		self.nreq = 0
 		self.act_exec = {}
 		#self.act_thread = {} # This does not seem to be used, you could remove it?
+
+		# Configurazione del retry
+		retry_strategy = Retry(
+			total=100,                   # numero di tentativi
+			backoff_factor=0.5,          # 0.5 secondi come base per il calcolo
+			allowed_methods=["GET", "POST", "PUT", "DELETE"],
+			status_forcelist=[429, 500, 501, 502, 503, 504],  # specifici codici di errore
+			backoff_max=30,              # tempo massimo di attesa in secondi
+			raise_on_status=False        # non lanciare eccezioni per codici di stato
+		)
+		
+		# Applica il retry strategy alla sessione
+		adapter = HTTPAdapter(max_retries=retry_strategy)
+		self.client.mount("http://", adapter)
+		self.client.mount("https://", adapter)
 
 	# Variables added for token cache
 	_id_token = None
@@ -71,38 +88,29 @@ class SimpleWorkload(HttpUser):
 		self.act_exec["acti01"] = True;
 		self.doWait(1.0E-4);
 		
-		# Define the HTTPS URL of the 'entr1' function 
-		# Necessary for string concatenation
-		region = "$config.getRegionName()"
-		projectId = "$config.getProjectName()"
+		region = "us-central1"
+		projectId = "syda-serverless-wless"
 		function_full_url = f"https://{region}-{projectId}.cloudfunctions.net/entr1" 
 
-		# Obtain the ID token for that specific URL
 		token = self._get_id_token(function_full_url)
-		#print(f"Token = {token}")
 		
-        # Check if the token was obtained
 		if not token:
 			print(f"ERROR: Unable to obtain token for {function_full_url}, skipping request in acti01.")
-			return # Exit the acti01 function if there is no token
+			return
 
-		# Prepare the authorization header
 		auth_header = {"Authorization": f"Bearer {token}"}
 
-		# Perform the GET request using the Locust client, passing the header
-		# and using catch_response to mark success/failure
-		with self.client.get(
-			function_full_url,      # Use the full URL
-			headers = auth_header,    # Pass the header with the token!
-			name = "entr1",           # Name to group statistics in Locust
-			catch_response=True 
-		) as response:
-			if response.ok:
-				# print(f"Request to {function_full_url} succeeded: {response.status_code}")
-				response.success()
-			else:
-				print(f"Request to {function_full_url} failed: {response.status_code} - {response.text}")
-				response.failure(f"Status code {response.status_code}")
+		# Rimuovi catch_response=True per permettere al retry di funzionare
+		response = self.client.get(
+			function_full_url,
+			headers = auth_header,
+			name = "entr1"
+		)
+		
+		# Verifica la risposta dopo che il retry ha avuto la possibilità di intervenire
+		if response.status_code >= 400:
+			print(f"Request to {function_full_url} failed after retries: {response.status_code} - {response.text}")
+			response.raise_for_status()  # Questo lancerà un'eccezione che Locust catturerà
 
 	#Dnodes
 	def OrNode_acti0(self):
