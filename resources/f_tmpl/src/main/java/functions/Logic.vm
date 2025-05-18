@@ -103,7 +103,7 @@ public class Logic implements HttpFunction {
 
 
         HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(300)).build();
-        int maxRetries = 5;
+        int maxRetries = 10;
         int retryCount = 0;
         boolean success = false;
 
@@ -143,7 +143,7 @@ public class Logic implements HttpFunction {
                 if (retryCount < maxRetries) {
                     System.err.println("Attempt " + retryCount + " failed, retrying...");
                     try {
-                        Thread.sleep(1000); // Attendi 1 secondo prima di riprovare
+                        Thread.sleep(30000); // Attendi 1 secondo prima di riprovare
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt(); // Ripristina lo stato interrupted
                         System.err.println("Sleep interrupted: " + ie.getMessage());

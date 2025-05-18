@@ -82,8 +82,6 @@ log_step 2 8 "Running validation profile (1 user, ${DURATION}m)..."
 measure_step_time 2 "Validation profile run" ./profile.sh validation 5 "$DURATION" fixed "$UTILIZATION" || error_exit "Step 2 failed: ./profile.sh validation 1 $DURATION fixed $UTILIZATION"
 echo "[Step 2/8] Completed. Validation CSV expected at '$VALIDATION_CSV_PATH'"
 
-../waitWarmIstance.sh
-
 # Step 3: Update system for NC profile
 log_step 3 8 "Updating system for NC profile (1, 400, 1)..."
 measure_step_time 3 "Update system for NC profile" ../update_sys.sh 1 400 0 || error_exit "Step 3 failed: ../update_sys.sh 1 400 0"
