@@ -103,7 +103,7 @@ public class Logic implements HttpFunction {
 
 
         HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(300)).build();
-        int maxRetries = 10;
+        int maxRetries = 100;
         int retryCount = 0;
         boolean success = false;
 
