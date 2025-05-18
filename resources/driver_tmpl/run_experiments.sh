@@ -82,6 +82,8 @@ log_step 2 8 "Running validation profile (1 user, ${DURATION}m)..."
 measure_step_time 2 "Validation profile run" ./profile.sh validation 5 "$DURATION" fixed "$UTILIZATION" || error_exit "Step 2 failed: ./profile.sh validation 1 $DURATION fixed $UTILIZATION"
 echo "[Step 2/8] Completed. Validation CSV expected at '$VALIDATION_CSV_PATH'"
 
+../waitWarmIstance.sh
+
 # Step 3: Update system for NC profile
 log_step 3 8 "Updating system for NC profile (1, 400, 1)..."
 measure_step_time 3 "Update system for NC profile" ../update_sys.sh 1 400 0 || error_exit "Step 3 failed: ../update_sys.sh 1 400 0"
@@ -95,6 +97,8 @@ log_step 4 8 "Running NC profile (${N_USERS} users, ${DURATION}m)..."
 measure_step_time 4 "NC profile run" ./profile.sh NC "$N_USERS" "$DURATION" || error_exit "Step 4 failed: ./profile.sh NC $N_USERS $DURATION"
 echo "[Step 4/8] Completed."
 
+../waitWarmIstance.sh
+
 # Step 5: Update system for GCR profile
 log_step 5 8 "Updating system for GCR profile (80, 400, 0)..."
 measure_step_time 5 "Update system for GCR profile" ../update_sys.sh 80 400 0 || error_exit "Step 5 failed: ../update_sys.sh 80 400 0"
@@ -107,6 +111,8 @@ log_step 4 8 "Waiting for NC profile to Cool Down..."
 log_step 6 8 "Running GCR profile (${N_USERS} users, ${DURATION}m)..."
 measure_step_time 6 "GCR profile run" ./profile.sh GCR "$N_USERS" "$DURATION" || error_exit "Step 6 failed: ./profile.sh GCR $N_USERS $DURATION"
 echo "[Step 6/8] Completed."
+
+../waitWarmIstance.sh
 
 # Step 7: Prepare and run multi-function update based on validation CSV
 log_step 7 8 "Preparing and running multi-function update (WL)..."
