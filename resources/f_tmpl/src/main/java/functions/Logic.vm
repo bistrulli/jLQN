@@ -103,29 +103,44 @@ public class Logic implements HttpFunction {
 
 
         HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(300)).build();
-        try {
-            String idToken = getSharedIdToken(url);
+        int maxRetries = 5;
+        int retryCount = 0;
+        boolean success = false;
 
-            if (idToken != null) {
-                // Prepare the HTTP request with the Authorization header
-                java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Authorization", "Bearer " + idToken)
-                    .GET() // Metodo HTTP
-                    .build();
+        while (!success && retryCount < maxRetries) {
+            try {
+                String idToken = getSharedIdToken(url);
 
-                // Make the call
-                java.net.http.HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+                if (idToken != null) {
+                    java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .header("Authorization", "Bearer " + idToken)
+                        .GET()
+                        .build();
 
-                // Process the answer
-                System.out.println("HTTP Version: " + response.version());
-                System.out.println("Status Code: " + response.statusCode());
-                System.out.println("Response Body: " + response.body());
-            } else {
-                System.err.println("Failed to obtain ID token.");
+                    java.net.http.HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+
+                    System.out.println("HTTP Version: " + response.version());
+                    System.out.println("Status Code: " + response.statusCode());
+                    //System.out.println("Response Body: " + response.body());
+                    
+                    success = true; // Se arriviamo qui, la richiesta è andata a buon fine
+                } else {
+                    System.err.println("Failed to obtain ID token.");
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        Thread.sleep(1000); // Attendi 1 secondo prima di riprovare
+                    }
+                }
+            } catch (IOException | InterruptedException e) {
+                retryCount++;
+                if (retryCount < maxRetries) {
+                    System.err.println("Attempt " + retryCount + " failed, retrying...");
+                    Thread.sleep(1000); // Attendi 1 secondo prima di riprovare
+                } else {
+                    e.printStackTrace();
+                }
             }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
         }
 
         #end
