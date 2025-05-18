@@ -138,7 +138,7 @@ public class Logic implements HttpFunction {
                         }
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 retryCount++;
                 if (retryCount < maxRetries) {
                     System.err.println("Attempt " + retryCount + " failed, retrying...");
@@ -330,7 +330,7 @@ public class Logic implements HttpFunction {
         
     }
 
-    private static String getSharedIdToken(String audience) throws IOException, InterruptedException {
+    private static String getSharedIdToken(String audience){
         String token = null;
         try {
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
@@ -348,7 +348,6 @@ public class Logic implements HttpFunction {
             }
         } catch (Exception e) {
             System.err.println("Errore while obtaining the token: " + e.getMessage());
-            throw e;
         }
         
         return token;
