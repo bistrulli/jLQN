@@ -129,14 +129,26 @@ public class Logic implements HttpFunction {
                     System.err.println("Failed to obtain ID token.");
                     retryCount++;
                     if (retryCount < maxRetries) {
-                        Thread.sleep(1000); // Attendi 1 secondo prima di riprovare
+                        try {
+                            Thread.sleep(1000); // Attendi 1 secondo prima di riprovare
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt(); // Ripristina lo stato interrupted
+                            System.err.println("Sleep interrupted: " + ie.getMessage());
+                            break; // Esce dal loop se il thread viene interrotto
+                        }
                     }
                 }
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 retryCount++;
                 if (retryCount < maxRetries) {
                     System.err.println("Attempt " + retryCount + " failed, retrying...");
-                    Thread.sleep(1000); // Attendi 1 secondo prima di riprovare
+                    try {
+                        Thread.sleep(1000); // Attendi 1 secondo prima di riprovare
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt(); // Ripristina lo stato interrupted
+                        System.err.println("Sleep interrupted: " + ie.getMessage());
+                        break; // Esce dal loop se il thread viene interrotto
+                    }
                 } else {
                     e.printStackTrace();
                 }
