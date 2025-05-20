@@ -253,7 +253,7 @@ public class Logic implements HttpFunction {
             this.handleRequest(request, response);
         } catch (Exception e) {
             httpStatusCode = 500; // Internal server error
-            Logic.logger.severe("Error in function: " + e.getMessage());.   
+            Logic.logger.severe("Error in function: " + e.getMessage());
             throw e;
         } 
     }
