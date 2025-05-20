@@ -12,9 +12,15 @@ PROMETHEUS_URL = 'http://localhost:9090'  # Adjust if Prometheus is hosted elsew
 OUTPUT_CSV = 'function_metrics.csv'
 
 # Query templates for Prometheus metrics
-QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(http_requests_total[{duration_m}m])) by (function_name)'
-QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'sum(rate(logic_response_time_seconds_sum[{duration_m}m])) by (function_name) / sum(rate(logic_response_time_seconds_count[{duration_m}m])) by (function_name)'
-QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name)'
+#QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(http_requests_total[{duration_m}m])) by (function_name)'
+QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(stackdriver_cloud_run_revision_run_googleapis_com_request_count[{duration_m}m])) by (service_name)' 
+
+#QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'sum(rate(logic_response_time_seconds_sum[{duration_m}m])) by (function_name) / sum(rate(logic_response_time_seconds_count[{duration_m}m])) by (function_name)'
+QUERY_TEMPLATE_AVG_RESPONSE_TIME = '(sum by (service_name,configuration_name,revision_name) ( rate(stackdriver_cloud_run_revision_run_googleapis_com_request_latencies_sum[{duration_m}m])) / sum by (service_name,configuration_name,revision_name)(rate(stackdriver_cloud_run_revision_run_googleapis_com_request_latencies_count[{duration_m}m])))/1000.0'
+
+#QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name)'
+QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(stackdriver_cloud_run_revision_run_googleapis_com_container_cpu_allocation_time[{duration_m}m])) by (service_name)'
+
 QUERY_TEMPLATE_BILL = 'avg_over_time(stackdriver_cloud_run_revision_run_googleapis_com_container_billable_instance_time[{duration_m}m]) * {duration_s}'
 
 def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
@@ -57,7 +63,7 @@ def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
         print(f"  Unexpected error during query: {e}", file=sys.stderr)
         return None
 
-def process_results(results_dict, query_results, metric_key, label_key='function_name'):
+def process_results(results_dict, query_results, metric_key, label_key='service_name'):
     """Processes Prometheus query results and aggregates them into a dictionary."""
     if query_results is None:
         print(f"  Skipping processing for {metric_key} due to query error.")
@@ -68,7 +74,7 @@ def process_results(results_dict, query_results, metric_key, label_key='function
         func_name = labels.get(label_key)
 
         # Normalize service_name to match function_name format if needed
-        if metric_key == 'bill' and label_key == 'service_name' and func_name:
+        if label_key == 'service_name' and func_name:
             func_name = func_name.capitalize()  # Convert 'entr1' to 'Entr1', etc.
 
         if func_name:
@@ -130,9 +136,9 @@ if __name__ == "__main__":
     # Aggregate query results
     aggregated_results = collections.defaultdict(dict)
     print("\nProcessing results...")
-    process_results(aggregated_results, throughput_results, 'throughput')
-    process_results(aggregated_results, response_time_results, 'avg_response_time')
-    process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result')
+    process_results(aggregated_results, throughput_results, 'throughput', label_key='service_name')
+    process_results(aggregated_results, response_time_results, 'avg_response_time', label_key='service_name')
+    process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result', label_key='service_name')
     process_results(aggregated_results, bill_results, 'bill', label_key='service_name')
 
     # Write results to CSV

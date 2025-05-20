@@ -1,0 +1,25 @@
+metrics,type,name,value
+throughput,entry,Entr0,0.0
+throughput,entry,Entr1,0.2549860256982732
+throughput,entry,Entr2,0.038247904045877905
+throughput,entry,Entr3,0.050997205355078304
+throughput,entry,Entr4,0.06374650668538642
+throughput,entry,Entr5,0.08542031882479928
+throughput,entry,Entr6,0.12749301318302247
+throughput,entry,Entr7,0.25498602587721864
+utilization,proc,Proc0,0.2550115243006663
+utilization,proc,Proc1,0.11986893127954902
+utilization,proc,Proc2,0.06693765652571304
+utilization,proc,Proc3,0.05151227709497929
+utilization,proc,Proc4,0.09817599434094139
+utilization,proc,Proc5,0.004279557973997595
+utilization,proc,Proc6,0.13133055237624983
+utilization,proc,Proc7,0.2728350460137654
+response time,entry,Entr0,Infinity
+response time,entry,Entr1,2.921643545830531
+response time,entry,Entr2,1.7501699909801751
+response time,entry,Entr3,1.0101684993296356
+response time,entry,Entr4,1.5401667905054504
+response time,entry,Entr5,0.05016507463713511
+response time,entry,Entr6,3.170163378810133
+response time,entry,Entr7,1.0700149934314962

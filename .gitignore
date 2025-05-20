@@ -5,6 +5,7 @@ random-LQN-generator/venv/
 random-LQN-generator/__pycache__/
 results-manipulation/__pycache__/
 *.out
+env
 
 target/
 pom.xml.tag

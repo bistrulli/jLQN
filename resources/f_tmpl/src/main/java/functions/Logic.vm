@@ -55,24 +55,24 @@ public class Logic implements HttpFunction {
 
     private static final String FUNCTION_NAME = "$f.getName()";
 
-    private static final PushGateway pushGateway = new PushGateway("${config.getPrometheusIp()}:9091");
+    //private static final PushGateway pushGateway = new PushGateway("${config.getPrometheusIp()}:9091");
 
-    private static final PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+    //private static final PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
 
-    private static final Timer responseTimeTimer = Timer.builder("logic_response_time_seconds")
-        .description("Response time in seconds")
-        .tag("function_name", FUNCTION_NAME)
-        .register(prometheusRegistry);
+    //private static final Timer responseTimeTimer = Timer.builder("logic_response_time_seconds")
+    //    .description("Response time in seconds")
+    //    .tag("function_name", FUNCTION_NAME)
+    //    .register(prometheusRegistry);
 
-    private static final Timer cpuTimeTimer = Timer.builder("logic_cpu_time_seconds")
-        .description("CPU time used in seconds")
-        .tag("function_name", FUNCTION_NAME)
-        .register(prometheusRegistry);
+    //private static final Timer cpuTimeTimer = Timer.builder("logic_cpu_time_seconds")
+    //    .description("CPU time used in seconds")
+    //    .tag("function_name", FUNCTION_NAME)
+    //    .register(prometheusRegistry);
 
-    private static final Counter httpRequestsTotal = Counter.builder("http_requests_total")
-        .description("Total number of HTTP requests")
-        .tag("function_name", FUNCTION_NAME)
-        .register(prometheusRegistry);
+    //private static final Counter httpRequestsTotal = Counter.builder("http_requests_total")
+    //    .description("Total number of HTTP requests")
+    //    .tag("function_name", FUNCTION_NAME)
+    //    .register(prometheusRegistry);
 
 
     static {
@@ -245,7 +245,7 @@ public class Logic implements HttpFunction {
         int httpStatusCode = 200; // Default status code
 
         // Start timers
-        Timer.Sample responseTimeSample = Timer.start(prometheusRegistry);
+        //Timer.Sample responseTimeSample = Timer.start(prometheusRegistry);
         long startCpuTime = mgm.getCurrentThreadCpuTime();
 
         try {
@@ -253,28 +253,9 @@ public class Logic implements HttpFunction {
             this.handleRequest(request, response);
         } catch (Exception e) {
             httpStatusCode = 500; // Internal server error
+            Logic.logger.severe("Error in function: " + e.getMessage());.   
             throw e;
-        } finally {
-            // Update metrics
-            long cpuTimeUsed = mgm.getCurrentThreadCpuTime() - startCpuTime;
-            cpuTimeTimer.record(cpuTimeUsed, TimeUnit.NANOSECONDS);
-            responseTimeSample.stop(responseTimeTimer);
-            httpRequestsTotal.increment();
-
-            if (pushGateway != null) {
-                try {
-                    Map<String, String> groupingKey = Map.of(
-                        "function_name", FUNCTION_NAME,
-                        "status_code", String.valueOf(httpStatusCode),
-                        "instance", INSTANCE_UUID
-                    );
-                    pushGateway.pushAdd(prometheusRegistry.getPrometheusRegistry(), FUNCTION_NAME, groupingKey);
-                } catch (IOException e) {
-                    logger.warning("Failed to push metrics to PushGateway: " + e.getMessage());
-                    //e.printStackTrace();
-                }
-            }
-        }
+        } 
     }
     
     private void handleRequest(HttpRequest request, HttpResponse response) throws IOException {
