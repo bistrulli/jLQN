@@ -177,9 +177,6 @@ public class Logic implements HttpFunction {
 
                     System.out.println("HTTP Version: " + response.version());
                     System.out.println("Status Code: " + response.statusCode());
-                    //System.out.println("Response Body: " + response.body());
-                    
-                    success = true; // Se arriviamo qui, la richiesta è andata a buon fine
                 } else {
                     System.err.println("Failed to obtain ID token.");
                 }
