@@ -164,6 +164,7 @@ public class Logic implements HttpFunction {
         #end
         Thread ${act.getAsyncCall().getSource().toLowerCase()}${act.getAsyncCall().getDest().toLowerCase()}Thread = new Thread(() -> {
             try {
+                HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(300)).build();
                 String idToken = Logic.getSharedIdToken(url);
                 if (idToken != null) {
                     java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
