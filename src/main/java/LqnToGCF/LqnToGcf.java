@@ -31,13 +31,15 @@ import java.util.List;
 
 public class LqnToGcf {
     
-    private Path destPath = Main.projectPath.resolve("output");
+    private Path destPath;
     private VelocityEngine velocityEngine;
     private static Path tmpPath = Main.projectPath.resolve("resources/f_tmpl");
     private static Path tmpLocustPath = Main.projectPath.resolve("resources/driver_tmpl");
     private static Path tmpSysScriptsPath = Main.projectPath.resolve("resources/scripts_sys_tmpl");
 
     public LqnToGcf(App lqnApp) {
+        // Set the destination path from Config
+        this.destPath = Paths.get(Main.config.getOutputDirectory());
         
         //init velocity
         Properties props = new Properties();

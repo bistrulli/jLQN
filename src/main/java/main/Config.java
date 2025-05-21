@@ -11,9 +11,10 @@ public class Config {
     private Boolean sleepOption = false;
     private String prometheusIp;
     private String lqnModelPath;
+    private String outputDirectory;
 
     public Config(String projectName, String regionName, Boolean testOption, Boolean sleepOption, 
-    String prometheusIp, String lqnModelPath) {
+    String prometheusIp, String lqnModelPath, String outputDirectory) {
         this.projectName = projectName;
         this.regionName = regionName;
         this.testOption = testOption;
@@ -26,6 +27,17 @@ public class Config {
             throw new IllegalArgumentException("LQN model path does not exist: " + lqnModelPath);
         }
         this.lqnModelPath = lqnModelPath;
+
+        // Create output directory if it doesn't exist
+        Path outputPath = Paths.get(outputDirectory);
+        try {
+            if (!Files.exists(outputPath)) {
+                Files.createDirectories(outputPath);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Could not create output directory: " + outputDirectory, e);
+        }
+        this.outputDirectory = outputDirectory;
     }
 
     public String getProjectName() {
@@ -50,5 +62,9 @@ public class Config {
 
     public String getLqnModelPath() {
         return lqnModelPath;
+    }
+
+    public String getOutputDirectory() {
+        return outputDirectory;
     }
 }

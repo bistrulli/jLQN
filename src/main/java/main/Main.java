@@ -115,6 +115,10 @@ public class Main {
         prometheusOption.setRequired(true);
         options.addOption(prometheusOption);
 
+        Option outputDirOption = new Option("o", "output", true, "Output directory for generated files");
+        outputDirOption.setRequired(true);
+        options.addOption(outputDirOption);
+
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
 
@@ -126,8 +130,9 @@ public class Main {
             boolean isSleep = cmd.hasOption("sleep");
             String prometheusIp = cmd.getOptionValue("prometheus-ip");
             String lqnPath = cmd.getOptionValue("lqnPath");
+            String outputDir = cmd.getOptionValue("output");
 
-            return new Config(project, region, isTest, isSleep, prometheusIp, lqnPath);
+            return new Config(project, region, isTest, isSleep, prometheusIp, lqnPath, outputDir);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("utility-name", options);
