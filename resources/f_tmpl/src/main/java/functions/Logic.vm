@@ -162,11 +162,26 @@ public class Logic implements HttpFunction {
         #else
         String url =  "https://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getAsyncCall().getDest().toLowerCase()}";
         #end
-        var getRequest = java.net.http.HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
-
         Thread ${act.getAsyncCall().getSource().toLowerCase()}${act.getAsyncCall().getDest().toLowerCase()}Thread = new Thread(() -> {
             try {
-                var getResponse = client.send(getRequest, BodyHandlers.ofString());
+                String idToken = Logic.getSharedIdToken(url);
+                if (idToken != null) {
+                    java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .header("Authorization", "Bearer " + idToken)
+                        .GET()
+                        .build();
+
+                    java.net.http.HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+
+                    System.out.println("HTTP Version: " + response.version());
+                    System.out.println("Status Code: " + response.statusCode());
+                    //System.out.println("Response Body: " + response.body());
+                    
+                    success = true; // Se arriviamo qui, la richiesta è andata a buon fine
+                } else {
+                    System.err.println("Failed to obtain ID token.");
+                }
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
