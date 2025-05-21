@@ -19,7 +19,7 @@ QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(stackdriver_cloud_run_revision_run_goo
 QUERY_TEMPLATE_AVG_RESPONSE_TIME = '(sum by (service_name,configuration_name,revision_name) ( rate(stackdriver_cloud_run_revision_run_googleapis_com_request_latencies_sum[{duration_m}m])) / sum by (service_name,configuration_name,revision_name)(rate(stackdriver_cloud_run_revision_run_googleapis_com_request_latencies_count[{duration_m}m])))/1000.0'
 
 #QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name)'
-QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(stackdriver_cloud_run_revision_run_googleapis_com_container_cpu_allocation_time[{duration_m}m])) by (service_name)'
+QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(stackdriver_cloud_run_revision_run_googleapis_com_container_cpu_usage_sum[{duration_m}m])) by (service_name)'
 
 QUERY_TEMPLATE_BILL = 'avg_over_time(stackdriver_cloud_run_revision_run_googleapis_com_container_billable_instance_time[{duration_m}m]) * {duration_s}'
 

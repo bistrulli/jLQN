@@ -45,6 +45,7 @@ To add new metrics to Stackdriver, follow these steps:
        --monitoring.metrics-prefixes="run.googleapis.com/container/instance_count" \
        --monitoring.metrics-prefixes="run.googleapis.com/container/billable_instance_time" \
        --monitoring.metrics-prefixes="run.googleapis.com/request_count" \
+       --monitoring.metrics-prefixes="run.googleapis.com/container/cpu/usage" \
        --monitoring.metrics-prefixes="run.googleapis.com/container/cpu/utilizations" \
        --monitoring.metrics-prefixes="run.googleapis.com/container/cpu/allocation_time" \
        --monitoring.metrics-prefixes="run.googleapis.com/request_latencies" \
