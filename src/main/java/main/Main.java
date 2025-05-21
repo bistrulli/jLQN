@@ -40,8 +40,7 @@ public class Main {
         projectPath = currentFilePath.getParent().getParent(); 
         // Find the current path (run the jar file from the root of the project)
         
-        //Path directoryPath = projectPath.resolve("resources/wasteless_journal");
-        Path directoryPath = projectPath.resolve("resources/"+config.getLqnModelPath());
+        Path directoryPath = projectPath.resolve(config.getLqnModelPath());
         String wildcardPattern = "*.lqn";
         try {
             Collection<File> matchingFiles = FileUtils.listFiles(directoryPath.toFile(),
