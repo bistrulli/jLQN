@@ -12,3 +12,8 @@ do
 	source deploy.sh
 	cd -
 done
+
+#run the experiments
+cd ./Entr0
+./run_experiments.sh 1 10 0.3
+cd -
