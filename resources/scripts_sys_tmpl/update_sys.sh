@@ -25,8 +25,10 @@ cd "$script_dir" || { echo "Error: Could not cd to script directory '$script_dir
 
 echo "Searching for Entr*/update.sh in $PWD"
 
-# Explicitly iterate over Entr[1-9]* directories (as update_all_functions.sh did)
-# This is safer than a recursive find if the structure is known.
+# Array to store background process IDs
+pids=()
+
+# Explicitly iterate over Entr[1-9]* directories
 for dir in Entr[1-9]*; do
     # Check if it is actually a directory found by globbing
     if [ -d "$dir" ]; then
@@ -35,25 +37,27 @@ for dir in Entr[1-9]*; do
         if [ -f "$update_script" ]; then
             echo "Found script: $update_script"
             echo "Executing $update_script with args $ARG1 $ARG2 $ARG3"
-            # Execute the script passing the arguments
-            sh "$update_script" "$ARG1" "$ARG2" "$ARG3"
-            # Check the execution result
-            if [ $? -ne 0 ]; then
-                echo "Error: Execution failed for $update_script" >&2
-                # You might want to exit here with 'exit 1' if a failure is critical
-            else
-                echo "Successfully executed $update_script"
-                executed_something=1
-            fi
-        # else
-            # echo "Debug: update.sh not found in $dir" # Uncomment for debugging
+            # Execute the script in background and store its PID
+            (
+                sh "$update_script" "$ARG1" "$ARG2" "$ARG3"
+                if [ $? -eq 0 ]; then
+                    echo "Successfully executed $update_script"
+                    executed_something=1
+                else
+                    echo "Error: Execution failed for $update_script" >&2
+                fi
+            ) &
+            pids+=($!)
         fi
-    # else
-        # echo "Debug: '$dir' matched by globbing is not a directory." # Uncomment for debugging
     fi
 done
 
-# Return to the original directory from which the script was called (optional, good practice)
+# Wait for all background processes to complete
+for pid in "${pids[@]}"; do
+    wait $pid
+done
+
+# Return to the original directory from which the script was called
 cd - > /dev/null
 
 if [ $executed_something -eq 0 ]; then
