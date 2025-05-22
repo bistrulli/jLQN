@@ -48,7 +48,7 @@ def save_file(output_folder, filename, text_string):
     with open(f"{output_folder}/{filename}.lqn", "w") as file:
         file.write(text_string)
 
-def random_service_time(lb=0.001, ub=1.0):
+def random_service_time(lb=0.020, ub=3.0):
     """Randomly pick a uniformely distributed number for the service time.
 
     :param lb:  The lower bound of the uniform distribution.
