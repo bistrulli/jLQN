@@ -58,6 +58,10 @@ fi
 # --- Execute Updates ---
 if [ "$num_dirs" -gt 0 ]; then
     echo "Starting update for $num_dirs functions..."
+    
+    # Array to store background process IDs
+    pids=()
+    
     # Iterate through the indices of the directories array
     for index in "${!dirs[@]}"; do
         dir_name="${dirs[index]}"        # Get the directory name (e.g., ./Entr1 relative to script_dir)
@@ -68,13 +72,20 @@ if [ "$num_dirs" -gt 0 ]; then
 
         # Check if the update script exists and is a regular file (-f)
         if [ -f "$update_script" ]; then
-            echo "--------------------------------------------------"
-            # Message indicating execution via sh
-            echo "Running with sh: sh $update_script $concurrency 400 0"
-            echo "--------------------------------------------------"
-            # Execute the update.sh script explicitly using the 'sh' interpreter
-            sh "$update_script" "$concurrency" 400 0
-            echo "Completed for directory: $dir_name"
+            (
+                echo "--------------------------------------------------"
+                # Message indicating execution via sh
+                echo "Running with sh: sh $update_script $concurrency 400 0"
+                echo "--------------------------------------------------"
+                # Execute the update.sh script explicitly using the 'sh' interpreter
+                sh "$update_script" "$concurrency" 400 0
+                if [ $? -eq 0 ]; then
+                    echo "Completed for directory: $dir_name"
+                else
+                    echo "Error: Update failed for directory: $dir_name" >&2
+                fi
+            ) &
+            pids+=($!)
         else
             echo "--------------------------------------------------"
             # Warning message if script is not found or not a regular file
@@ -82,6 +93,13 @@ if [ "$num_dirs" -gt 0 ]; then
             echo "--------------------------------------------------"
         fi
     done
+
+    # Wait for all background processes to complete
+    for pid in "${pids[@]}"; do
+        wait $pid
+    done
+    
+    echo "All updates completed."
 else
     echo "No function directories found to update."
 fi
