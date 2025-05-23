@@ -20,5 +20,5 @@ wait
 
 #run the experiments
 cd ./Entr0
-./run_experiments.sh 1 10 0.3
+./run_experiments.sh 1 10 0.5
 cd -
