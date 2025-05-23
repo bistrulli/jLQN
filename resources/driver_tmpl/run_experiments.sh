@@ -40,8 +40,8 @@ measure_step_time() {
     echo "[Step $step_number] Duration: $duration seconds"
 
     # 1-minute break
-    #echo "Taking a 1-minute break..."
-    #sleep 60
+    echo "Taking a 1-minute break..."
+    sleep 60
 }
 
 # === Input Argument Handling ===

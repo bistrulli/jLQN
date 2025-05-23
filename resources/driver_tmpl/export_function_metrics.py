@@ -63,7 +63,7 @@ def query_prometheus_instant(prometheus_url, query, evaluation_time=None):
         print(f"  Unexpected error during query: {e}", file=sys.stderr)
         return None
 
-def process_results(results_dict, query_results, metric_key, label_key='service_name'):
+def process_results(results_dict, query_results, metric_key, label_key='service_name', entries=None):
     """Processes Prometheus query results and aggregates them into a dictionary."""
     if query_results is None:
         print(f"  Skipping processing for {metric_key} due to query error.")
@@ -76,6 +76,10 @@ def process_results(results_dict, query_results, metric_key, label_key='service_
         # Normalize service_name to match function_name format if needed
         if label_key == 'service_name' and func_name:
             func_name = func_name.capitalize()  # Convert 'entr1' to 'Entr1', etc.
+
+        # Skip if entries is provided and func_name is not in entries
+        if func_name not in entries:
+            continue
 
         if func_name:
             try:
@@ -112,9 +116,12 @@ if __name__ == "__main__":
     parser.add_argument('--minutes', type=int, default=10, help='Time duration in minutes for query ranges (default: 10)')
     parser.add_argument('--output', default=OUTPUT_CSV, help=f'Output CSV filename (default: {OUTPUT_CSV})')
     parser.add_argument('--utilization', type=float, default=0.4, help='Utilization factor for ScaledConc calculation (default: 0.4)')
+    parser.add_argument('--entries', nargs='+', help='List of entries to include in the results')
     args = parser.parse_args()
 
     print(f"Starting Prometheus data export for a duration of {args.minutes} minutes with utilization {args.utilization}...")
+    if args.entries:
+        print(f"Filtering results for entries: {', '.join(args.entries)}")
 
     # Calculate query durations
     duration_m = args.minutes
@@ -136,10 +143,10 @@ if __name__ == "__main__":
     # Aggregate query results
     aggregated_results = collections.defaultdict(dict)
     print("\nProcessing results...")
-    process_results(aggregated_results, throughput_results, 'throughput', label_key='service_name')
-    process_results(aggregated_results, response_time_results, 'avg_response_time', label_key='service_name')
-    process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result', label_key='service_name')
-    process_results(aggregated_results, bill_results, 'bill', label_key='service_name')
+    process_results(aggregated_results, throughput_results, 'throughput', label_key='service_name', entries=args.entries)
+    process_results(aggregated_results, response_time_results, 'avg_response_time', label_key='service_name', entries=args.entries)
+    process_results(aggregated_results, cpu_metric_results, 'cpu_metric_result', label_key='service_name', entries=args.entries)
+    process_results(aggregated_results, bill_results, 'bill', label_key='service_name', entries=args.entries)
 
     # Write results to CSV
     csv_headers = ['Func', 'RPS', 'RT', 'CPU', 'BILL', 'Conc', 'ScaledConc']
