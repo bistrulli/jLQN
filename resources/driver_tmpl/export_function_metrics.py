@@ -13,10 +13,11 @@ OUTPUT_CSV = 'function_metrics.csv'
 
 # Query templates for Prometheus metrics
 #QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(http_requests_total[{duration_m}m])) by (function_name)'
-QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(stackdriver_cloud_run_revision_run_googleapis_com_request_count[{duration_m}m])) by (service_name)' 
+#QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(stackdriver_cloud_run_revision_run_googleapis_com_request_count[{duration_m}m])) by (service_name)' 
+QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(stackdriver_cloud_run_revision_run_googleapis_com_request_latencies_count{response_code="200"}[{duration_m}m])) by (service_name)' 
 
 #QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'sum(rate(logic_response_time_seconds_sum[{duration_m}m])) by (function_name) / sum(rate(logic_response_time_seconds_count[{duration_m}m])) by (function_name)'
-QUERY_TEMPLATE_AVG_RESPONSE_TIME = '(sum by (service_name,configuration_name,revision_name) ( rate(stackdriver_cloud_run_revision_run_googleapis_com_request_latencies_sum[{duration_m}m])) / sum by (service_name,configuration_name,revision_name)(rate(stackdriver_cloud_run_revision_run_googleapis_com_request_latencies_count[{duration_m}m])))/1000.0'
+QUERY_TEMPLATE_AVG_RESPONSE_TIME = '(sum by (service_name,configuration_name,revision_name) ( rate(stackdriver_cloud_run_revision_run_googleapis_com_request_latencies_sum{response_code="200"}[{duration_m}m])) / sum by (service_name,configuration_name,revision_name)(rate(stackdriver_cloud_run_revision_run_googleapis_com_request_latencies_count{response_code="200"}[{duration_m}m])))/1000.0'
 
 #QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(logic_cpu_time_seconds_sum[{duration_m}m])) by (function_name)'
 QUERY_TEMPLATE_AVG_CPU_METRIC = 'sum(rate(stackdriver_cloud_run_revision_run_googleapis_com_container_cpu_usage_sum[{duration_m}m])) by (service_name)'
