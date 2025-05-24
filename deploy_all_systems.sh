@@ -40,6 +40,15 @@ deploy_all_systems() {
         local script_dir="$(dirname "$script_path")"
         local script_name="$(basename "$script_path")"
         
+        # Get the parent directory of the lqn directory
+        local parent_dir="$(dirname "$script_dir")"
+        
+        # Check if experiments directory exists in Entr0
+        if [ -d "$parent_dir/Entr0/experiments" ]; then
+            echo "Skipping $script_path - experiments directory found in Entr0"
+            continue
+        fi
+        
         echo "Executing $script_path"
         
         # Change to the script's directory and execute
