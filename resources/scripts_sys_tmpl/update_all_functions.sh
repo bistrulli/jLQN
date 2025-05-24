@@ -31,7 +31,7 @@ echo "Debug: Changed directory to $PWD to search for functions."
 # sort them numerically (sort -V for version sort),
 # and store them in the 'dirs' array.
 echo "Debug: Searching for Entr[1-9]* directories in $PWD..."
-mapfile -t dirs < <(find . -maxdepth 1 -type d -name 'Entr[1-9]*' | sort -V)
+mapfile -t dirs < <(find . -maxdepth 1 -type d -name 'Entr[1-9]*' | sort)
 
 # --- Argument and Directory Count Check ---
 num_dirs=${#dirs[@]}
