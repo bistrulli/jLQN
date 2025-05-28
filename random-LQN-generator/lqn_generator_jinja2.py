@@ -28,7 +28,7 @@ def generate_random_lqn(folder_path, lqn_id, num_tasks, call_avg, call_var, p_ed
     # The list of tasks that receive calls that are only asynchronous
     async_tasks = random.sample(eligible_async_tasks, int(p_async * len(eligible_async_tasks)))
 
-    eligible_parallel_tasks = [task for task in tasks if len(dag[task]) == 2]
+    eligible_parallel_tasks = [task for task in tasks]
     
     #list(range(1, num_tasks))
     parallel_tasks = random.sample(eligible_parallel_tasks, int(p_parallelism * len(eligible_parallel_tasks)))

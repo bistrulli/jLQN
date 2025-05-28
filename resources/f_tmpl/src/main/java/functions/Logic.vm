@@ -231,12 +231,28 @@ public class Logic implements HttpFunction {
         #end
         Thread ${act}Thread = new Thread(() -> {
             // TBA all the activated Dnodes by ${act} to allow a more complex parallel execution
-            // in this way only asynch call are supported
+            // in this way only synch call are supported
             mainLogic.$act(act_exec);
         });
+        ${act}Thread.setName("${act}");
         act_thread.put("${act}", ${act}Thread);
         act_thread.get("${act}").start();
         #end
+
+        String[] threadToJoin=joinEvt.split("&");
+        // Iterazione sulla HashMap e join di tutti i thread
+        for (String threadName : threadToJoin) {
+            Thread thread = act_thread.get(threadName);
+            try {
+                System.out.println("Waiting for " + thread.getName());
+                thread.join();
+                System.out.println(thread.getName() + " ended");
+            } catch (InterruptedException e) {
+                System.err.println("InterruptedException" + thread.getName() + ": " + e.getMessage());
+                Thread.currentThread().interrupt();
+            }
+        }
+        System.out.println("All threads ended.");
         act_exec.put(joinEvt, true);
     #end
     #if($node.class.getSimpleName()=="ReplyNode")
