@@ -11,6 +11,13 @@ import os  # For filesystem operations
 PROMETHEUS_URL = 'http://localhost:9090'  # Adjust if Prometheus is hosted elsewhere
 OUTPUT_CSV = 'function_metrics.csv'
 
+# Example Prometheus queries for 10m duration:
+# sum(rate(http_requests_total[10m])) by (function_name)
+# sum(rate(logic_response_time_seconds_sum[10m])) by (function_name) / sum(rate(logic_response_time_seconds_count[10m])) by (function_name)
+# sum(rate(logic_cpu_time_seconds_sum[10m])) by (function_name)
+# sum(rate(stackdriver_cloud_run_revision_run_googleapis_com_container_billable_instance_time[10m])) * 600
+
+
 # Query templates for Prometheus metrics
 QUERY_TEMPLATE_AVG_THROUGHPUT = 'sum(rate(http_requests_total[{duration_m}m])) by (function_name)'
 QUERY_TEMPLATE_AVG_RESPONSE_TIME = 'sum(rate(logic_response_time_seconds_sum[{duration_m}m])) by (function_name) / sum(rate(logic_response_time_seconds_count[{duration_m}m])) by (function_name)'
