@@ -88,9 +88,9 @@ class SimpleWorkload(HttpUser):
 		self.act_exec["acti01"] = True;
 		self.doWait(1.0E-4);
 		
-		region = "us-central1"
-		projectId = "syda-serverless-wless"
-		function_full_url = f"https://{region}-{projectId}.cloudfunctions.net/entr1" 
+		#set($region = $config.getRegionName())
+		#set($projectId = $config.getProjectName())
+		function_full_url = f"https://${region}-${projectId}.cloudfunctions.net/entr1" 
 
 		token = self._get_id_token(function_full_url)
 		
