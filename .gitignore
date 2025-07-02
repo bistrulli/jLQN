@@ -1,5 +1,4 @@
 .venv
-random-LQN-generator/
 output/
 random-LQN-generator/venv/
 random-LQN-generator/__pycache__/
