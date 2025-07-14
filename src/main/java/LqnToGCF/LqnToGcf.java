@@ -246,6 +246,19 @@ public class LqnToGcf {
     }
 
     public void updatePlaceholder(Path file, String placeholder, String text) {
+
+        boolean environmentVariables = false;
+        // If text is null, set it to the appropriate shell variable reference
+        if (text == null) {
+            environmentVariables = true;
+            if ("$region".equals(placeholder)) {
+                text = "$REGION_NAME";
+            } else if ("$project".equals(placeholder)) {
+                text = "$PROJECT_NAME";
+            } else {
+                text = "";
+            }
+        }
         File f = file.toFile();
         try {
             Scanner sc = new Scanner(f);
@@ -253,7 +266,13 @@ public class LqnToGcf {
             while (sc.hasNextLine())
                 content += sc.nextLine() + "\n";
             sc.close();
-            content = content.replace(placeholder, text.toLowerCase());
+            if (environmentVariables) {
+                // Replace with environment variable reference
+                content = content.replace(placeholder, text);
+            } else {
+                // Replace with lowercase text
+                content = content.replace(placeholder, text.toLowerCase());
+            }
             try {
                 FileWriter fw = new FileWriter(f);
                 fw.write(content);

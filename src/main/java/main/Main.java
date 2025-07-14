@@ -91,18 +91,44 @@ public class Main {
     private static Config processCommandLineArgs(String[] args) {
         Options options = new Options();
 
-        Option projectName = new Option("p", "project", true, "Project name");
-        projectName.setRequired(true);
+        // Project, region and prometheus-ip options (useful for the configuration of the resulting application)
+        Option projectName = new Option(
+            "p",
+            "project",
+            true,
+            "Project name (if not provided, the resulting code will retrieve the PROJECT_NAME environment variable at runtime)"
+        );
+        projectName.setRequired(false);
         options.addOption(projectName);
 
-        Option lqnPathOpt = new Option("l", "lqnPath", true, "LQN models Directory");
-        lqnPathOpt.setRequired(true);
-        options.addOption(lqnPathOpt);
-
-        Option regionName = new Option("r", "region", true, "Region name");
-        regionName.setRequired(true);
+        Option regionName = new Option(
+            "r",
+            "region",
+            true,
+            "Region name (if not provided, the resulting code will retrieve the REGION_NAME environment variable at runtime)"
+        );
+        regionName.setRequired(false);
         options.addOption(regionName);
 
+        Option prometheusOption = new Option(
+            "pi",
+            "prometheus-ip",
+            true,
+            "The IP address of the Prometheus server (if not provided, the resulting code will retrieve the PROMETHEUS_IP environment variable at runtime)"
+        );
+        prometheusOption.setRequired(false);
+        options.addOption(prometheusOption);
+
+        // Input and output paths
+        Option lqnPathOpt = new Option("l", "lqnPath", true, "LQN models Directory (default: <projectRoot>/resources/wasteless_journal)");
+        lqnPathOpt.setRequired(false);
+        options.addOption(lqnPathOpt);
+
+        Option outputDirOption = new Option("o", "output", true, "Output directory for generated files (default: <projectRoot>/output)");
+        outputDirOption.setRequired(false);
+        options.addOption(outputDirOption);
+
+        // Testing and debugging options
         Option testOption = new Option("t", "test", false, "Local test mode");
         testOption.setRequired(false);
         options.addOption(testOption);
@@ -110,14 +136,6 @@ public class Main {
         Option sleepOption = new Option("s", "sleep", false, "Sleep mode");
         sleepOption.setRequired(false);
         options.addOption(sleepOption);
-
-        Option prometheusOption = new Option("pi", "prometheus-ip", true, "The IP address of the Prometheus server");
-        prometheusOption.setRequired(true);
-        options.addOption(prometheusOption);
-
-        Option outputDirOption = new Option("o", "output", true, "Output directory for generated files");
-        outputDirOption.setRequired(true);
-        options.addOption(outputDirOption);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -129,8 +147,22 @@ public class Main {
             boolean isTest = cmd.hasOption("test");
             boolean isSleep = cmd.hasOption("sleep");
             String prometheusIp = cmd.getOptionValue("prometheus-ip");
+
+            // Default lqnPath to "<projectRoot>/resources/wasteless_journal" if not provided
             String lqnPath = cmd.getOptionValue("lqnPath");
+            if (lqnPath == null) {
+                Path currentFilePath = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).toAbsolutePath();
+                Path projectRoot = currentFilePath.getParent().getParent();
+                lqnPath = projectRoot.resolve("resources/wasteless_journal").toString();
+            }
+
+            // Default output directory to "<projectRoot>/output" if not provided
             String outputDir = cmd.getOptionValue("output");
+            if (outputDir == null) {
+                Path currentFilePath = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).toAbsolutePath();
+                Path projectRoot = currentFilePath.getParent().getParent();
+                outputDir = projectRoot.resolve("output").toString();
+            }
 
             return new Config(project, region, isTest, isSleep, prometheusIp, lqnPath, outputDir);
         } catch (ParseException e) {
