@@ -7,6 +7,9 @@ VALIDATION_CSV_PATH="./experiments/validation_metrics.csv"
 # CSV file to log step times
 STEP_TIMES_CSV="./experiments/step_times.csv"
 
+# Set the concurrency parameter
+CONCURRENCY_PARAM=400
+
 # === Function Definitions ===
 # Function to print error messages and exit
 error_exit() {
@@ -83,8 +86,8 @@ measure_step_time 2 "Validation profile run" ./profile.sh validation 5 "$DURATIO
 echo "[Step 2/8] Completed. Validation CSV expected at '$VALIDATION_CSV_PATH'"
 
 # Step 3: Update system for NC profile
-log_step 3 8 "Updating system for NC profile (1, 400, 1)..."
-measure_step_time 3 "Update system for NC profile" ../update_sys.sh 1 400 0 || error_exit "Step 3 failed: ../update_sys.sh 1 400 0"
+log_step 3 8 "Updating system for NC profile (1, $CONCURRENCY_PARAM, 1)..."
+measure_step_time 3 "Update system for NC profile" ../update_sys.sh 1 $CONCURRENCY_PARAM 0 || error_exit "Step 3 failed: ../update_sys.sh 1 $CONCURRENCY_PARAM 0"
 echo "[Step 3/8] Completed."
 
 log_step 2 8 "Waiting for Validation profile to Cool Down..."
@@ -98,8 +101,8 @@ echo "[Step 4/8] Completed."
 ../waitWarmIstance.sh
 
 # Step 5: Update system for GCR profile
-log_step 5 8 "Updating system for GCR profile (80, 400, 0)..."
-measure_step_time 5 "Update system for GCR profile" ../update_sys.sh 80 400 0 || error_exit "Step 5 failed: ../update_sys.sh 80 400 0"
+log_step 5 8 "Updating system for GCR profile (80, $CONCURRENCY_PARAM, 0)..."
+measure_step_time 5 "Update system for GCR profile" ../update_sys.sh 80 $CONCURRENCY_PARAM 0 || error_exit "Step 5 failed: ../update_sys.sh 80 $CONCURRENCY_PARAM 0"
 echo "[Step 5/8] Completed."
 
 log_step 4 8 "Waiting for NC profile to Cool Down..."
