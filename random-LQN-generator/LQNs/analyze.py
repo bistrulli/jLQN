@@ -18,6 +18,7 @@ def analyze_file(file_path):
     async_call_count = 0
     probabilistic_choice_count = 0
     ampersand_line_count = 0
+    found_first_y = False  # Flag to track if the first 'y' has been found
 
     try:
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -29,7 +30,10 @@ def analyze_file(file_path):
 
                 # Count synchronous ('y') and asynchronous ('z') calls
                 if stripped_line.startswith('y'):
-                    synch_call_count += 1
+                    if not found_first_y:
+                        found_first_y = True  # Mark the first 'y' as found and ignore it for the count.
+                    else:
+                        synch_call_count += 1  # Count all subsequent 'y's.
                 elif stripped_line.startswith('z'):
                     async_call_count += 1
 

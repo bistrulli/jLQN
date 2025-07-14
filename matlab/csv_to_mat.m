@@ -3,7 +3,7 @@ clear; % Pulisce il workspace
 % Nome del file CSV di input
 %filename = 'experiment_data.csv';
 
-filename = 'async_exp_data.csv';
+filename = 'paral_experiment_data.csv';
 
 % Carica i dati dal file CSV
 try
@@ -77,7 +77,7 @@ end
 
 
 % Nome del file .mat di output
-output_mat_file = 'async_exp_data_processed.mat';
+output_mat_file = 'paral_exp_data_processed.mat';
 
 % Salva le variabili nel file .mat
 save(output_mat_file, 'gcrRtAvg', 'wlRtAvg', 'ncRtAvg', 'gcrBillAvg', 'wlBillAvg', 'ncBillAvg');

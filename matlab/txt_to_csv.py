@@ -20,7 +20,7 @@ def extract_and_save_data(input_txt_file, output_csv_file):
 
     # Split the content into blocks for each experiment
     # Each block starts with "==================================================\nRunning comparison in: /home/rpizziol/jLQN/output/20250523/" 
-    experiment_blocks = re.split(r'==================================================\nRunning comparison in: /home/rpizziol/jLQN/output/20250523/', content)
+    experiment_blocks = re.split(r'==================================================\nRunning comparison in: /home/robb/git/jLQN/output/experiments_paper/', content)
 
     # The first element of experiment_blocks will be empty or just the initial header, so we skip it
     for block in experiment_blocks[1:]:
