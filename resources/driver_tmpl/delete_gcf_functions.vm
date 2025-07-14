@@ -1,7 +1,10 @@
 #! /bin/sh
 
 # Specify the region
-REGION="$config.getRegionName()"
+REGION="$!{config.getRegionName()}"
+if [ -z "$REGION" ]; then
+  REGION="$REGION_NAME"
+fi
 
 # List all functions in the specified region
 echo "Fetching list of functions in region '${REGION}'..."

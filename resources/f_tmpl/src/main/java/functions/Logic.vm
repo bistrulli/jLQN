@@ -94,11 +94,22 @@ public class Logic implements HttpFunction {
     public void $act.getName()(Map<String, Boolean> act_exec) {
         act_exec.put("$act.getName()", true);
         this.doWork($act.getDemand());
+        
+        String regionName = "$!{config.getRegionName()}";
+        if (regionName == null || regionName.isEmpty() || regionName.startsWith("$")) {
+            regionName = System.getenv("REGION_NAME");
+        }
+
+        String projectName = "$!{config.getProjectName()}";
+        if (projectName == null || projectName.isEmpty() || projectName.startsWith("$")) {
+            projectName = System.getenv("PROJECT_NAME");
+        }
+        
         #if ($act.getCall() != $null)
         #if(${config.getTestOption()})
-        String url = "http://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
+        String url = "http://" + regionName + "-" + projectName + ".cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
         #else
-        String url = "https://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
+        String url = "https://" + regionName + "-" + projectName + ".cloudfunctions.net/${act.getCall().getDest().toLowerCase()}";
         #end
 
 
@@ -124,17 +135,17 @@ public class Logic implements HttpFunction {
                     System.out.println("Status Code: " + response.statusCode());
                     //System.out.println("Response Body: " + response.body());
                     
-                    success = true; // Se arriviamo qui, la richiesta è andata a buon fine
+                    success = true; // If we get here, the request was successful
                 } else {
                     System.err.println("Failed to obtain ID token.");
                     retryCount++;
                     if (retryCount < maxRetries) {
                         try {
-                            Thread.sleep(1000); // Attendi 1 secondo prima di riprovare
+                            Thread.sleep(1000); // Wait 1 second before retrying
                         } catch (InterruptedException ie) {
-                            Thread.currentThread().interrupt(); // Ripristina lo stato interrupted
+                            Thread.currentThread().interrupt(); // Restore the interrupted status
                             System.err.println("Sleep interrupted: " + ie.getMessage());
-                            break; // Esce dal loop se il thread viene interrotto
+                            break; // Exit the loop if the thread is interrupted
                         }
                     }
                 }
@@ -143,11 +154,11 @@ public class Logic implements HttpFunction {
                 if (retryCount < maxRetries) {
                     System.err.println("Attempt " + retryCount + " failed, retrying...");
                     try {
-                        Thread.sleep(30000); // Attendi 1 secondo prima di riprovare
+                        Thread.sleep(30000); // Wait 30 seconds before retrying
                     } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt(); // Ripristina lo stato interrupted
+                        Thread.currentThread().interrupt(); // Restore the interrupted status
                         System.err.println("Sleep interrupted: " + ie.getMessage());
-                        break; // Esce dal loop se il thread viene interrotto
+                        break; // Exit the loop if the thread is interrupted
                     }
                 } else {
                     e.printStackTrace();
@@ -158,9 +169,9 @@ public class Logic implements HttpFunction {
         #end
         #if ($act.getAsyncCall() != $null)
         #if(${config.getTestOption()})
-        String url =  "http://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getAsyncCall().getDest().toLowerCase()}";
+        String url =  "http://" + regionName + "-" + projectName + ".cloudfunctions.net/${act.getAsyncCall().getDest().toLowerCase()}";
         #else
-        String url =  "https://${config.getRegionName()}-${config.getProjectName()}.cloudfunctions.net/${act.getAsyncCall().getDest().toLowerCase()}";
+        String url =  "https://" + regionName + "-" + projectName + ".cloudfunctions.net/${act.getAsyncCall().getDest().toLowerCase()}";
         #end
         Thread ${act.getAsyncCall().getSource().toLowerCase()}${act.getAsyncCall().getDest().toLowerCase()}Thread = new Thread(() -> {
             try {
@@ -240,7 +251,7 @@ public class Logic implements HttpFunction {
         #end
 
         String[] threadToJoin=joinEvt.split("&");
-        // Iterazione sulla HashMap e join di tutti i thread
+        // Iterate over the HashMap and join all threads
         for (String threadName : threadToJoin) {
             Thread thread = act_thread.get(threadName);
             try {
@@ -357,7 +368,7 @@ public class Logic implements HttpFunction {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("Errore while obtaining the token: " + e.getMessage());
+            System.err.println("Error while obtaining the token: " + e.getMessage());
         }
         
         return token;
